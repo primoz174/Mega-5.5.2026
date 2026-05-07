@@ -98,3 +98,40 @@ html.lenis body {
 .animate-scan {
   animation: scan-line 4s linear infinite;
 }
+
+/* HoverBorderGradient — rotating light ring around button border */
+@property --hbg-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes hbg-spin {
+  to { --hbg-angle: 360deg; }
+}
+
+.hbg-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  animation: hbg-spin 3s linear infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hbg-ring-idle {
+  background: conic-gradient(from var(--hbg-angle), transparent 75%, rgba(255,255,255,0.55) 88%, transparent 100%);
+  filter: blur(1.5px);
+  opacity: 1;
+  transition: opacity 0.35s ease;
+}
+
+.hbg-ring-hover {
+  background: conic-gradient(from var(--hbg-angle), transparent 60%, #0071e3 78%, #34d399 88%, transparent 100%);
+  filter: blur(2.5px);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.hbg-root:hover .hbg-ring-idle { opacity: 0; }
+.hbg-root:hover .hbg-ring-hover { opacity: 1; }
