@@ -14,7 +14,6 @@ const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const [isHeroLoaded, setIsHeroLoaded] = useState(false);
   const location = useLocation();
-  const isHome = location.pathname === '/';
 
   useEffect(() => {
     const handleHeroLoaded = () => setIsHeroLoaded(true);
@@ -25,7 +24,6 @@ const Navbar: React.FC = () => {
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
-
       const sections = ['home', 'services', 'about', 'contact'];
       for (const section of sections) {
         const element = document.getElementById(section);
@@ -42,7 +40,6 @@ const Navbar: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Lock body scroll AND stop Lenis when mobile menu is open
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = 'hidden';
@@ -65,22 +62,15 @@ const Navbar: React.FC = () => {
       navigate('/#' + id);
       return;
     }
-
     if (location.pathname !== '/' && id === 'home') {
       navigate('/');
       return;
     }
-
     const element = document.getElementById(id);
     if (element) {
-      const navbarHeight = 50;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - navbarHeight;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth"
-      });
+      const offsetPosition =
+        element.getBoundingClientRect().top + window.pageYOffset - 50;
+      window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
       setIsMobileMenuOpen(false);
     }
   };
@@ -88,20 +78,20 @@ const Navbar: React.FC = () => {
   const navLinks = [
     { name: t.nav.home, id: 'home' },
     { name: t.nav.services, id: 'services', isPage: true, path: '/storitve' },
-    { 
-      name: language === 'sl' ? 'Ekspertiza' : 'Expertise', 
-      id: 'expertise', 
+    {
+      name: language === 'sl' ? 'Ekspertiza' : 'Expertise',
+      id: 'expertise',
       isDropdown: true,
       subLinks: [
         { name: t.nav.certificates, path: '/certifikati' },
         { name: t.nav.industries, path: '/panoge' },
-        { name: t.nav.equipment, path: '/oprema' }
-      ]
+        { name: t.nav.equipment, path: '/oprema' },
+      ],
     },
     { name: t.personnel.hero_title, id: 'personnel', isPage: true, path: '/personnel' },
     { name: t.nav.blog, id: 'blog', isPage: true, path: '/blog' },
     { name: t.nav.about, id: 'about', isPage: true, path: '/about' },
-    { name: t.nav.contact, id: 'contact' },
+    { name: t.nav.contact, id: 'contact', isCta: true },
   ];
 
   const toggleLanguage = () => {
@@ -110,155 +100,242 @@ const Navbar: React.FC = () => {
 
   return (
     <>
-      <header
-        className={`fixed left-0 right-0 z-50 transition-all duration-200 flex justify-center ${isScrolled
-          ? 'top-4 px-4'
-          : 'top-0 px-6'
-          }`}
+      <motion.header
+        className="fixed left-0 right-0 z-50 flex justify-center px-4 md:px-5"
+        animate={{ top: isScrolled ? 10 : 0 }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         style={{ pointerEvents: 'none' }}
       >
-        <div 
-          style={{ pointerEvents: 'auto' }}
-          className={`w-[100%] transition-all duration-200 flex items-center justify-between ${isScrolled
-            ? 'max-w-[1200px] bg-white/[0.05] backdrop-blur-2xl rounded-full px-4 md:px-6 py-2.5 shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.2)] border border-white/10'
-            : 'max-w-[1200px] bg-transparent py-4'
-          }`}
-        >
-          {/* Left: Logo */}
-            <div className="flex-1 flex items-center justify-start min-w-[70px] relative h-10 md:h-12">
-              <button 
-                onClick={() => scrollToSection('home')} 
-                className="flex items-center group focus:outline-none absolute left-0 origin-left"
-              >
-                <motion.img
-                  layoutId="hero-logo-img"
-                  transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
-                  src="https://megama.si/wp-content/uploads/2021/01/cropped-cropped-website_logo_transparent_background-1-1.png"
-                  alt="MEGAMA"
-                  className="h-10 md:h-12 w-auto object-contain"
-                />
-              </button>
-            </div>
-
-          {/* Center: Desktop Nav */}
-          <div className="hidden lg:flex flex-[2] items-center justify-center space-x-1 lg:space-x-4">
-            <nav className="flex items-center space-x-1 lg:space-x-2">
-              {navLinks.map((link) => {
-                const isActive = link.isPage 
-                  ? location.pathname === link.path
-                  : activeSection === link.id && location.pathname === '/';
-
-                if (link.isDropdown) {
-                  return (
-                    <div key={link.id} className="relative group">
-                      <button className="relative text-[11px] lg:text-xs font-bold tracking-[0.1em] uppercase transition-all duration-300 px-3 py-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-[#1d1d1f] dark:text-gray-200 opacity-70 hover:opacity-100 flex items-center gap-1">
-                        {link.name}
-                        <ChevronDown className="w-3 h-3 group-hover:rotate-180 transition-transform duration-300" />
-                      </button>
-                      <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-56 bg-white dark:bg-[#1a1a1a] rounded-2xl shadow-2xl border border-black/5 dark:border-white/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 flex flex-col p-2 z-50">
-                          {link.subLinks?.map(sub => (
-                            <Link key={sub.name} to={sub.path} className="text-[10px] font-bold tracking-wider uppercase px-4 py-3 hover:bg-apple-blue/10 dark:hover:bg-white/5 rounded-xl text-[#1d1d1f] dark:text-white transition-colors whitespace-nowrap block border border-transparent hover:border-apple-blue/20">
-                              {sub.name}
-                            </Link>
-                          ))}
-                      </div>
-                    </div>
-                  );
+        <motion.div
+          style={{
+            pointerEvents: 'auto',
+            border: '1px solid',
+            position: 'relative',
+            willChange: 'border-color, background-color, border-radius, box-shadow',
+          }}
+          className="w-full max-w-[1200px] flex items-center justify-between"
+          animate={
+            isScrolled
+              ? {
+                  paddingLeft: 18,
+                  paddingRight: 18,
+                  paddingTop: 8,
+                  paddingBottom: 8,
+                  borderRadius: 20,
+                  backgroundColor: 'rgba(4, 4, 4, 0.82)',
+                  borderColor: 'rgba(255, 255, 255, 0.09)',
+                  boxShadow:
+                    '0 8px 40px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.05)',
                 }
+              : {
+                  paddingLeft: 0,
+                  paddingRight: 0,
+                  paddingTop: 18,
+                  paddingBottom: 18,
+                  borderRadius: 0,
+                  backgroundColor: 'rgba(0, 0, 0, 0)',
+                  borderColor: 'rgba(255, 255, 255, 0)',
+                  boxShadow: '0 0px 0px rgba(0,0,0,0)',
+                }
+          }
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        >
+          {/* Backdrop blur layer — separate div so opacity animates smoothly */}
+          <div
+            className={`absolute inset-0 pointer-events-none transition-opacity duration-500 ${isScrolled ? 'opacity-100' : 'opacity-0'}`}
+            style={{ backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderRadius: 'inherit' }}
+          />
+          {/* Logo */}
+          <div className="flex-1 flex items-center justify-start min-w-[70px] relative h-10 md:h-12">
+            <button
+              onClick={() => scrollToSection('home')}
+              className="absolute left-0 origin-left focus:outline-none"
+            >
+              <motion.img
+                layoutId="hero-logo-img"
+                transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
+                src="https://megama.si/wp-content/uploads/2021/01/cropped-cropped-website_logo_transparent_background-1-1.png"
+                alt="MEGAMA"
+                className="h-10 md:h-12 w-auto object-contain"
+              />
+            </button>
+          </div>
 
-                return link.isPage ? (
-                  <Link
-                    key={link.name}
-                    to={link.path || '/'}
-                    className={`relative text-[11px] lg:text-xs font-bold tracking-[0.1em] uppercase transition-all duration-300 px-3 py-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 ${
-                      isActive
-                        ? 'text-apple-blue'
-                        : 'text-[#1d1d1f] dark:text-gray-200 opacity-70 hover:opacity-100'
-                    }`}
-                  >
-                    {link.name}
-                    {isActive && (
-                      <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-apple-blue rounded-full" />
-                    )}
-                  </Link>
-                ) : (
+          {/* Desktop Nav */}
+          <nav className="hidden lg:flex flex-[2] items-center justify-center gap-0.5">
+            {navLinks.map((link) => {
+              const isActive = link.isPage
+                ? location.pathname === link.path
+                : activeSection === link.id && location.pathname === '/';
+
+              if (link.isCta) {
+                return (
                   <button
                     key={link.name}
                     onClick={() => scrollToSection(link.id)}
-                    className={`relative text-[11px] lg:text-xs font-bold tracking-[0.1em] uppercase transition-all duration-300 px-3 py-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 ${
-                      isActive
-                        ? 'text-[#1d1d1f] dark:text-white opacity-100'
-                        : 'text-[#1d1d1f] dark:text-gray-200 opacity-70 hover:opacity-100'
-                    }`}
+                    className="ml-1.5 px-4 py-2 rounded-[10px] text-[11px] font-semibold tracking-[0.08em] uppercase text-[#0071e3] bg-[#0071e3]/[0.08] border border-[#0071e3]/[0.22] hover:bg-[#0071e3]/[0.14] hover:border-[#0071e3]/[0.4] hover:shadow-[0_0_18px_rgba(0,113,227,0.18)] transition-all duration-250"
                   >
                     {link.name}
-                    {isActive && (
-                      <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-[#1d1d1f] dark:bg-white rounded-full" />
-                    )}
                   </button>
                 );
-              })}
-            </nav>
-          </div>
+              }
 
-          <div className="hidden lg:flex flex-1 items-center justify-end gap-3">
+              if (link.isDropdown) {
+                return (
+                  <div key={link.id} className="relative group">
+                    <button className="flex items-center gap-1 px-3 py-2 rounded-[10px] text-[11px] font-medium tracking-[0.06em] uppercase text-white/45 hover:text-white/90 hover:bg-white/[0.07] transition-all duration-200">
+                      {link.name}
+                      <ChevronDown className="w-3 h-3 opacity-60 group-hover:rotate-180 transition-transform duration-300" />
+                    </button>
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2.5 w-52 bg-[#080808] rounded-2xl border border-white/[0.09] shadow-[0_20px_60px_rgba(0,0,0,0.7)] opacity-0 invisible pointer-events-none group-hover:opacity-100 group-hover:visible group-hover:pointer-events-auto translate-y-1 group-hover:translate-y-0 transition-all duration-250 flex flex-col p-1.5 z-50">
+                      {link.subLinks?.map((sub) => (
+                        <Link
+                          key={sub.name}
+                          to={sub.path}
+                          className="px-4 py-2.5 rounded-xl text-[11px] font-medium tracking-[0.06em] uppercase text-white/50 hover:text-white hover:bg-white/[0.06] transition-all duration-150 whitespace-nowrap block"
+                        >
+                          {sub.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+
+              return link.isPage ? (
+                <Link
+                  key={link.name}
+                  to={link.path || '/'}
+                  className={`relative px-3 py-2 rounded-[10px] text-[11px] font-medium tracking-[0.06em] uppercase transition-all duration-200 ${
+                    isActive
+                      ? 'text-white bg-white/[0.08]'
+                      : 'text-white/45 hover:text-white/90 hover:bg-white/[0.07]'
+                  }`}
+                >
+                  {link.name}
+                  {isActive && (
+                    <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#0071e3]" />
+                  )}
+                </Link>
+              ) : (
+                <button
+                  key={link.name}
+                  onClick={() => scrollToSection(link.id)}
+                  className={`relative px-3 py-2 rounded-[10px] text-[11px] font-medium tracking-[0.06em] uppercase transition-all duration-200 ${
+                    isActive
+                      ? 'text-white bg-white/[0.08]'
+                      : 'text-white/45 hover:text-white/90 hover:bg-white/[0.07]'
+                  }`}
+                >
+                  {link.name}
+                  {isActive && (
+                    <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#0071e3]" />
+                  )}
+                </button>
+              );
+            })}
+          </nav>
+
+          {/* Right: Language + Mobile Toggle */}
+          <div className="flex-1 flex items-center justify-end gap-2.5">
             <button
               onClick={toggleLanguage}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#f2c94c] hover:bg-[#e6be48] text-black shadow-sm transition-all hover:shadow-md"
+              className="hidden lg:flex items-center gap-1.5 px-3.5 py-2 rounded-[10px] bg-white/[0.05] border border-white/[0.1] text-white/50 text-[11px] font-semibold tracking-wider uppercase hover:bg-white/[0.09] hover:border-white/[0.2] hover:text-white/85 transition-all duration-200"
               title={language === 'sl' ? 'Switch to English' : 'Preklopi na slovenščino'}
             >
               <Globe className="w-3.5 h-3.5" />
-              <span className="text-[11px] font-extrabold tracking-wider">{language === 'sl' ? 'EN' : 'SL'}</span>
+              {language === 'sl' ? 'EN' : 'SL'}
             </button>
-          </div>
 
-          {/* Mobile Toggle */}
-          <div className="flex items-center lg:hidden gap-3 justify-end flex-1">
-            <button
-              onClick={toggleLanguage}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#f2c94c] hover:bg-[#e6be48] text-black shadow-sm transition-all hover:shadow-md"
-            >
-              <Globe className="w-3.5 h-3.5" />
-              <span className="text-[11px] font-extrabold tracking-wider">{language === 'sl' ? 'EN' : 'SL'}</span>
-            </button>
-            <button
-              onClick={() => setIsMobileMenuOpen(true)}
-              className="p-2 text-[#1d1d1f] dark:text-industrial-text bg-black/5 dark:bg-white/10 rounded-full"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
+            <div className="flex items-center lg:hidden gap-2">
+              <button
+                onClick={toggleLanguage}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-[10px] bg-white/[0.06] border border-white/[0.1] text-white/55 text-[11px] font-semibold tracking-wider uppercase transition-all duration-200"
+              >
+                <Globe className="w-3.5 h-3.5" />
+                {language === 'sl' ? 'EN' : 'SL'}
+              </button>
+              <button
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="p-2.5 text-white/55 bg-white/[0.06] border border-white/[0.1] rounded-[10px] hover:text-white hover:bg-white/[0.1] transition-all duration-200"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+            </div>
           </div>
-        </div>
-      </header>
+        </motion.div>
+      </motion.header>
 
-      {/* Mobile Menu Overlay */}
+      {/* Mobile overlay */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: '100vh' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="fixed inset-0 bg-white dark:bg-industrial-black z-[60] flex flex-col px-6 py-4 lg:hidden"
+            key="overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[55] lg:hidden"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Mobile drawer */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            key="drawer"
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed top-0 right-0 h-full w-[82vw] max-w-[340px] bg-[#050505] border-l border-white/[0.07] z-[60] flex flex-col lg:hidden"
           >
-            <div className="flex justify-end mb-8">
+            <div className="flex items-center justify-between px-6 py-5 border-b border-white/[0.07]">
+              <span className="font-mono text-[10px] tracking-[0.3em] text-white/25 uppercase">
+                Navigacija
+              </span>
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="p-2 text-[#1d1d1f] dark:text-industrial-text"
+                className="p-2 text-white/35 hover:text-white/80 bg-white/[0.05] rounded-xl transition-colors"
               >
-                <X className="w-6 h-6" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            <nav className="flex flex-col space-y-4 overflow-y-auto pb-20">
+            <nav className="flex flex-col px-4 py-5 gap-1 overflow-y-auto flex-1">
               {navLinks.map((link) => {
+                const isActive = link.isPage
+                  ? location.pathname === link.path
+                  : activeSection === link.id && location.pathname === '/';
+
+                if (link.isCta) {
+                  return (
+                    <button
+                      key={link.name}
+                      onClick={() => scrollToSection(link.id)}
+                      className="mt-3 w-full text-left px-5 py-4 rounded-2xl text-[15px] font-semibold tracking-tight text-[#0071e3] bg-[#0071e3]/[0.08] border border-[#0071e3]/[0.2] hover:bg-[#0071e3]/[0.14] hover:border-[#0071e3]/[0.35] transition-all duration-200"
+                    >
+                      {link.name}
+                    </button>
+                  );
+                }
+
                 if (link.isDropdown) {
                   return (
-                    <div key={link.id} className="flex flex-col border-b border-black/10 dark:border-white/10 py-3">
-                      <span className="text-left text-sm font-bold font-mono text-gray-500 mb-4">{link.name} //</span>
-                      <div className="flex flex-col space-y-4 pl-4 border-l border-apple-blue/20 ml-2">
-                        {link.subLinks?.map(sub => (
-                          <Link key={sub.name} to={sub.path} onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-bold font-mono text-[#1d1d1f] dark:text-industrial-text hover:text-apple-blue transition-colors">
+                    <div key={link.id} className="flex flex-col">
+                      <div className="px-5 py-2.5 text-[10px] font-semibold tracking-[0.15em] uppercase text-white/25">
+                        {link.name}
+                      </div>
+                      <div className="flex flex-col gap-0.5 pl-4 border-l border-white/[0.07] ml-5 mb-1">
+                        {link.subLinks?.map((sub) => (
+                          <Link
+                            key={sub.name}
+                            to={sub.path}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="px-4 py-3 rounded-xl text-[13px] font-medium text-white/50 hover:text-white/90 hover:bg-white/[0.05] transition-all duration-150"
+                          >
                             {sub.name}
                           </Link>
                         ))}
@@ -266,13 +343,17 @@ const Navbar: React.FC = () => {
                     </div>
                   );
                 }
-                
+
                 return link.isPage ? (
                   <Link
                     key={link.name}
                     to={link.path || '/'}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className={`text-left text-2xl font-bold font-mono py-3 border-b border-black/10 dark:border-white/10 ${location.pathname === link.path ? 'text-apple-blue' : 'text-[#1d1d1f] dark:text-industrial-text'}`}
+                    className={`px-5 py-3.5 rounded-2xl text-[15px] font-medium transition-all duration-150 ${
+                      isActive
+                        ? 'text-white bg-white/[0.07] border border-white/[0.09]'
+                        : 'text-white/50 hover:text-white/90 hover:bg-white/[0.05]'
+                    }`}
                   >
                     {link.name}
                   </Link>
@@ -280,33 +361,43 @@ const Navbar: React.FC = () => {
                   <button
                     key={link.name}
                     onClick={() => scrollToSection(link.id)}
-                    className="text-left text-2xl font-bold font-mono text-[#1d1d1f] dark:text-industrial-text py-3 border-b border-black/10 dark:border-white/10"
+                    className={`text-left px-5 py-3.5 rounded-2xl text-[15px] font-medium transition-all duration-150 ${
+                      isActive
+                        ? 'text-white bg-white/[0.07] border border-white/[0.09]'
+                        : 'text-white/50 hover:text-white/90 hover:bg-white/[0.05]'
+                    }`}
                   >
                     {link.name}
                   </button>
                 );
               })}
-
-              <button
-                onClick={() => { toggleLanguage(); setIsMobileMenuOpen(false); }}
-                className="text-left text-xl font-medium text-[#1d1d1f] dark:text-industrial-text py-3 mt-4 flex items-center gap-3 border-b border-black/10 dark:border-white/10"
-              >
-                <Globe className="w-6 h-6" />
-                <span className="flex items-center gap-2">
-                  <span className={language === 'sl' ? 'text-apple-blue font-bold' : 'text-gray-400'}>SL</span>
-                  <span className="text-gray-300">/</span>
-                  <span className={language === 'en' ? 'text-apple-blue font-bold' : 'text-gray-400'}>EN</span>
-                </span>
-              </button>
             </nav>
 
-            <div className="absolute inset-0 z-[-1] pointer-events-none opacity-20 dark:opacity-20 opacity-5">
-              <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.05)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:40px_40px]" />
+            <div className="px-4 py-5 border-t border-white/[0.07]">
+              <button
+                onClick={() => { toggleLanguage(); setIsMobileMenuOpen(false); }}
+                className="w-full flex items-center justify-between px-5 py-4 rounded-2xl bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.07] transition-all duration-200"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Globe className="w-4 h-4 text-white/35" />
+                  <span className="text-[13px] font-medium text-white/50">
+                    {language === 'sl' ? 'Slovenščina' : 'English'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className={`text-[11px] font-bold tracking-wider px-2 py-1 rounded-lg ${language === 'sl' ? 'text-white bg-white/[0.1]' : 'text-white/25'}`}>
+                    SL
+                  </span>
+                  <span className="text-white/15">/</span>
+                  <span className={`text-[11px] font-bold tracking-wider px-2 py-1 rounded-lg ${language === 'en' ? 'text-white bg-white/[0.1]' : 'text-white/25'}`}>
+                    EN
+                  </span>
+                </div>
+              </button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-
     </>
   );
 };
