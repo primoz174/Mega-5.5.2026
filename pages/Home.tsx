@@ -7,7 +7,6 @@ import Services from '../components/Services';
 import WhyMegama from '../components/WhyMegama';
 import VerticalTabs from '../components/ui/vertical-tabs';
 import { HoverBorderGradient } from '../components/ui/hover-border-gradient';
-import povprasevanjeImage from '../src/assets/images/regenerated_image_1778013338863.jpg';
 
 const HERO_BG = '/images/home/hero-bg.webp';
 const RECIPIENT_EMAIL = 'info@megama.si';
@@ -299,26 +298,26 @@ function StatCell({ item, delay }: { item: StatItem; delay: number }) {
 const STEPS = [
   {
     id: '01',
-    title: 'Povpraševanje',
-    description: 'Oddate povpraševanje za vaš projekt. V 24 urah vam vrnemo prvi odziv in vprašanja.',
-    image: povprasevanjeImage,
+    title: 'Oddajte povpraševanje',
+    description: 'Pošljite specifikacije vašega projekta. Naša ekipa strokovnjakov (Level III) bo pregledala zahteve in vam v 24 urah pripravila prvi odziv.',
+    image: '/images/home/cap-04-svetovanje.webp',
   },
   {
     id: '02',
-    title: 'Tehnični načrt',
-    description: 'Izberemo optimalno metodo (UT, RT, MT, PT, VT) in osebje z ustreznim nivojem certifikacije (Level II/III) glede na zahteve standardov ASME ali ISO.',
+    title: 'Inženirska priprava',
+    description: 'Izberemo optimalno NDT metodo in opremo (npr. UT, RT, MT) ter pripravimo načrt preiskav, ki je v celoti skladen s standardi ASME ali ISO.',
     image: '/images/home/cap-01-ndt.webp',
   },
   {
     id: '03',
-    title: 'Izvedba na terenu',
-    description: 'Mobilna ekipa izvede preiskave z vrhunsko opremo (npr. Olympus/Evident). Zagotavljamo izvedbo brez motenj vaših delovnih procesov.',
+    title: 'Brezhibna izvedba',
+    description: 'Naša mobilna ekipa izvede preiskave na terenu hitro in natančno. Zagotavljamo delo brez prekinitev vaših ključnih delovnih procesov.',
     image: '/images/home/cap-02-nadzori.webp',
   },
   {
     id: '04',
-    title: 'Dokumentacija',
-    description: 'Prejmete digitalno poročilo, pripravljeno za takojšnjo predajo nadzornim organom (URSJV) ali končnemu kupcu.',
+    title: 'Certificirano poročilo',
+    description: 'Prejmete celovito dokumentacijo in poročilo o meritvah, ki je pripravljeno za takojšnjo predajo nadzornim organom ali končnemu kupcu.',
     image: '/images/home/cap-03-qaqc.webp',
   },
 ];

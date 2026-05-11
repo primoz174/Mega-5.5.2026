@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { motion, useScroll, useTransform, useMotionValueEvent, MotionValue } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 import { cn } from "../../lib/utils";
 
 export interface StepItem {
@@ -117,7 +118,6 @@ function StepProgressBar({
         style={{ scaleY }}
         transition={{ ease: 'linear' }}
       />
-      {/* Glow dot at head of progress */}
       {isActive && (
         <motion.div
           className="absolute left-1/2 -translate-x-1/2 w-[6px] h-[6px] rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.9)] -translate-y-1/2"
@@ -144,52 +144,29 @@ function useIsDesktop() {
 function ScrollLinkedImage({
   item,
   index,
-  total,
-  scrollYProgress,
+  activeIndex,
 }: {
   item: StepItem;
   index: number;
-  total: number;
-  scrollYProgress: MotionValue<number>;
+  activeIndex: number;
 }) {
-  const stepSize = 1 / total;
-
-  // fullyIn: image is at 100% opacity
-  const fullyIn = index * stepSize;
-
-  // fullyOut: image starts sinking/scaling up as the NEXT image fades over it
-  const fullyOut = (index + 1) * stepSize;
-
-  // startIn must be >= 0 — WAAPI does not allow negative keyframe offsets.
-  // For index 0, (index-0.5)*stepSize is negative, so clamp to 0.
-  const startIn = Math.max(0, (index - 0.5) * stepSize);
-
-  // When startIn === fullyIn (index 0), the image is pre-revealed at scroll=0.
-  const preRevealed = startIn >= fullyIn;
-
-  const opacity = useTransform(
-    scrollYProgress,
-    preRevealed ? [0, 0.001] : [startIn, fullyIn],
-    preRevealed ? [1, 1] : [0, 1],
-    { clamp: true }
-  );
-
-  const scale = useTransform(
-    scrollYProgress,
-    preRevealed ? [0, fullyOut] : [startIn, fullyIn, fullyOut],
-    preRevealed ? [1, 1.05] : [1.15, 1, 1.05],
-    { clamp: true }
-  );
+  const isActive = activeIndex === index;
+  const isPast = activeIndex > index;
 
   return (
     <motion.div
       className="absolute inset-0 origin-center"
-      style={{ opacity, scale, zIndex: index }}
+      animate={{
+        opacity: isActive || isPast ? 1 : 0,
+        scale: isActive ? 1 : isPast ? 1.04 : 1.1,
+      }}
+      transition={{ duration: 0.85, ease: [0.25, 0.46, 0.45, 0.94] }}
+      style={{ zIndex: index }}
     >
       <img
         src={item.image}
         alt={item.title}
-        className="w-full h-full object-cover object-right"
+        className="w-full h-full object-cover object-center"
         onError={(e) => {
           (e.currentTarget as HTMLImageElement).style.display = 'none';
         }}
@@ -199,9 +176,19 @@ function ScrollLinkedImage({
   );
 }
 
+function renderTitle(title: string) {
+  if (title.includes('?')) {
+    const idx = title.indexOf('?');
+    const line1 = title.slice(0, idx + 1);
+    const line2 = title.slice(idx + 1).trim();
+    return line2 ? <>{line1}<br />{line2}.</> : <>{line1}</>;
+  }
+  return <>{title}.</>;
+}
+
 export function VerticalTabs({
-  title = "Kako delamo",
-  subtitle = "Od tehničnega povpraševanja do revizijsko varnega poročila. Strukturiran proces, ki zagotavlja 100 % skladnost s standardi.",
+  title = "Imate projekt? Zagotovite si varno izvedbo",
+  subtitle = "Vaše povpraševanje spremenimo v strukturiran inženirski proces — od prvega tehničnega načrta do končnega revizijsko varnega poročila.",
   items,
 }: VerticalTabsProps) {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -235,117 +222,143 @@ export function VerticalTabs({
       style={isDesktop ? { height: `${items.length * 100}vh` } : {}}
     >
       {isDesktop ? (
-        /* ── Desktop: sticky scroll layout ── */
-        <div className="sticky top-0 h-screen w-full overflow-hidden relative bg-black">
-          {/* Full-width background images tied directly to scroll progress */}
-          {items.map((item, index) => (
-            <ScrollLinkedImage
-              key={item.id}
-              item={item}
-              index={index}
-              total={items.length}
-              scrollYProgress={scrollYProgress}
-            />
-          ))}
+        /* ── Desktop: sticky split layout ── */
+        <div className="sticky top-0 h-screen w-full overflow-hidden bg-black">
+          {/* Top/bottom fades */}
+          <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black to-transparent pointer-events-none z-20" />
+          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black to-transparent pointer-events-none z-20" />
 
-          {/* Gradient overlay for text legibility — dark on left, fades out */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/75 to-transparent pointer-events-none z-10" />
-          {/* Top fade */}
-          <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black to-transparent pointer-events-none z-10" />
-          {/* Bottom fade */}
-          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black to-transparent pointer-events-none z-10" />
-
-          {/* Step counter badge */}
-          <div className="absolute bottom-8 right-8 font-mono text-[10px] tracking-[0.25em] text-white/30 uppercase z-20">
-            {items[activeIndex].id} / {String(items.length).padStart(2, '0')}
-          </div>
-
-          {/* Left column — original design, overlaid on image */}
-          <div className="absolute inset-0 z-20 flex items-center">
+          <div className="absolute inset-0 z-10 flex items-center">
             <div className="max-w-[1200px] mx-auto w-full px-6">
-              <div className="lg:w-5/12">
-                <div className="space-y-4 mb-12">
-                  <h2 className="text-5xl md:text-6xl lg:text-7xl font-semibold tracking-[-0.03em] leading-[1.0] text-white">
-                    {title}.
+              <div className="grid lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+
+                {/* Left: title + steps + CTA */}
+                <div className="lg:col-span-5">
+                  <div className="font-mono text-[10px] tracking-[0.3em] text-[#0071e3]/70 uppercase mb-6 flex items-center gap-3">
+                    <span className="w-4 h-px bg-[#0071e3]/40" />
+                    Kako delamo
+                  </div>
+
+                  <h2 className="text-4xl lg:text-[2.75rem] font-semibold tracking-[-0.03em] leading-[1.08] text-white mb-4">
+                    {renderTitle(title)}
                   </h2>
-                  <p className="text-xl text-white/60 max-w-xl leading-snug font-light">
+                  <p className="text-sm text-white/50 leading-relaxed font-light mb-8 max-w-[300px]">
                     {subtitle}
                   </p>
-                </div>
 
-                <div className="flex flex-col space-y-0">
-                  {items.map((item, index) => {
-                    const isActive = activeIndex === index;
-                    return (
-                      <button
-                        key={item.id}
-                        onClick={() => scrollToStep(index)}
-                        className={cn(
-                          "group relative flex items-start gap-4 py-6 md:py-8 text-left transition-all duration-500 border border-white/10 rounded-2xl md:p-6 mb-2",
-                          isActive
-                            ? "text-white bg-white/10 backdrop-blur-3xl shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.2)]"
-                            : "text-white/40 hover:text-white bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-md"
-                        )}
-                      >
-                        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#00a8ff]/25 via-transparent to-transparent opacity-0 transition-opacity duration-300 pointer-events-none blur-2xl group-hover:opacity-100" />
-
-                        <StepProgressBar
-                          scrollYProgress={scrollYProgress}
-                          stepIndex={index}
-                          total={items.length}
-                          isActive={isActive}
-                        />
-
-                        <motion.span
-                          initial={{ scale: 1, opacity: 0.6 }}
-                          animate={
+                  <div className="flex flex-col space-y-0 mb-7">
+                    {items.map((item, index) => {
+                      const isActive = activeIndex === index;
+                      return (
+                        <button
+                          key={item.id}
+                          onClick={() => scrollToStep(index)}
+                          className={cn(
+                            "group relative flex items-start gap-4 py-4 px-5 text-left transition-all duration-500 border border-white/10 rounded-2xl mb-2",
                             isActive
-                              ? { scale: 1.2, opacity: 1, x: 4, color: "#ffffff" }
-                              : { scale: 1, opacity: 0.6, x: 0, color: "rgba(255,255,255,0.6)" }
-                          }
-                          transition={{ duration: 0.4, ease: "easeOut" }}
-                          className="text-sm font-medium tabular-nums mt-1 origin-left group-hover:opacity-80 transition-colors inline-block"
+                              ? "text-white bg-white/10 backdrop-blur-3xl shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.2)]"
+                              : "text-white/40 hover:text-white bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-md"
+                          )}
                         >
-                          /{item.id}
-                        </motion.span>
+                          <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#00a8ff]/20 via-transparent to-transparent opacity-0 transition-opacity duration-300 pointer-events-none blur-2xl group-hover:opacity-100" />
 
-                        <div className="flex flex-col gap-2 flex-1 overflow-hidden">
-                          <span className={cn(
-                            "text-2xl md:text-[1.75rem] font-semibold tracking-[-0.02em] transition-all duration-500 leading-tight group-hover:drop-shadow-[0_0_10px_rgba(0,168,255,0.8)]",
-                            isActive ? "text-white translate-x-2" : "translate-x-0"
-                          )}>
-                            {item.title}
-                          </span>
-                          <div style={{
-                            overflow: 'hidden',
-                            maxHeight: isActive ? '120px' : '0px',
-                            opacity: isActive ? 1 : 0,
-                            marginTop: isActive ? '8px' : '0px',
-                            transition: 'max-height 0.35s cubic-bezier(0.23,1,0.32,1), opacity 0.25s ease, margin-top 0.35s ease',
-                          }}>
-                            <p className="text-white/55 text-base font-light leading-snug max-w-sm pb-2">
-                              {item.description}
-                            </p>
+                          <StepProgressBar
+                            scrollYProgress={scrollYProgress}
+                            stepIndex={index}
+                            total={items.length}
+                            isActive={isActive}
+                          />
+
+                          <motion.span
+                            initial={{ scale: 1, opacity: 0.6 }}
+                            animate={
+                              isActive
+                                ? { scale: 1.1, opacity: 1, x: 2, color: "#ffffff" }
+                                : { scale: 1, opacity: 0.5, x: 0, color: "rgba(255,255,255,0.5)" }
+                            }
+                            transition={{ duration: 0.4, ease: "easeOut" }}
+                            className="text-sm font-medium tabular-nums mt-0.5 origin-left inline-block"
+                          >
+                            /{item.id}
+                          </motion.span>
+
+                          <div className="flex flex-col gap-1.5 flex-1 overflow-hidden">
+                            <span className={cn(
+                              "text-xl font-semibold tracking-[-0.02em] transition-all duration-500 leading-tight",
+                              isActive ? "text-white translate-x-1 drop-shadow-[0_0_10px_rgba(0,168,255,0.6)]" : "translate-x-0"
+                            )}>
+                              {item.title}
+                            </span>
+                            <div style={{
+                              overflow: 'hidden',
+                              maxHeight: isActive ? '100px' : '0px',
+                              opacity: isActive ? 1 : 0,
+                              transition: 'max-height 0.35s cubic-bezier(0.23,1,0.32,1), opacity 0.25s ease',
+                            }}>
+                              <p className="text-white/55 text-sm font-light leading-snug pb-1">
+                                {item.description}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                      </button>
-                    );
-                  })}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* CTA */}
+                  <a
+                    href="#contact"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium transition-all duration-300 bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 hover:border-white/20 text-white/60 hover:text-white group/cta"
+                  >
+                    Začnite projekt tukaj
+                    <ArrowRight size={15} className="transition-transform group-hover/cta:translate-x-1 text-[#0071e3]" />
+                  </a>
                 </div>
+
+                {/* Right: contained image panel */}
+                <div className="lg:col-span-7 relative">
+                  <div
+                    className="relative rounded-[2rem] overflow-hidden border border-white/[0.08] shadow-[0_40px_100px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.06)]"
+                    style={{ height: 'calc(100vh - 9rem)' }}
+                  >
+                    {items.map((item, index) => (
+                      <ScrollLinkedImage
+                        key={item.id}
+                        item={item}
+                        index={index}
+                        activeIndex={activeIndex}
+                      />
+                    ))}
+
+                    {/* Bottom overlay strip */}
+                    <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/60 to-transparent pointer-events-none z-20" />
+
+                    {/* Step label + counter */}
+                    <div className="absolute bottom-4 left-4 right-4 z-30 flex items-center justify-between">
+                      <div className="font-mono text-[10px] tracking-[0.2em] text-white/50 uppercase bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/10">
+                        {items[activeIndex].title}
+                      </div>
+                      <div className="font-mono text-[10px] tracking-[0.25em] text-white/30 uppercase bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/10">
+                        {items[activeIndex].id} / {String(items.length).padStart(2, '0')}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
               </div>
             </div>
           </div>
-
         </div>
       ) : (
         /* ── Mobile: simple stacked layout ── */
         <div className="px-6 py-24">
           <div className="mb-12">
-            <div className="font-mono text-[10px] tracking-[0.3em] text-[#0071e3]/70 uppercase mb-5">
-              Proces
+            <div className="font-mono text-[10px] tracking-[0.3em] text-[#0071e3]/70 uppercase mb-5 flex items-center gap-3">
+              <span className="w-4 h-px bg-[#0071e3]/40" />
+              Kako delamo
             </div>
             <h2 className="text-4xl font-semibold tracking-[-0.03em] leading-[1.0] text-white mb-4">
-              {title}.
+              {renderTitle(title)}
             </h2>
             <p className="text-base text-white/50 leading-snug font-light">
               {subtitle}
@@ -367,7 +380,7 @@ export function VerticalTabs({
                   {item.id === '02' && <UltrasonicWaveOverlay />}
                 </div>
                 <div className="flex items-start gap-4">
-                  <span className="font-mono text-[11px] text-white/25 mt-1 shrink-0">{item.id}</span>
+                  <span className="font-mono text-[11px] text-white/25 mt-1 shrink-0">/{item.id}</span>
                   <div>
                     <div className="text-lg font-semibold text-white mb-1">{item.title}</div>
                     <p className="text-sm text-white/50 font-light leading-snug">{item.description}</p>
@@ -375,6 +388,16 @@ export function VerticalTabs({
                 </div>
               </div>
             ))}
+          </div>
+
+          <div className="mt-12">
+            <a
+              href="#contact"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium transition-all duration-300 bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 text-white/60 hover:text-white group/cta"
+            >
+              Začnite projekt tukaj
+              <ArrowRight size={15} className="transition-transform group-hover/cta:translate-x-1 text-[#0071e3]" />
+            </a>
           </div>
         </div>
       )}
