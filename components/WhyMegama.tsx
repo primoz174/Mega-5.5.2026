@@ -72,15 +72,19 @@ const WhyMegama: React.FC = () => {
         }
         .animate-scanner {
           animation: tech-scanner 5s ease-in-out infinite;
+          will-change: transform;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .animate-scanner { animation: none; opacity: 0; }
         }
       `}</style>
-      
+
       {/* Background patterns */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:60px_60px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_50%,black_30%,transparent_100%)] pointer-events-none" />
 
-      {/* Blue glows */}
-      <div className="absolute top-1/4 left-0 w-[600px] h-[600px] bg-[#00a8ff]/5 rounded-full blur-[150px] pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-[800px] h-[800px] bg-blue-600/5 rounded-full blur-[150px] pointer-events-none" />
+      {/* Blue glows — reduced blur radius for better paint performance */}
+      <div className="absolute top-1/4 left-0 w-[500px] h-[500px] bg-[#00a8ff]/4 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-blue-600/4 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="relative z-10 max-w-[1200px] mx-auto px-6">
         {/* Section Header */}
@@ -102,14 +106,18 @@ const WhyMegama: React.FC = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
           {/* Left — USP list */}
-          <div className="space-y-6">
-            {usps.map((usp, i) => (
+          <motion.div
+            className="space-y-6"
+            initial="hidden"
+            animate={inView ? 'visible' : 'hidden'}
+            variants={{ visible: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } } }}
+          >
+            {usps.map((usp) => (
               <motion.div
                 key={usp.code}
-                initial={{ opacity: 0, x: -20 }}
-                animate={inView ? { opacity: 1, x: 0 } : {}}
-                transition={{ duration: 0.5, delay: 0.1 + i * 0.12 }}
-                className="group relative flex gap-5 p-6 md:p-8 rounded-[2rem] border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-2xl hover:shadow-[0_8px_32px_rgba(0,168,255,0.1),inset_0_1px_2px_rgba(255,255,255,0.1)] transition-all duration-300 overflow-hidden"
+                variants={{ hidden: { opacity: 0, x: -20 }, visible: { opacity: 1, x: 0 } }}
+                transition={{ duration: 0.5 }}
+                className="group relative flex gap-5 p-6 md:p-8 rounded-[2rem] border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:shadow-[0_8px_32px_rgba(0,168,255,0.1),inset_0_1px_2px_rgba(255,255,255,0.1)] transition-all duration-300 overflow-hidden"
               >
                 {/* Tech Shimmer inside card */}
                 <div className="absolute inset-0 w-full h-full pointer-events-none">
@@ -137,7 +145,7 @@ const WhyMegama: React.FC = () => {
                 <div className="absolute bottom-0 left-8 right-8 h-[2px] bg-gradient-to-r from-transparent via-[#00a8ff]/50 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-center" />
               </motion.div>
             ))}
-          </div>
+          </motion.div>
 
           {/* Right — Certification Panel */}
           <motion.div
@@ -147,7 +155,7 @@ const WhyMegama: React.FC = () => {
             className="relative"
           >
             {/* Glass certification card */}
-            <div className="relative rounded-[2.5rem] border border-white/10 bg-white/[0.03] backdrop-blur-3xl overflow-hidden shadow-[0_16px_64px_rgba(0,0,0,0.5),inset_0_1px_2px_rgba(255,255,255,0.1)]">
+            <div className="relative rounded-[2.5rem] border border-white/10 bg-white/[0.03] overflow-hidden shadow-[0_16px_64px_rgba(0,0,0,0.5),inset_0_1px_2px_rgba(255,255,255,0.1)]">
               
               {/* Automated Scanner Line */}
               <div className="absolute inset-0 z-20 pointer-events-none rounded-[2.5rem] overflow-hidden">
@@ -178,13 +186,17 @@ const WhyMegama: React.FC = () => {
                 </div>
 
                 {/* Cert list */}
-                <div className="space-y-3">
-                  {certs.map((cert, i) => (
+                <motion.div
+                  className="space-y-3"
+                  initial="hidden"
+                  animate={inView ? 'visible' : 'hidden'}
+                  variants={{ visible: { transition: { staggerChildren: 0.08, delayChildren: 0.5 } } }}
+                >
+                  {certs.map((cert) => (
                     <motion.div
                       key={cert.code}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={inView ? { opacity: 1, y: 0 } : {}}
-                      transition={{ duration: 0.4, delay: 0.5 + i * 0.1 }}
+                      variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}
+                      transition={{ duration: 0.35 }}
                       onMouseEnter={() => setHoveredCert(cert.code)}
                       onMouseLeave={() => setHoveredCert(null)}
                       className={`relative flex items-center justify-between p-4 md:p-5 rounded-2xl border transition-all duration-300 overflow-hidden cursor-pointer group ${
@@ -255,7 +267,7 @@ const WhyMegama: React.FC = () => {
                       </div>
                     </motion.div>
                   ))}
-                </div>
+                </motion.div>
 
                 {/* Bottom stat */}
                 <div className="mt-10 pt-8 border-t border-white/10 flex items-center justify-between">
