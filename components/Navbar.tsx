@@ -161,7 +161,7 @@ const Navbar: React.FC = () => {
           </div>
 
           {/* Desktop Nav — flex-1 takes remaining space, z-10 above backdrop */}
-          <nav className="relative z-10 hidden lg:flex flex-1 items-center justify-center gap-0.5">
+          <nav className="relative z-10 hidden lg:flex flex-[2] items-center justify-center gap-0.5">
             {navLinks.map((link) => {
               const isActive = link.isPage
                 ? location.pathname === link.path
@@ -243,7 +243,7 @@ const Navbar: React.FC = () => {
           </nav>
 
           {/* Right: Language + Mobile Toggle — flex-shrink-0 so it never gets squeezed */}
-          <div className="relative z-10 flex-shrink-0 flex items-center justify-end gap-2.5">
+          <div className="relative z-10 flex-1 flex items-center justify-end gap-2.5">
             {/* Desktop language: segmented SL | EN */}
             <button
               onClick={toggleLanguage}
