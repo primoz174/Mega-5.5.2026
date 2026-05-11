@@ -144,8 +144,8 @@ const Navbar: React.FC = () => {
             className={`absolute inset-0 pointer-events-none transition-opacity duration-500 ${isScrolled ? 'opacity-100' : 'opacity-0'}`}
             style={{ backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderRadius: 'inherit', zIndex: 0 }}
           />
-          {/* Logo — flex-shrink-0 so it never gets squeezed */}
-          <div className="relative z-10 flex-shrink-0 flex items-center h-10 md:h-12">
+          {/* Logo */}
+          <div className="relative z-10 flex-1 flex items-center justify-start min-w-[70px] h-10 md:h-12">
             <button
               onClick={() => scrollToSection('home')}
               className="absolute left-0 origin-left focus:outline-none"
