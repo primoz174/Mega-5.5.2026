@@ -111,7 +111,6 @@ const Navbar: React.FC = () => {
             pointerEvents: 'auto',
             border: '1px solid',
             position: 'relative',
-            willChange: 'border-color, background-color, border-radius, box-shadow',
           }}
           className="w-full max-w-[1200px] flex items-center justify-between"
           animate={
@@ -140,13 +139,13 @@ const Navbar: React.FC = () => {
           }
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         >
-          {/* Backdrop blur layer — separate div so opacity animates smoothly */}
+          {/* Backdrop blur — z-index: 0 so content (z-index: 1) always paints above it */}
           <div
             className={`absolute inset-0 pointer-events-none transition-opacity duration-500 ${isScrolled ? 'opacity-100' : 'opacity-0'}`}
-            style={{ backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderRadius: 'inherit' }}
+            style={{ backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderRadius: 'inherit', zIndex: 0 }}
           />
-          {/* Logo */}
-          <div className="flex-1 flex items-center justify-start min-w-[70px] relative h-10 md:h-12">
+          {/* Logo — flex-shrink-0 so it never gets squeezed */}
+          <div className="relative z-10 flex-shrink-0 flex items-center h-10 md:h-12">
             <button
               onClick={() => scrollToSection('home')}
               className="absolute left-0 origin-left focus:outline-none"
@@ -161,8 +160,8 @@ const Navbar: React.FC = () => {
             </button>
           </div>
 
-          {/* Desktop Nav */}
-          <nav className="hidden lg:flex flex-[2] items-center justify-center gap-0.5">
+          {/* Desktop Nav — flex-1 takes remaining space, z-10 above backdrop */}
+          <nav className="relative z-10 hidden lg:flex flex-1 items-center justify-center gap-0.5">
             {navLinks.map((link) => {
               const isActive = link.isPage
                 ? location.pathname === link.path
@@ -243,8 +242,8 @@ const Navbar: React.FC = () => {
             })}
           </nav>
 
-          {/* Right: Language + Mobile Toggle */}
-          <div className="flex-1 flex items-center justify-end gap-2.5">
+          {/* Right: Language + Mobile Toggle — flex-shrink-0 so it never gets squeezed */}
+          <div className="relative z-10 flex-shrink-0 flex items-center justify-end gap-2.5">
             {/* Desktop language: segmented SL | EN */}
             <button
               onClick={toggleLanguage}
