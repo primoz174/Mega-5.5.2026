@@ -14,7 +14,7 @@ const ParticleWaveBackground: React.FC = () => {
                     x: [-20, 20, -20]
                 }}
                 transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute top-1/4 -left-1/4 w-[80%] h-[80%] bg-[#1392ec]/20 blur-[160px] rounded-full"
+                className="absolute top-1/4 -left-1/4 w-[80%] h-[80%] bg-[#0071e3]/20 blur-[160px] rounded-full"
             />
             <motion.div
                 animate={{
@@ -44,7 +44,7 @@ const ParticleWaveBackground: React.FC = () => {
                         cx={Math.random() * 1440}
                         cy={Math.random() * 800}
                         r={Math.random() * 2 + 0.5}
-                        fill={i % 3 === 0 ? "#1392ec" : i % 3 === 1 ? "#00ffc2" : "#ffffff"}
+                        fill={i % 3 === 0 ? "#0071e3" : i % 3 === 1 ? "#00ffc2" : "#ffffff"}
                         filter="url(#glow)"
                         initial={{ opacity: 0 }}
                         animate={{
@@ -68,7 +68,7 @@ const ParticleWaveBackground: React.FC = () => {
                         key={`wave-${wave}`}
                         d={`M -100 ${400 + wave * 60} Q 400 ${200 + wave * 40} 800 ${500 + wave * 20} T 1600 ${400 + wave * 50}`}
                         fill="none"
-                        stroke={wave % 2 === 0 ? "#1392ec" : "#00ffc2"}
+                        stroke={wave % 2 === 0 ? "#0071e3" : "#00ffc2"}
                         strokeWidth={wave === 0 ? "2" : "0.5"}
                         strokeDasharray={wave % 2 === 0 ? "none" : "4 8"}
                         strokeOpacity={wave === 0 ? "0.4" : "0.2"}
@@ -86,7 +86,7 @@ const ParticleWaveBackground: React.FC = () => {
             </svg>
 
             {/* Grid */}
-            <div className="absolute inset-0 bg-[linear-gradient(rgba(19,146,236,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(19,146,236,0.05)_1px,transparent_1px)] bg-[size:60px_60px] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_90%)]" />
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(0,113,227,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(0,113,227,0.05)_1px,transparent_1px)] bg-[size:60px_60px] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_90%)]" />
         </div>
     );
 };

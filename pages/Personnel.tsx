@@ -2,9 +2,11 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Award, Shield, FileCheck, ChevronRight } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import TeamShowcase from '../components/ui/team-showcase';
 
 const Personnel: React.FC = () => {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
+    const sl = language === 'sl';
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -63,6 +65,34 @@ const Personnel: React.FC = () => {
 
                 {/* Decorative Background Element */}
                 <div className="absolute top-0 right-0 -translate-y-1/4 translate-x-1/4 w-[600px] h-[600px] bg-apple-blue/5 rounded-full blur-3xl pointer-events-none" />
+            </section>
+
+            {/* ==================== TEAM SHOWCASE ==================== */}
+            <section className="py-20 bg-[#050505] border-t border-white/[0.06] relative z-10">
+                <div className="max-w-[1100px] mx-auto px-6">
+                    <motion.div
+                        initial={{ opacity: 0, y: 16 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                        className="mb-16"
+                    >
+                        <span className="font-mono text-[10px] tracking-widest uppercase text-[#0071e3]">
+                            {sl ? '01 / Ekipa' : '01 / Team'}
+                        </span>
+                        <h2 className="font-heading text-4xl md:text-5xl font-bold text-white mt-3 tracking-tight">
+                            {sl ? 'Ljudje za standardi' : 'People Behind the Standards'}
+                        </h2>
+                    </motion.div>
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+                    >
+                        <TeamShowcase />
+                    </motion.div>
+                </div>
             </section>
 
             {/* ==================== NARRATIVE SECTION ==================== */}

@@ -1,44 +1,81 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Globe, ChevronDown } from 'lucide-react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
-import { useTheme } from '../context/ThemeContext';
 
 const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
+  const [activeServiceSection, setActiveServiceSection] = useState<string | null>(null);
   const { language, setLanguage, t } = useLanguage();
-  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
-  const [isHeroLoaded, setIsHeroLoaded] = useState(false);
   const location = useLocation();
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
+  // Reset active sections when navigating away from Home
   useEffect(() => {
-    const handleHeroLoaded = () => setIsHeroLoaded(true);
-    window.addEventListener('heroLoaded', handleHeroLoaded);
-    return () => window.removeEventListener('heroLoaded', handleHeroLoaded);
-  }, []);
+    if (location.pathname !== '/') {
+      setActiveSection('');
+      setActiveServiceSection(null);
+    }
+  }, [location.pathname]);
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
-      const sections = ['home', 'services', 'about', 'contact'];
-      for (const section of sections) {
-        const element = document.getElementById(section);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          if (rect.top >= -100 && rect.top <= 300) {
-            setActiveSection(section);
-            break;
-          }
-        }
-      }
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    // IntersectionObserver for active section highlighting
+    const options = {
+      root: null,
+      rootMargin: '-80px 0px -60% 0px',
+      threshold: 0,
+    };
+
+    const callback = (entries: IntersectionObserverEntry[]) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+          if (['home', 'services', 'certifikati', 'ekipa', 'vrednote', 'contact'].includes(id)) {
+            setActiveSection(id);
+          }
+          if (id.startsWith('services-')) {
+            setActiveServiceSection(id);
+          }
+        }
+      });
+    };
+
+    observerRef.current = new IntersectionObserver(callback, options);
+
+    const sections = ['home', 'services', 'certifikati', 'ekipa', 'vrednote', 'contact', 'services-ndt', 'services-nadzori', 'services-qa', 'services-svetovanje'];
+    sections.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observerRef.current?.observe(el);
+    });
+
+    return () => observerRef.current?.disconnect();
+  }, [location.pathname]);
+
+  useEffect(() => {
+    // Handle cross-page hash scrolling
+    if (location.hash) {
+      const id = location.hash.replace('#', '');
+      setTimeout(() => {
+        const element = document.getElementById(id);
+        if (element) {
+          const offsetPosition = element.getBoundingClientRect().top + window.pageYOffset - 80;
+          window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+        }
+      }, 100);
+    }
+  }, [location.pathname, location.hash]);
 
   useEffect(() => {
     if (isMobileMenuOpen) {
@@ -58,39 +95,80 @@ const Navbar: React.FC = () => {
   }, [isMobileMenuOpen]);
 
   const scrollToSection = (id: string) => {
-    if (location.pathname !== '/' && id !== 'home') {
-      navigate('/#' + id);
+    if (location.pathname !== '/' && !['home', 'services', 'contact'].includes(id)) {
+      // If it's a known anchor but we're on a subpage, go home + hash
+      if (id.startsWith('services-') || id === 'services' || id === 'contact' || id === 'ekipa' || id === 'vrednote' || id === 'certifikati') {
+        navigate('/#' + id);
+      } else {
+        navigate(id.startsWith('/') ? id : '/' + id);
+      }
+      setIsMobileMenuOpen(false);
       return;
     }
+
     if (location.pathname !== '/' && id === 'home') {
       navigate('/');
+      setIsMobileMenuOpen(false);
       return;
     }
+
     const element = document.getElementById(id);
     if (element) {
-      const offsetPosition =
-        element.getBoundingClientRect().top + window.pageYOffset - 50;
+      const offsetPosition = element.getBoundingClientRect().top + window.pageYOffset - 80;
       window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+      setIsMobileMenuOpen(false);
+    } else {
+      // Fallback: if element doesn't exist on this page, try navigating
+      navigate('/#' + id);
       setIsMobileMenuOpen(false);
     }
   };
 
   const navLinks = [
     { name: t.nav.home, id: 'home' },
-    { name: t.nav.services, id: 'services', isPage: true, path: '/storitve' },
+    {
+      name: t.nav.services,
+      id: 'services',
+      isDropdown: true,
+      subLinks: [
+        {
+          name: language === 'sl' ? 'NDT Preiskave' : 'NDT Inspections',
+          scrollId: 'services-ndt',
+          color: '#3b82f6',
+          desc: language === 'sl' ? 'Zvari, materiali, tlačna oprema' : 'Welds, materials, pressure vessels',
+        },
+        {
+          name: language === 'sl' ? 'Inženirski nadzori' : 'Engineering Supervision',
+          scrollId: 'services-nadzori',
+          color: '#f97316',
+          desc: language === 'sl' ? 'Varilni nadzor, prevzemi' : 'Welding supervision, acceptance',
+        },
+        {
+          name: language === 'sl' ? 'Kakovost QC/QA' : 'Quality QC/QA',
+          scrollId: 'services-qa',
+          color: '#10b981',
+          desc: language === 'sl' ? 'Dokumentacija, ITP, NCR' : 'Documentation, ITP, NCR',
+        },
+        {
+          name: language === 'sl' ? 'Svetovanje' : 'Consulting',
+          scrollId: 'services-svetovanje',
+          color: '#a855f7',
+          desc: language === 'sl' ? 'WPS/WPQR, NDT plani' : 'WPS/WPQR, NDT plans',
+        },
+      ],
+    },
     {
       name: language === 'sl' ? 'Ekspertiza' : 'Expertise',
       id: 'expertise',
       isDropdown: true,
       subLinks: [
-        { name: t.nav.certificates, path: '/certifikati' },
+        { name: t.nav.certificates, scrollId: 'certifikati' },
         { name: t.nav.industries, path: '/panoge' },
         { name: t.nav.equipment, path: '/oprema' },
-        { name: language === 'sl' ? 'Ekipa' : 'Team', path: '/personnel' },
       ],
     },
     { name: t.nav.blog, id: 'blog', isPage: true, path: '/blog' },
-    { name: t.nav.about, id: 'about', isPage: true, path: '/about' },
+    { name: t.nav.about, id: 'ekipa' },
     { name: t.nav.contact, id: 'contact', isCta: true },
   ];
 
@@ -116,15 +194,15 @@ const Navbar: React.FC = () => {
           animate={
             isScrolled
               ? {
-                  paddingLeft: 18,
-                  paddingRight: 18,
-                  paddingTop: 8,
-                  paddingBottom: 8,
-                  borderRadius: 20,
-                  backgroundColor: 'rgba(4, 4, 4, 0.82)',
-                  borderColor: 'rgba(255, 255, 255, 0.09)',
+                  paddingLeft: 20,
+                  paddingRight: 20,
+                  paddingTop: 10,
+                  paddingBottom: 10,
+                  borderRadius: 24,
+                  backgroundColor: 'rgba(5, 5, 5, 0.85)',
+                  borderColor: 'rgba(255, 255, 255, 0.08)',
                   boxShadow:
-                    '0 8px 40px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.05)',
+                    '0 12px 48px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05)',
                 }
               : {
                   paddingLeft: 0,
@@ -151,8 +229,10 @@ const Navbar: React.FC = () => {
               className="absolute left-0 origin-left focus:outline-none"
             >
               <motion.img
-                layoutId="hero-logo-img"
-                transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
+                {...(location.pathname === '/' ? {
+                  layoutId: 'hero-logo-img',
+                  transition: { duration: 1.5, ease: [0.16, 1, 0.3, 1] },
+                } : {})}
                 src="https://megama.si/wp-content/uploads/2021/01/cropped-cropped-website_logo_transparent_background-1-1.png"
                 alt="MEGAMA"
                 className="h-10 md:h-12 w-auto object-contain"
@@ -180,23 +260,88 @@ const Navbar: React.FC = () => {
               }
 
               if (link.isDropdown) {
+                const isSectionActive = activeSection === link.id && location.pathname === '/';
+                // Robust path matching: remove trailing slashes and compare
+                const currentPath = location.pathname.replace(/\/$/, '');
+                const isPathActive = link.subLinks?.some((s: any) => 
+                  s.path && (s.path.replace(/\/$/, '') === currentPath || currentPath.startsWith(s.path + '/'))
+                );
+                const isDropActive = isSectionActive || isPathActive;
+                
+                const hasScrollLinks = link.subLinks?.some((s: any) => s.scrollId);
+                const activeSub = hasScrollLinks
+                  ? link.subLinks?.find((s: any) => s.scrollId === activeServiceSection)
+                  : link.subLinks?.find((s: any) => s.path && s.path.replace(/\/$/, '') === currentPath);
                 return (
                   <div key={link.id} className="relative group">
-                    <button className="relative flex items-center gap-1 px-3 py-2 rounded-[10px] text-[11px] font-medium tracking-[0.06em] uppercase text-white/65 hover:text-[#4da3ff] hover:bg-[#0071e3]/[0.07] transition-colors duration-200 whitespace-nowrap">
+                    <button className={`relative group/btn flex items-center gap-1 px-3 py-2 rounded-[10px] text-[11px] font-medium tracking-[0.06em] uppercase transition-colors duration-200 whitespace-nowrap ${isDropActive ? 'text-white bg-white/[0.08]' : 'text-white/65 hover:text-[#4da3ff] hover:bg-[#0071e3]/[0.07]'}`}>
                       {link.name}
                       <ChevronDown className="w-3 h-3 opacity-60 group-hover:rotate-180 transition-transform duration-300" />
-                      <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-0 h-px bg-[#0071e3]/70 group-hover:w-5 transition-all duration-300" />
+                      {isDropActive ? (
+                        <span
+                          className="absolute bottom-0.5 left-2 right-2 h-[2px] rounded-full transition-all duration-300"
+                          style={{
+                            background: (activeSub as any)?.color ?? '#0071e3',
+                            boxShadow: (activeSub as any)?.color
+                              ? `0 0 6px 2px ${(activeSub as any).color}55`
+                              : '0 0 6px 2px rgba(0,113,227,0.45)',
+                          }}
+                        />
+                      ) : (
+                        <span className="absolute bottom-0.5 left-2 right-2 h-[2px] rounded-full bg-[#0071e3]/70 origin-center scale-x-0 group-hover/btn:scale-x-100 transition-transform duration-300" />
+                      )}
                     </button>
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2.5 w-56 bg-[#080808] rounded-2xl border border-white/[0.09] shadow-[0_20px_60px_rgba(0,0,0,0.7)] opacity-0 invisible pointer-events-none group-hover:opacity-100 group-hover:visible group-hover:pointer-events-auto translate-y-1 group-hover:translate-y-0 transition-all duration-250 flex flex-col p-1.5 z-50">
-                      {link.subLinks?.map((sub) => (
-                        <Link
-                          key={sub.name}
-                          to={sub.path}
-                          className="px-4 py-2.5 rounded-xl text-[11px] font-medium tracking-[0.06em] uppercase text-white/65 hover:text-[#4da3ff] hover:bg-[#0071e3]/[0.07] transition-colors duration-150 whitespace-nowrap block"
-                        >
-                          {sub.name}
-                        </Link>
-                      ))}
+                    <div className={`absolute top-full left-1/2 -translate-x-1/2 pt-2.5 opacity-0 invisible pointer-events-none group-hover:opacity-100 group-hover:visible group-hover:pointer-events-auto transition-all duration-250 z-50 ${hasScrollLinks ? 'w-72' : 'w-56'}`}>
+                    <div className="bg-[#080808] rounded-2xl border border-white/[0.09] shadow-[0_20px_60px_rgba(0,0,0,0.7)] translate-y-1 group-hover:translate-y-0 transition-transform duration-250 flex flex-col p-1.5">
+                      {link.subLinks?.map((sub: any) => {
+                        const isSubActive = sub.scrollId && activeServiceSection === sub.scrollId;
+                        return sub.scrollId ? (
+                          <button
+                            key={sub.name}
+                            onClick={() => scrollToSection(sub.scrollId)}
+                            className="w-full flex items-start gap-3 px-4 py-3 rounded-xl text-left transition-all duration-150 group/sub hover:bg-white/[0.04]"
+                            style={isSubActive ? { background: `${sub.color}18` } : undefined}
+                          >
+                            <div
+                              className="mt-1 w-2 h-2 rounded-full shrink-0 transition-all duration-200"
+                              style={{
+                                background: sub.color,
+                                opacity: isSubActive ? 1 : 0.6,
+                                boxShadow: isSubActive ? `0 0 7px 2px ${sub.color}60` : 'none',
+                              }}
+                            />
+                            <div className="flex-1">
+                              <div
+                                className="text-[11px] font-semibold tracking-[0.04em] uppercase transition-colors group-hover/sub:text-white/90"
+                                style={{ color: isSubActive ? sub.color : 'rgba(255,255,255,0.75)' }}
+                              >
+                                {sub.name}
+                              </div>
+                              {sub.desc && (
+                                <div className="text-[10px] text-white/40 mt-0.5 leading-snug">
+                                  {sub.desc}
+                                </div>
+                              )}
+                            </div>
+                            {isSubActive && (
+                              <div className="mt-1 w-1.5 h-1.5 rounded-full shrink-0 self-start" style={{ background: sub.color, boxShadow: `0 0 5px 1px ${sub.color}70` }} />
+                            )}
+                          </button>
+                        ) : (
+                          <Link
+                            key={sub.name}
+                            to={sub.path}
+                            className={`px-4 py-2.5 rounded-xl text-[11px] font-medium tracking-[0.06em] uppercase transition-colors duration-150 whitespace-nowrap block ${
+                              sub.path.replace(/\/$/, '') === currentPath
+                                ? 'text-[#4da3ff] bg-[#0071e3]/[0.12] font-semibold'
+                                : 'text-white/65 hover:text-[#4da3ff] hover:bg-[#0071e3]/[0.07]'
+                            }`}
+                          >
+                            {sub.name}
+                          </Link>
+                        );
+                      })}
+                    </div>
                     </div>
                   </div>
                 );
@@ -214,10 +359,10 @@ const Navbar: React.FC = () => {
                 >
                   {link.name}
                   {!isActive && (
-                    <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-0 h-px bg-[#0071e3]/70 group-hover/link:w-5 transition-all duration-300" />
+                    <span className="absolute bottom-0.5 left-2 right-2 h-[2px] rounded-full bg-[#0071e3]/70 origin-center scale-x-0 group-hover/link:scale-x-100 transition-transform duration-300" />
                   )}
                   {isActive && (
-                    <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#0071e3]" />
+                    <span className="absolute bottom-0.5 left-2 right-2 h-[2px] rounded-full bg-[#0071e3]/90 shadow-[0_0_6px_2px_rgba(0,113,227,0.45)]" />
                   )}
                 </Link>
               ) : (
@@ -232,10 +377,10 @@ const Navbar: React.FC = () => {
                 >
                   {link.name}
                   {!isActive && (
-                    <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-0 h-px bg-[#0071e3]/70 group-hover/link:w-5 transition-all duration-300" />
+                    <span className="absolute bottom-0.5 left-2 right-2 h-[2px] rounded-full bg-[#0071e3]/70 origin-center scale-x-0 group-hover/link:scale-x-100 transition-transform duration-300" />
                   )}
                   {isActive && (
-                    <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#0071e3]" />
+                    <span className="absolute bottom-0.5 left-2 right-2 h-[2px] rounded-full bg-[#0071e3]/90 shadow-[0_0_6px_2px_rgba(0,113,227,0.45)]" />
                   )}
                 </button>
               );
@@ -247,24 +392,24 @@ const Navbar: React.FC = () => {
             {/* Desktop language: segmented SL | EN */}
             <button
               onClick={toggleLanguage}
-              className="hidden lg:flex items-center gap-0.5 p-1 rounded-[10px] bg-white/[0.04] border border-white/[0.08] hover:border-white/[0.18] transition-colors duration-200"
+              className="hidden lg:flex items-center gap-0.5 p-1 rounded-xl bg-white/[0.03] border border-white/[0.08] hover:border-white/[0.15] transition-all duration-200"
               title={language === 'sl' ? 'Switch to English' : 'Preklopi na slovenščino'}
               aria-label="Change language"
             >
               <span
-                className={`px-2 py-1 rounded-md text-[10px] font-bold tracking-[0.1em] transition-colors duration-200 ${
+                className={`px-2.5 py-1.5 rounded-[9px] text-[10px] font-bold tracking-[0.1em] transition-all duration-200 ${
                   language === 'sl'
-                    ? 'bg-[#0071e3]/15 text-[#4da3ff]'
-                    : 'text-white/30'
+                    ? 'bg-[#0071e3] text-white shadow-[0_2px_8px_rgba(0,113,227,0.3)]'
+                    : 'text-white/40 hover:text-white/60'
                 }`}
               >
                 SL
               </span>
               <span
-                className={`px-2 py-1 rounded-md text-[10px] font-bold tracking-[0.1em] transition-colors duration-200 ${
+                className={`px-2.5 py-1.5 rounded-[9px] text-[10px] font-bold tracking-[0.1em] transition-all duration-200 ${
                   language === 'en'
-                    ? 'bg-[#0071e3]/15 text-[#4da3ff]'
-                    : 'text-white/30'
+                    ? 'bg-[#0071e3] text-white shadow-[0_2px_8px_rgba(0,113,227,0.3)]'
+                    : 'text-white/40 hover:text-white/60'
                 }`}
               >
                 EN
@@ -274,13 +419,13 @@ const Navbar: React.FC = () => {
             <div className="flex items-center lg:hidden gap-2">
               <button
                 onClick={toggleLanguage}
-                className="flex items-center gap-0.5 p-1 rounded-[10px] bg-white/[0.04] border border-white/[0.08] transition-colors duration-200"
+                className="flex items-center gap-0.5 p-1 rounded-xl bg-white/[0.04] border border-white/[0.08] transition-colors duration-200"
                 aria-label="Change language"
               >
-                <span className={`px-2 py-1 rounded-md text-[10px] font-bold tracking-[0.1em] ${language === 'sl' ? 'bg-[#0071e3]/15 text-[#4da3ff]' : 'text-white/30'}`}>
+                <span className={`px-2.5 py-1.5 rounded-[9px] text-[10px] font-bold tracking-[0.1em] ${language === 'sl' ? 'bg-[#0071e3] text-white shadow-[0_2px_8px_rgba(0,113,227,0.3)]' : 'text-white/30'}`}>
                   SL
                 </span>
-                <span className={`px-2 py-1 rounded-md text-[10px] font-bold tracking-[0.1em] ${language === 'en' ? 'bg-[#0071e3]/15 text-[#4da3ff]' : 'text-white/30'}`}>
+                <span className={`px-2.5 py-1.5 rounded-[9px] text-[10px] font-bold tracking-[0.1em] ${language === 'en' ? 'bg-[#0071e3] text-white shadow-[0_2px_8px_rgba(0,113,227,0.3)]' : 'text-white/30'}`}>
                   EN
                 </span>
               </button>
@@ -359,15 +504,26 @@ const Navbar: React.FC = () => {
                         {link.name}
                       </div>
                       <div className="flex flex-col gap-0.5 pl-4 border-l border-white/[0.07] ml-5 mb-1">
-                        {link.subLinks?.map((sub) => (
-                          <Link
-                            key={sub.name}
-                            to={sub.path}
-                            onClick={() => setIsMobileMenuOpen(false)}
-                            className="px-4 py-3 rounded-xl text-[13px] font-medium text-white/65 hover:text-[#4da3ff] hover:bg-[#0071e3]/[0.07] transition-colors duration-150"
-                          >
-                            {sub.name}
-                          </Link>
+                        {link.subLinks?.map((sub: any) => (
+                          sub.scrollId ? (
+                            <button
+                              key={sub.name}
+                              onClick={() => { scrollToSection(sub.scrollId); setIsMobileMenuOpen(false); }}
+                              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-[13px] font-medium text-white/65 hover:text-[#4da3ff] hover:bg-[#0071e3]/[0.07] transition-colors duration-150"
+                            >
+                              {sub.color && <div className="w-2 h-2 rounded-full shrink-0" style={{ background: sub.color }} />}
+                              {sub.name}
+                            </button>
+                          ) : (
+                            <Link
+                              key={sub.name}
+                              to={sub.path}
+                              onClick={() => setIsMobileMenuOpen(false)}
+                              className="px-4 py-3 rounded-xl text-[13px] font-medium text-white/65 hover:text-[#4da3ff] hover:bg-[#0071e3]/[0.07] transition-colors duration-150"
+                            >
+                              {sub.name}
+                            </Link>
+                          )
                         ))}
                       </div>
                     </div>
@@ -414,11 +570,11 @@ const Navbar: React.FC = () => {
                     {language === 'sl' ? 'Jezik' : 'Language'}
                   </span>
                 </div>
-                <div className="flex items-center gap-0.5 p-1 rounded-[10px] bg-black/40 border border-white/[0.06]">
-                  <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold tracking-[0.1em] transition-colors duration-200 ${language === 'sl' ? 'bg-[#0071e3]/15 text-[#4da3ff]' : 'text-white/35'}`}>
+                <div className="flex items-center gap-0.5 p-1 rounded-xl bg-black/40 border border-white/[0.06]">
+                  <span className={`px-3 py-1.5 rounded-[9px] text-[10px] font-bold tracking-[0.1em] transition-all duration-200 ${language === 'sl' ? 'bg-[#0071e3] text-white shadow-[0_2px_8px_rgba(0,113,227,0.3)]' : 'text-white/35'}`}>
                     SL
                   </span>
-                  <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold tracking-[0.1em] transition-colors duration-200 ${language === 'en' ? 'bg-[#0071e3]/15 text-[#4da3ff]' : 'text-white/35'}`}>
+                  <span className={`px-3 py-1.5 rounded-[9px] text-[10px] font-bold tracking-[0.1em] transition-all duration-200 ${language === 'en' ? 'bg-[#0071e3] text-white shadow-[0_2px_8px_rgba(0,113,227,0.3)]' : 'text-white/35'}`}>
                     EN
                   </span>
                 </div>

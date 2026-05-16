@@ -5,7 +5,7 @@ const sectors = [
   {
     id: 'nuclear',
     label: { sl: 'Jedrska energetika', en: 'Nuclear Energy' },
-    code: 'SEKTOR_01',
+    code: 'NUC.01',
     icon: (
       <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.2" className="w-7 h-7">
         <circle cx="16" cy="16" r="3" fill="currentColor" fillOpacity="0.4" />
@@ -16,22 +16,21 @@ const sectors = [
     ),
   },
   {
-    id: 'petrochemical',
-    label: { sl: 'Petrokemija', en: 'Petrochemical' },
-    code: 'SEKTOR_02',
+    id: 'pharma',
+    label: { sl: 'Farmacija', en: 'Pharmaceuticals' },
+    code: 'PHA.02',
     icon: (
       <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.2" className="w-7 h-7">
-        <rect x="6" y="18" width="20" height="8" rx="2" />
-        <path d="M10 18V12C10 9 12 8 16 8s6 1 6 4v6" />
-        <path d="M13 8V6M16 8V5M19 8V6" strokeLinecap="round" />
-        <path d="M6 22h20" strokeOpacity="0.4" />
+        <path d="M8 10h16v12H8z" />
+        <path d="M12 10V7h8v3" />
+        <circle cx="16" cy="16" r="2" strokeOpacity="0.5" />
       </svg>
     ),
   },
   {
-    id: 'energy',
-    label: { sl: 'Energetika', en: 'Power & Energy' },
-    code: 'SEKTOR_03',
+    id: 'power',
+    label: { sl: 'Konvencionalna energetika', en: 'Power & Energy' },
+    code: 'PWR.03',
     icon: (
       <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.2" className="w-7 h-7">
         <path d="M18 4L8 18h8l-2 10 12-16h-8l2-8z" strokeLinejoin="round" />
@@ -39,9 +38,32 @@ const sectors = [
     ),
   },
   {
-    id: 'heavy-industry',
-    label: { sl: 'Težka industrija', en: 'Heavy Industry' },
-    code: 'SEKTOR_04',
+    id: 'steel',
+    label: { sl: 'Jeklene konstrukcije', en: 'Steel Structures' },
+    code: 'STL.04',
+    icon: (
+      <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.2" className="w-7 h-7">
+        <path d="M4 24h24M8 24V10l8-4 8 4v14" />
+        <path d="M8 14h16M16 6v18" strokeOpacity="0.4" />
+      </svg>
+    ),
+  },
+  {
+    id: 'foundry',
+    label: { sl: 'Livarstvo in jeklo', en: 'Foundry & Steel' },
+    code: 'FND.05',
+    icon: (
+      <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.2" className="w-7 h-7">
+        <path d="M6 26h20l-2-12H8L6 26z" />
+        <path d="M16 14V6M12 6h8" strokeLinecap="round" />
+        <path d="M10 20h12" strokeOpacity="0.4" />
+      </svg>
+    ),
+  },
+  {
+    id: 'engineering',
+    label: { sl: 'Splošna strojegradnja', en: 'General Engineering' },
+    code: 'ENG.06',
     icon: (
       <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.2" className="w-7 h-7">
         <rect x="4" y="20" width="24" height="6" rx="1" />
@@ -55,7 +77,7 @@ const sectors = [
   {
     id: 'construction',
     label: { sl: 'Gradbeništvo', en: 'Construction' },
-    code: 'SEKTOR_05',
+    code: 'CON.07',
     icon: (
       <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.2" className="w-7 h-7">
         <path d="M4 28h24" strokeLinecap="round" />
@@ -66,34 +88,9 @@ const sectors = [
     ),
   },
   {
-    id: 'maritime',
-    label: { sl: 'Ladjarstvo', en: 'Maritime' },
-    code: 'SEKTOR_06',
-    icon: (
-      <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.2" className="w-7 h-7">
-        <path d="M5 22l3-12h16l3 12" strokeLinejoin="round" />
-        <path d="M16 10V4" strokeLinecap="round" />
-        <path d="M16 4l-4 3h8l-4-3z" />
-        <path d="M3 26c2-3 5-3 8 0s6 3 8 0 5-3 9 0" strokeLinecap="round" />
-      </svg>
-    ),
-  },
-  {
-    id: 'pressure-vessels',
-    label: { sl: 'Tlačne posode', en: 'Pressure Vessels' },
-    code: 'SEKTOR_07',
-    icon: (
-      <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.2" className="w-7 h-7">
-        <rect x="8" y="6" width="16" height="20" rx="8" />
-        <path d="M8 14h16M8 18h16" strokeOpacity="0.4" />
-        <path d="M16 4v2M16 26v2" strokeLinecap="round" />
-      </svg>
-    ),
-  },
-  {
-    id: 'pipelines',
-    label: { sl: 'Cevovodi', en: 'Pipelines' },
-    code: 'SEKTOR_08',
+    id: 'oil',
+    label: { sl: 'Naftna industrija', en: 'Oil & Gas' },
+    code: 'OIL.08',
     icon: (
       <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.2" className="w-7 h-7">
         <path d="M2 12h10c2 0 4 2 4 4s2 4 4 4h10" strokeLinecap="round" />
@@ -119,14 +116,14 @@ const SectorItem: React.FC<{ sector: typeof sectors[0]; lang: 'sl' | 'en' }> = (
       className="flex items-center gap-4 px-8 shrink-0 group relative cursor-pointer"
     >
       {/* Glow backdrop */}
-      <div className="absolute inset-0 bg-[#1392ec]/0 group-hover:bg-[#1392ec]/10 blur-xl transition-all duration-700 rounded-full z-0 pointer-events-none" />
+      <div className="absolute inset-0 bg-[#0071e3]/0 group-hover:bg-[#0071e3]/10 blur-xl transition-all duration-700 rounded-full z-0 pointer-events-none" />
       
-      <div className="text-[#1392ec]/60 group-hover:text-[#1392ec] group-hover:drop-shadow-[0_0_8px_rgba(19,146,236,0.8)] transition-all duration-500 z-10 group-hover:scale-110">
+      <div className="text-[#0071e3]/60 group-hover:text-[#0071e3] group-hover:drop-shadow-[0_0_8px_rgba(0,113,227,0.8)] transition-all duration-500 z-10 group-hover:scale-110">
         {sector.icon}
       </div>
       
       <div className="flex flex-col z-10">
-        <span className="font-mono text-[9px] tracking-[0.25em] text-[#1392ec]/40 group-hover:text-[#1392ec]/90 transition-colors duration-500 uppercase">
+        <span className="font-mono text-[9px] tracking-[0.25em] text-[#0071e3]/40 group-hover:text-[#0071e3]/90 transition-colors duration-500 uppercase">
           [{sector.code}]
         </span>
         <span className="text-sm font-semibold text-[#1d1d1f] dark:text-white/80 group-hover:text-[#1d1d1f] dark:group-hover:text-white transition-colors duration-500 tracking-tight whitespace-nowrap">
@@ -134,8 +131,7 @@ const SectorItem: React.FC<{ sector: typeof sectors[0]; lang: 'sl' | 'en' }> = (
         </span>
       </div>
       
-      {/* Premium gradient divider */}
-      <div className="ml-6 w-px h-8 bg-gradient-to-b from-transparent via-black/10 dark:via-white/10 to-transparent group-hover:via-[#1392ec]/70 transition-all duration-700" />
+
     </div>
   );
 };
@@ -148,7 +144,7 @@ const IndustrySectors: React.FC<IndustrySectorsProps> = ({ lang = 'sl' }) => {
   const tripled = [...sectors, ...sectors, ...sectors];
 
   return (
-    <div className="w-full py-10 bg-white dark:bg-[#0a0a0a] overflow-hidden relative z-30">
+    <div className="w-full py-10 bg-black overflow-hidden relative z-30">
       
       <style>{`
         @keyframes pro-max-marquee {
@@ -165,18 +161,18 @@ const IndustrySectors: React.FC<IndustrySectorsProps> = ({ lang = 'sl' }) => {
       
       {/* Label */}
       <div className="max-w-[980px] mx-auto px-6 mb-6 flex items-center gap-4 relative z-20">
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-black/10 dark:via-white/10 to-transparent" />
+        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-20" />
         <span className="font-mono text-[9px] tracking-[0.3em] text-gray-400 uppercase shrink-0">
           {lang === 'sl' ? 'Sektorji delovanja' : 'Sectors of operation'}
         </span>
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-black/10 dark:via-white/10 to-transparent" />
+        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-20" />
       </div>
 
       {/* Marquee Wrapper with Pause on Hover */}
       <div className="relative overflow-hidden hover-pause">
         {/* Fade edges */}
-        <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-white dark:from-[#0a0a0a] to-transparent z-20 pointer-events-none" />
-        <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-white dark:from-[#0a0a0a] to-transparent z-20 pointer-events-none" />
+        <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-black to-transparent z-20 pointer-events-none" />
+        <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-black to-transparent z-20 pointer-events-none" />
 
         <div className="flex items-center animate-pro-marquee w-max">
           {tripled.map((sector, i) => (

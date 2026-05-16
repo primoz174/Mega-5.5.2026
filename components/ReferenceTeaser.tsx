@@ -74,8 +74,8 @@ const ReferenceTeaser: React.FC = () => {
               className="group inline-flex items-center gap-3 px-6 py-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
             >
               <span className="text-sm font-medium text-white">{lang === 'sl' ? 'Vse reference' : 'All References'}</span>
-              <div className="w-6 h-6 rounded-full bg-[#1392ec]/20 group-hover:bg-[#1392ec] flex items-center justify-center transition-all">
-                <ChevronRight size={14} className="text-[#1392ec] group-hover:text-white" />
+              <div className="w-6 h-6 rounded-full bg-[#0071e3]/20 group-hover:bg-[#0071e3] flex items-center justify-center transition-all">
+                <ChevronRight size={14} className="text-[#0071e3] group-hover:text-white" />
               </div>
             </Link>
           </motion.div>
@@ -89,10 +89,10 @@ const ReferenceTeaser: React.FC = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: 0.3 + i * 0.15 }}
-              className="group relative rounded-2xl bg-white/[0.02] border border-white/10 hover:border-[#1392ec]/50 overflow-hidden transition-all duration-500 hover:-translate-y-1"
+              className="group relative rounded-2xl bg-white/[0.02] border border-white/10 hover:border-[#0071e3]/50 overflow-hidden transition-all duration-500 hover:-translate-y-1"
             >
               {/* Top Accent */}
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1392ec]/0 via-[#1392ec]/0 to-[#1392ec]/0 group-hover:via-[#1392ec] transition-all duration-700 opacity-50" />
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#0071e3]/0 via-[#0071e3]/0 to-[#0071e3]/0 group-hover:via-[#0071e3] transition-all duration-700 opacity-50" />
 
               <div className="p-8">
                 <div className="text-[10px] font-mono tracking-widest text-gray-500 mb-6 uppercase">
@@ -113,7 +113,7 @@ const ReferenceTeaser: React.FC = () => {
                     <span className="text-[10px] font-mono text-gray-500">METHODS:</span>
                     <div className="flex gap-2">
                       {item.methods.map(method => (
-                        <span key={method} className="px-2 py-0.5 rounded bg-[#1392ec]/10 text-[#1392ec] text-[10px] font-mono font-bold">
+                        <span key={method} className="px-2 py-0.5 rounded bg-[#0071e3]/10 text-[#0071e3] text-[10px] font-mono font-bold">
                           {method}
                         </span>
                       ))}

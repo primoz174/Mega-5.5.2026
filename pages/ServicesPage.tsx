@@ -1,21 +1,24 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { motion, AnimatePresence, useInView } from 'framer-motion';
+import { motion, AnimatePresence, useInView, useReducedMotion } from 'framer-motion';
 import {
   ScanEye, ShieldCheck, ClipboardCheck, Lightbulb,
   Eye, Droplet, Magnet, Activity, Ruler, Wind, Radiation, FileSearch, Hammer,
   Shield, CheckSquare, Users, PackageCheck, Network, FileText, Factory, FileSignature, BookOpen,
-  Settings, Award, Book, GraduationCap, ArrowRight, Download, FileBadge
+  Settings, Award, Book, GraduationCap, ArrowRight, Download, FileBadge, ChevronDown,
 } from 'lucide-react';
 import { servicesData } from '../data/services';
-import MethodIllustrations from '../components/MethodIllustrations';
+import { ServiceCategory, ServiceItem } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import MethodIllustrations from '../components/MethodIllustrations';
+import { GlowCard } from '../components/ui/spotlight-card';
 
+/* ── Icon map ── */
 const iconMap: Record<string, React.ReactNode> = {
-  ScanEye: <ScanEye size={24} />,
-  ShieldCheck: <ShieldCheck size={24} />,
-  ClipboardCheck: <ClipboardCheck size={24} />,
-  Lightbulb: <Lightbulb size={24} />,
+  ScanEye: <ScanEye size={22} />,
+  ShieldCheck: <ShieldCheck size={22} />,
+  ClipboardCheck: <ClipboardCheck size={22} />,
+  Lightbulb: <Lightbulb size={22} />,
   Eye: <Eye size={20} />,
   Droplet: <Droplet size={20} />,
   Magnet: <Magnet size={20} />,
@@ -37,423 +40,827 @@ const iconMap: Record<string, React.ReactNode> = {
   Settings: <Settings size={20} />,
   Award: <Award size={20} />,
   Book: <Book size={20} />,
-  GraduationCap: <GraduationCap size={20} />
+  GraduationCap: <GraduationCap size={20} />,
 };
 
-type Stat = { value: string; label: { sl: string; en: string } };
+/* ── Color themes — blue family, soft-pour transitions ── */
+interface ColorTheme {
+  accent: string;
+  accentMuted: string;
+  glow: string;
+  border: string;
+  bg: string;
+  sectionBg: string;
+  nextBg: string;
+  glowPos: string;
+}
 
-const stats: Stat[] = [
-  { value: '15+', label: { sl: 'Let izkušenj', en: 'Years of experience' } },
-  { value: '500+', label: { sl: 'Izvedenih projektov', en: 'Completed projects' } },
-  { value: '8', label: { sl: 'Industrijskih panog', en: 'Industrial sectors' } },
-  { value: '100%', label: { sl: 'Sledljivost', en: 'Traceability' } },
+const COLOR_THEMES: Record<string, ColorTheme> = {
+  ndt: {
+    accent: '#4da8ff',
+    accentMuted: '#4da8ff70',
+    glow: 'rgba(0, 113, 227, 0.20)',
+    border: 'rgba(0, 113, 227, 0.28)',
+    bg: 'rgba(0, 113, 227, 0.09)',
+    sectionBg: '#04080f',
+    nextBg: '#050a12',
+    glowPos: '12% 50%',
+  },
+  nadzori: {
+    accent: '#38bdf8',
+    accentMuted: '#38bdf870',
+    glow: 'rgba(14, 165, 233, 0.18)',
+    border: 'rgba(14, 165, 233, 0.24)',
+    bg: 'rgba(14, 165, 233, 0.08)',
+    sectionBg: '#050a12',
+    nextBg: '#030c15',
+    glowPos: '88% 20%',
+  },
+  qa: {
+    accent: '#22d3ee',
+    accentMuted: '#22d3ee70',
+    glow: 'rgba(8, 145, 178, 0.16)',
+    border: 'rgba(8, 145, 178, 0.24)',
+    bg: 'rgba(8, 145, 178, 0.08)',
+    sectionBg: '#030c15',
+    nextBg: '#07060f',
+    glowPos: '50% 8%',
+  },
+  svetovanje: {
+    accent: '#a5b4fc',
+    accentMuted: '#a5b4fc70',
+    glow: 'rgba(99, 102, 241, 0.16)',
+    border: 'rgba(99, 102, 241, 0.22)',
+    bg: 'rgba(99, 102, 241, 0.08)',
+    sectionBg: '#07060f',
+    nextBg: '#050505',
+    glowPos: '74% 70%',
+  },
+};
+
+const PARTICLE_COLORS: Record<string, string> = {
+  ndt: '#0071e3',
+  nadzori: '#0ea5e9',
+  qa: '#0891b2',
+  svetovanje: '#6366f1',
+};
+
+const EASE_OUT_EXPO: [number, number, number, number] = [0.16, 1, 0.3, 1];
+
+/* ── Per-section CTA copy ── */
+const SECTION_CTA_COPY: Record<string, { sl: string; en: string }> = {
+  ndt: {
+    sl: 'Povejte nam material, standard in obseg — ocenimo metode in rok.',
+    en: 'Tell us the material, standard and scope — we assess methods and timeline.',
+  },
+  nadzori: {
+    sl: 'Opišite projekt — nastopimo kot tretja stranka ali pogodbeni nadzor.',
+    en: 'Describe the project — we join as third party or contracted supervisor.',
+  },
+  qa: {
+    sl: 'Pokažite specifikacijo — kompletiramo celotno dokumentacijo projekta.',
+    en: 'Share your specification — we complete all required project documentation.',
+  },
+  svetovanje: {
+    sl: 'Opišite izziv — strokovno mnenje brez zavez.',
+    en: 'Describe the challenge — expert opinion without commitment.',
+  },
+};
+
+const CERTS = [
+  { code: 'EN ISO 9712', sl: 'Osebje NDT', en: 'NDT personnel' },
+  { code: 'EN ISO/IEC 17020', sl: 'Inšpekcijski organ', en: 'Inspection body' },
+  { code: 'EN ISO 17637', sl: 'Vizualna preiskava', en: 'Visual testing' },
+  { code: 'EN ISO 3834', sl: 'Kakovost varjenja', en: 'Welding quality' },
 ];
 
-const certifications = [
-  { code: 'EN ISO 9712', scope: { sl: 'Osebje NDT', en: 'NDT personnel' } },
-  { code: 'EN ISO/IEC 17020', scope: { sl: 'Inšpekcijski organ', en: 'Inspection body' } },
-  { code: 'EN ISO 17637', scope: { sl: 'Vizualna preiskava', en: 'Visual testing' } },
-  { code: 'EN ISO 3834', scope: { sl: 'Kakovost varjenja', en: 'Welding quality' } },
-];
+/* ── Helpers ── */
+function getParenAbbr(label: string): string | null {
+  const m = label.match(/\(([^)]+)\)\*?$/);
+  return m ? m[1] : null;
+}
+function getMethodName(label: string): string {
+  return label.replace(/\s*\([^)]+\)\*?$/, '').trim();
+}
 
-function AnimatedStat({ stat, lang, delay }: { stat: Stat; lang: 'sl' | 'en'; delay: number }) {
+/* ── Ambient particles ── */
+function ParticleField({ color, count = 10 }: { color: string; count?: number }) {
+  const particles = useMemo(() =>
+    Array.from({ length: count }, () => ({
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      size: 1 + Math.random() * 2,
+      duration: 10 + Math.random() * 10,
+      delay: Math.random() * 7,
+      driftY: -(12 + Math.random() * 28),
+      driftX: (Math.random() - 0.5) * 16,
+    })), [count]
+  );
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
+      {particles.map((p, i) => (
+        <motion.div
+          key={i}
+          className="absolute rounded-full"
+          style={{ left: `${p.x}%`, top: `${p.y}%`, width: p.size, height: p.size, background: color }}
+          animate={{ opacity: [0, 0.35, 0.5, 0.15, 0], y: [0, p.driftY], x: [0, p.driftX] }}
+          transition={{ duration: p.duration, delay: p.delay, repeat: Infinity, ease: 'linear' }}
+        />
+      ))}
+    </div>
+  );
+}
+
+/* ── Scroll reveal ── */
+function Reveal({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: '-50px' });
+  const inView = useInView(ref, { once: true, margin: '-60px' });
+  const shouldReduce = useReducedMotion();
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 12 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.5, delay, ease: 'easeOut' }}
-      className="flex flex-col items-center gap-2 px-4 py-7 md:py-8"
+      initial={shouldReduce ? { opacity: 0 } : { opacity: 0, y: 28, filter: 'blur(8px)' }}
+      animate={inView ? (shouldReduce ? { opacity: 1 } : { opacity: 1, y: 0, filter: 'blur(0px)' }) : {}}
+      transition={{ duration: shouldReduce ? 0.2 : 0.8, delay, ease: EASE_OUT_EXPO }}
+      className={className}
     >
-      <div className="font-heading text-3xl md:text-5xl font-bold text-white tracking-tight tabular-nums whitespace-nowrap">
-        {stat.value}
+      {children}
+    </motion.div>
+  );
+}
+
+/* ── Section header ── */
+function SectionHeader({ category, theme, lang, index }: {
+  category: ServiceCategory;
+  theme: ColorTheme;
+  lang: 'sl' | 'en';
+  index: number;
+}) {
+  return (
+    <div className="flex flex-col md:flex-row md:items-end gap-8 md:gap-16">
+      <div className="flex-1">
+        <div className="flex items-center gap-3 mb-5">
+          <span
+            className="font-mono text-[10px] tracking-[0.32em] uppercase"
+            style={{ color: theme.accentMuted }}
+          >
+            {String(index + 1).padStart(2, '0')}
+          </span>
+          <span style={{ color: theme.accent }}>{iconMap[category.icon]}</span>
+          <span
+            className="font-mono text-[10px] tracking-[0.28em] uppercase"
+            style={{ color: theme.accent }}
+          >
+            {lang === 'sl' ? 'Področje ekspertize' : 'Area of expertise'}
+          </span>
+        </div>
+        <h2
+          className="font-heading font-bold text-white leading-[0.93] tracking-tight"
+          style={{ fontSize: 'clamp(2.2rem, 4.5vw, 3.5rem)' }}
+        >
+          {category.title}
+        </h2>
+        <p className="mt-5 text-slate-400 text-base font-light leading-relaxed max-w-xl">
+          {category.description}
+        </p>
       </div>
-      <div className="text-[10px] md:text-xs text-slate-400 uppercase tracking-wider font-medium text-center leading-tight">
-        {stat.label[lang]}
+      {/* Item count — right-aligned, typographic, not a badge */}
+      <div className="shrink-0 self-end pb-1">
+        <span
+          className="font-mono text-[11px] tracking-widest uppercase"
+          style={{ color: theme.accentMuted }}
+        >
+          {category.items.length} {lang === 'sl' ? 'storitev' : 'services'}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/* ── Section CTA ── */
+function SectionCTA({ category, theme, lang, focusRing }: {
+  category: ServiceCategory;
+  theme: ColorTheme;
+  lang: 'sl' | 'en';
+  focusRing: string;
+}) {
+  const copy = SECTION_CTA_COPY[category.id] ?? SECTION_CTA_COPY.ndt;
+  return (
+    <Reveal delay={0.05}>
+      <div
+        className="mt-14 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pt-10 border-t"
+        style={{ borderColor: theme.border }}
+      >
+        <p className="text-slate-500 text-sm leading-relaxed max-w-lg">
+          {lang === 'sl' ? copy.sl : copy.en}
+        </p>
+        <Link
+          to="/#contact"
+          state={{ service: category.id, serviceLabel: category.title }}
+          className={`shrink-0 inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-sm transition-all duration-200 hover:scale-[1.03] ${focusRing}`}
+          style={{ background: theme.bg, border: `1px solid ${theme.border}`, color: theme.accent }}
+        >
+          {lang === 'sl' ? 'Pošlji povpraševanje' : 'Send inquiry'}
+          <ArrowRight size={14} />
+        </Link>
+      </div>
+    </Reveal>
+  );
+}
+
+/* ── Method Card ── */
+function MethodCard({
+  item, isActive, theme, onClick, index, focusRing,
+}: {
+  item: ServiceItem;
+  isActive: boolean;
+  theme: ColorTheme;
+  onClick: () => void;
+  index: number;
+  focusRing: string;
+}) {
+  const abbrev = getParenAbbr(item.label);
+  const name = abbrev ? getMethodName(item.label) : item.label;
+  const badge = abbrev ?? String(index + 1).padStart(2, '0');
+
+  return (
+    <motion.button
+      onClick={onClick}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, delay: index * 0.04, ease: EASE_OUT_EXPO }}
+      whileHover={{ scale: 1.025, y: -2 }}
+      whileTap={{ scale: 0.97 }}
+      className={`text-left w-full relative rounded-2xl border p-5 transition-all duration-300 group overflow-hidden ${focusRing}`}
+      style={{
+        background: isActive ? theme.bg : 'rgba(255,255,255,0.015)',
+        borderColor: isActive ? theme.border : 'rgba(255,255,255,0.06)',
+        boxShadow: isActive ? `0 0 28px -8px ${theme.glow}` : 'none',
+      }}
+    >
+      {/* Hover radial glow */}
+      <div
+        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl"
+        style={{ background: `radial-gradient(ellipse 80% 60% at 50% 40%, ${theme.glow}, transparent 70%)` }}
+      />
+
+      {/* Header row */}
+      <div className="flex items-start justify-between mb-3 relative z-10">
+        <span
+          className="font-mono text-[13px] font-bold tracking-widest px-2.5 py-1 rounded-lg border"
+          style={{
+            color: theme.accent,
+            background: isActive ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.03)',
+            borderColor: isActive ? theme.border : 'rgba(255,255,255,0.06)',
+          }}
+        >
+          {badge}
+        </span>
+        {item.level3 && (
+          <span
+            className="flex items-center gap-1 font-mono text-[9px] px-2 py-1 rounded-md border"
+            style={{ color: theme.accentMuted, borderColor: 'rgba(255,255,255,0.07)' }}
+          >
+            <ShieldCheck size={9} style={{ color: theme.accent }} />
+            III
+          </span>
+        )}
+      </div>
+
+      {/* Title */}
+      <h4
+        className="font-heading font-bold leading-snug tracking-tight mb-2 relative z-10 text-[15px]"
+        style={{ color: isActive ? '#f1f5f9' : '#94a3b8' }}
+      >
+        {name}
+      </h4>
+
+      {/* Description preview */}
+      <p
+        className="text-[12px] leading-relaxed line-clamp-2 relative z-10"
+        style={{ color: isActive ? '#64748b' : '#334155' }}
+      >
+        {item.description}
+      </p>
+
+      {/* Standard */}
+      {item.quickFacts?.standard && (
+        <div className="mt-3 relative z-10">
+          <span
+            className="font-mono text-[10px] px-2 py-0.5 rounded"
+            style={{
+              color: isActive ? theme.accent : '#334155',
+              background: 'rgba(255,255,255,0.03)',
+            }}
+          >
+            {item.quickFacts.standard}
+          </span>
+        </div>
+      )}
+
+      {/* Active bottom line */}
+      {isActive && (
+        <div
+          className="absolute bottom-0 left-4 right-4 h-[2px] rounded-full"
+          style={{ background: `linear-gradient(90deg, transparent, ${theme.accent}, transparent)` }}
+        />
+      )}
+    </motion.button>
+  );
+}
+
+/* ── Active method detail panel ── */
+function ActiveMethodPanel({
+  item, theme, lang, focusRing,
+}: {
+  item: ServiceItem;
+  theme: ColorTheme;
+  lang: 'sl' | 'en';
+  focusRing: string;
+}) {
+  const abbrev = getParenAbbr(item.label);
+  const name = abbrev ? getMethodName(item.label) : item.label;
+
+  return (
+    <motion.div
+      key={item.id}
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -8 }}
+      transition={{ duration: 0.4, ease: EASE_OUT_EXPO }}
+      className="rounded-2xl border p-6 md:p-8 relative overflow-hidden"
+      style={{
+        background: theme.bg,
+        borderColor: theme.border,
+        boxShadow: `0 0 60px -20px ${theme.glow}`,
+      }}
+    >
+      {/* Background glow */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: `radial-gradient(ellipse 50% 80% at 80% 50%, ${theme.glow}, transparent 65%)` }}
+      />
+
+      <div className="relative z-10 flex flex-col lg:flex-row gap-8">
+        {/* Left: description + bullet details */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-3 mb-5">
+            {abbrev && (
+              <span
+                className="font-mono text-[13px] font-bold tracking-widest px-3 py-1.5 rounded-lg border shrink-0"
+                style={{ color: theme.accent, background: 'rgba(255,255,255,0.06)', borderColor: theme.border }}
+              >
+                {abbrev}
+              </span>
+            )}
+            <h4 className="font-heading font-bold text-white text-xl tracking-tight leading-snug">{name}</h4>
+          </div>
+
+          <p className="text-slate-400 text-[14px] leading-relaxed mb-6">{item.description}</p>
+
+          {item.details && item.details.length > 0 && (
+            <div className="grid sm:grid-cols-2 gap-x-8 gap-y-2.5">
+              {item.details.map((d, i) => (
+                <div key={i} className="flex items-start gap-2.5">
+                  <div className="mt-[7px] w-[4px] h-[4px] rounded-full shrink-0" style={{ background: theme.accent }} />
+                  <span className="text-[13px] text-slate-400 leading-relaxed">{d}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Right: quick facts + badges + CTA */}
+        <div className="lg:w-64 xl:w-72 flex flex-col gap-5 shrink-0">
+          {item.quickFacts && (
+            <div className="flex flex-col gap-3 p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]">
+              {[
+                { key: lang === 'sl' ? 'Standard' : 'Standard', val: item.quickFacts.standard },
+                { key: lang === 'sl' ? 'Uporaba' : 'Application', val: item.quickFacts.application },
+                { key: lang === 'sl' ? 'Rezultat' : 'Result', val: item.quickFacts.result },
+              ].filter(f => f.val).map(({ key, val }) => (
+                <div key={key} className="flex flex-col gap-0.5">
+                  <span className="text-[9px] uppercase tracking-widest text-slate-600 font-bold">{key}</span>
+                  <span className="text-[12px] text-slate-300">{val}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {item.level3 && (
+            <span
+              className="flex items-center gap-1.5 font-mono text-[10px] px-3 py-2 rounded-lg border self-start"
+              style={{ color: theme.accentMuted, borderColor: theme.border }}
+            >
+              <ShieldCheck size={11} style={{ color: theme.accent }} />
+              Level III
+            </span>
+          )}
+
+          <Link
+            to="/#contact"
+            state={{ service: item.id, serviceLabel: name }}
+            className={`inline-flex items-center gap-2 px-5 py-3 rounded-full font-semibold text-sm mt-auto hover:scale-[1.02] transition-transform ${focusRing}`}
+            style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${theme.border}`, color: theme.accent }}
+          >
+            {lang === 'sl' ? 'Povpraševanje' : 'Send inquiry'}
+            <ArrowRight size={14} />
+          </Link>
+        </div>
       </div>
     </motion.div>
   );
 }
 
+/* ════════════════════════════════════════════
+   SERVICE SECTION
+   ════════════════════════════════════════════ */
+function ServiceSection({ category, theme, lang, focusRing, index, sectionRef }: {
+  category: ServiceCategory;
+  theme: ColorTheme;
+  lang: 'sl' | 'en';
+  focusRing: string;
+  index: number;
+  sectionRef: (el: HTMLElement | null) => void;
+}) {
+  const [activeItem, setActiveItem] = useState(category.items[0].id);
+  const activeItemData = category.items.find(i => i.id === activeItem) ?? category.items[0];
+
+  return (
+    <section
+      id={`section-${category.id}`}
+      ref={sectionRef}
+      className="relative w-full py-24 md:py-32 overflow-hidden"
+      style={{
+        background: `linear-gradient(to bottom, ${theme.sectionBg} 0%, ${theme.sectionBg} 75%, ${theme.nextBg} 100%)`,
+      }}
+    >
+      {/* Ambient glow */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: `radial-gradient(ellipse 60% 65% at ${theme.glowPos}, ${theme.glow}, transparent 65%)`,
+        }}
+      />
+      <ParticleField color={PARTICLE_COLORS[category.id]} count={10} />
+
+      <div className="max-w-[1440px] mx-auto px-8 lg:px-16 relative z-10">
+        <Reveal>
+          <SectionHeader category={category} theme={theme} lang={lang} index={index} />
+        </Reveal>
+
+        {/* Method cards grid */}
+        <div className="mt-12 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
+          {category.items.map((item, idx) => (
+            <MethodCard
+              key={item.id}
+              item={item}
+              isActive={activeItem === item.id}
+              theme={theme}
+              focusRing={focusRing}
+              onClick={() => setActiveItem(item.id)}
+              index={idx}
+            />
+          ))}
+        </div>
+
+        {/* Active method detail panel */}
+        <div className="mt-5">
+          <AnimatePresence mode="wait">
+            <ActiveMethodPanel
+              key={activeItem}
+              item={activeItemData}
+              theme={theme}
+              lang={lang}
+              focusRing={focusRing}
+            />
+          </AnimatePresence>
+        </div>
+
+        {/* Section CTA */}
+        <SectionCTA category={category} theme={theme} lang={lang} focusRing={focusRing} />
+      </div>
+    </section>
+  );
+}
+
+/* ════════════════════════════════════════════
+   MAIN PAGE
+   ════════════════════════════════════════════ */
 function ServicesPage() {
   const location = useLocation();
-  const initialCategoryId = location.state?.categoryId || servicesData[0].id;
-
-  const [activeCategoryId, setActiveCategoryId] = useState<string>(initialCategoryId);
+  const [activeSection, setActiveSection] = useState('ndt');
   const { language } = useLanguage();
   const lang = language as 'sl' | 'en';
+  const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
+  const focusRing = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050505]';
 
-  const activeCategory = servicesData.find(c => c.id === activeCategoryId) || servicesData[0];
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+  useEffect(() => { window.scrollTo(0, 0); }, []);
 
   useEffect(() => {
     if (location.state?.categoryId) {
-      setActiveCategoryId(location.state.categoryId);
+      const el = sectionRefs.current[location.state.categoryId];
+      if (el) setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 120);
     }
   }, [location.state]);
 
-  const focusRing =
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1392ec] focus-visible:ring-offset-2 focus-visible:ring-offset-[#050505]';
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) setActiveSection(e.target.id.replace('section-', ''));
+        });
+      },
+      { threshold: 0.18 }
+    );
+    servicesData.forEach((cat) => {
+      const el = sectionRefs.current[cat.id];
+      if (el) observer.observe(el);
+    });
+    return () => observer.disconnect();
+  }, []);
+
+  const scrollToSection = (id: string) => {
+    const el = sectionRefs.current[id];
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   return (
-    <div className="min-h-screen bg-[#050505] text-slate-300 font-sans overflow-x-clip pt-20 flex flex-col items-center">
+    <div className="min-h-screen bg-[#050505] text-slate-300 font-sans overflow-x-clip">
 
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:60px_60px]" />
-      </div>
+      {/* ── HERO ── */}
+      <section className="relative min-h-[72vh] flex items-end pb-20 overflow-hidden pt-28">
+        <div className="absolute inset-0 z-0">
+          <motion.img
+            src="/images/references/hero_bg.png"
+            alt=""
+            className="w-full h-full object-cover"
+            style={{ opacity: 0.13 }}
+            initial={{ scale: 1.1 }}
+            animate={{ scale: 1.03 }}
+            transition={{ duration: 2.4, ease: [0.25, 1, 0.5, 1] }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/65 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#050505]/50 via-transparent to-[#050505]/50" />
+          <div
+            className="absolute inset-0"
+            style={{ background: 'radial-gradient(ellipse 60% 40% at 30% 60%, rgba(0,80,200,0.06) 0%, transparent 70%)' }}
+          />
+        </div>
 
-      {/* Hero */}
-      <section className="relative w-full h-[35vh] min-h-[300px] flex items-center justify-center overflow-hidden border-b border-white/5">
-         <div className="absolute inset-0 z-0">
-           <img src="/images/references/hero_bg.png" alt="" className="w-full h-full object-cover opacity-20 scale-105" />
-           <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/80 to-transparent" />
-         </div>
+        <div className="relative z-10 w-full max-w-[1440px] mx-auto px-8 lg:px-16">
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1, ease: EASE_OUT_EXPO }}
+            className="font-mono text-[10px] tracking-[0.35em] uppercase text-[#4da8ff] mb-6"
+          >
+            Megama — {lang === 'sl' ? 'Storitve' : 'Services'}
+          </motion.div>
 
-         <div className="relative z-10 text-center px-6">
-            <motion.div
-              initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-              className="font-mono text-[10px] tracking-[0.3em] uppercase text-[#1392ec] mb-4"
+          <div className="overflow-hidden">
+            <motion.h1
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              transition={{ duration: 0.95, delay: 0.18, ease: EASE_OUT_EXPO }}
+              className="font-heading font-bold text-white leading-[0.88] tracking-tight"
+              style={{ fontSize: 'clamp(3.2rem, 9.5vw, 8.5rem)' }}
             >
-              {lang === 'sl' ? 'STORITVE' : 'SERVICES'}
-            </motion.div>
-            <h1 className="font-heading text-5xl md:text-7xl font-bold text-white tracking-tight mb-6">
-              {lang === 'sl' ? 'Storitve & Ekspertiza' : 'Services & Expertise'}
-            </h1>
-            <p className="text-slate-300 max-w-2xl mx-auto text-lg font-light leading-relaxed">
-              {lang === 'sl'
-                ? 'Celovit pregled naših tehnoloških rešitev na področju neporušitvenih preiskav, nadzora in inženiringa.'
-                : 'A comprehensive overview of our technological solutions in NDT, supervision, and engineering.'}
-            </p>
-         </div>
-      </section>
+              {lang === 'sl' ? 'Storitve &' : 'Services &'}
+            </motion.h1>
+          </div>
+          <div className="overflow-hidden">
+            <motion.h1
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              transition={{ duration: 0.95, delay: 0.3, ease: EASE_OUT_EXPO }}
+              className="font-heading font-bold leading-[0.88] tracking-tight"
+              style={{ fontSize: 'clamp(3.2rem, 9.5vw, 8.5rem)', color: 'oklch(0.55 0.18 230)' }}
+            >
+              {lang === 'sl' ? 'Ekspertiza' : 'Expertise'}
+            </motion.h1>
+          </div>
 
-      {/* Proof strip — stats (top) + certifications (bottom) */}
-      <section className="w-full border-b border-white/5 bg-gradient-to-b from-white/[0.02] to-transparent">
-        <div className="max-w-[1240px] mx-auto px-6 lg:px-12 py-12 md:py-16">
+          <motion.p
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.52, ease: EASE_OUT_EXPO }}
+            className="mt-8 text-slate-400 max-w-xl text-lg font-light leading-relaxed"
+          >
+            {lang === 'sl'
+              ? 'NDT preiskave, inženirski nadzor, kakovost in svetovanje — certificirano po EN ISO.'
+              : 'NDT testing, engineering supervision, quality management and consulting — certified to EN ISO.'}
+          </motion.p>
 
-          {/* Stats row */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/5 rounded-2xl overflow-hidden border border-white/5">
-            {stats.map((stat, i) => (
-              <div key={stat.value} className="bg-[#050505]">
-                <AnimatedStat stat={stat} lang={lang} delay={0.1 + i * 0.08} />
+          {/* Credential pills */}
+          <motion.div
+            initial={{ opacity: 0, y: 22 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.68, ease: EASE_OUT_EXPO }}
+            className="mt-10 flex flex-wrap gap-3"
+          >
+            {[
+              { icon: <Award size={13} />, label: 'EN ISO 9712', sub: lang === 'sl' ? 'Nivo III' : 'Level III' },
+              { icon: <ShieldCheck size={13} />, label: 'ISO/IEC 17020', sub: lang === 'sl' ? 'Inšpekcijski organ' : 'Inspection body' },
+              { icon: null, label: '15+', sub: lang === 'sl' ? 'let izkušenj' : 'years experience' },
+            ].map(({ icon, label, sub }) => (
+              <div
+                key={label}
+                className="flex items-center gap-2.5 px-4 py-2.5 rounded-full border"
+                style={{ borderColor: 'rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)' }}
+              >
+                {icon && <span style={{ color: '#4da8ff' }}>{icon}</span>}
+                <span className="text-[12px] font-semibold text-white">{label}</span>
+                <span className="text-[11px] text-slate-500">{sub}</span>
               </div>
             ))}
-          </div>
-
-          {/* Certifications row */}
-          <div className="mt-10 md:mt-12">
-            <div className="text-[11px] text-slate-400 uppercase tracking-widest font-semibold mb-5 flex items-center gap-2">
-              <FileBadge size={14} className="text-[#1392ec]" />
-              {lang === 'sl' ? 'Akreditacije & standardi' : 'Accreditations & standards'}
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-              {certifications.map((cert, i) => (
-                <motion.div
-                  key={cert.code}
-                  initial={{ opacity: 0, y: 8 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: i * 0.06 }}
-                  className="px-4 py-4 rounded-xl bg-white/[0.03] border border-white/10 hover:border-[#1392ec]/30 transition-colors"
-                >
-                  <div className="text-white font-bold text-sm tracking-tight">{cert.code}</div>
-                  <div className="text-[11px] text-slate-400 mt-1 leading-snug">{cert.scope[lang]}</div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-
+          </motion.div>
         </div>
       </section>
 
-      {/* Mobile category tab bar (sticky) */}
-      <div className="lg:hidden sticky top-20 z-30 w-full bg-[#050505]/95 backdrop-blur-md border-b border-white/5">
-        <div
-          className="flex gap-2 overflow-x-auto px-6 py-3 snap-x snap-mandatory scrollbar-hide"
-          role="tablist"
-          aria-label={lang === 'sl' ? 'Področja storitev' : 'Service areas'}
-        >
-          {servicesData.map((category) => {
-            const isActive = activeCategoryId === category.id;
-            return (
-              <button
-                key={category.id}
-                role="tab"
-                aria-selected={isActive}
-                onClick={() => setActiveCategoryId(category.id)}
-                className={`snap-start shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-full border transition-all duration-300 ${focusRing} ${
-                  isActive
-                    ? 'bg-[#1392ec]/15 border-[#1392ec]/40 text-white'
-                    : 'bg-transparent border-white/10 text-slate-400 hover:text-white hover:border-white/20'
-                }`}
-              >
-                <span className={isActive ? 'text-[#1392ec]' : 'text-slate-500'}>
-                  {iconMap[category.icon]}
-                </span>
-                <span className="text-sm font-semibold tracking-tight whitespace-nowrap">
-                  {category.shortTitle}
-                </span>
-              </button>
-            );
-          })}
+      {/* ── CATEGORY OVERVIEW GRID ── */}
+      <section className="relative py-16 md:py-20" style={{ background: '#04080f' }}>
+        <div className="max-w-[1440px] mx-auto px-8 lg:px-16">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+            {servicesData.map((cat, i) => {
+              const t = COLOR_THEMES[cat.id] || COLOR_THEMES.ndt;
+              const glowColors: Record<string, 'blue' | 'purple' | 'green' | 'red' | 'orange'> = {
+                ndt: 'blue',
+                nadzori: 'blue',
+                qa: 'green',
+                svetovanje: 'purple',
+              };
+              return (
+                <motion.div
+                  key={cat.id}
+                  initial={{ opacity: 0, y: 32 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.7, delay: 0.1 + i * 0.1, ease: EASE_OUT_EXPO }}
+                >
+                  <GlowCard
+                    glowColor={glowColors[cat.id] ?? 'blue'}
+                    customSize
+                    className="w-full h-auto aspect-auto min-h-[260px] p-7 flex flex-col gap-5 cursor-pointer group"
+                    style={{ background: 'rgba(5,10,20,0.85)' } as React.CSSProperties}
+                  >
+                    {/* icon + number */}
+                    <div className="flex items-start justify-between">
+                      <div
+                        className="w-11 h-11 rounded-xl flex items-center justify-center"
+                        style={{ background: t.bg, border: `1px solid ${t.border}` }}
+                      >
+                        <span style={{ color: t.accent }}>{iconMap[cat.icon]}</span>
+                      </div>
+                      <span className="font-mono text-[10px] tracking-widest" style={{ color: t.accentMuted }}>
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+                    </div>
+
+                    {/* title + subtitle */}
+                    <div className="flex-1 flex flex-col gap-2">
+                      <div
+                        className="font-mono text-[11px] font-bold tracking-widest uppercase"
+                        style={{ color: t.accent }}
+                      >
+                        {cat.shortTitle}
+                      </div>
+                      <h3 className="font-heading font-bold text-white text-xl leading-snug tracking-tight">
+                        {cat.title}
+                      </h3>
+                      <p className="text-slate-500 text-[13px] leading-relaxed mt-1">{cat.subtitle}</p>
+                    </div>
+
+                    {/* footer: method count + CTA */}
+                    <div className="flex items-center justify-between pt-4" style={{ borderTop: `1px solid ${t.border}` }}>
+                      <span className="font-mono text-[11px]" style={{ color: t.accentMuted }}>
+                        {cat.items.length} {lang === 'sl' ? 'metod' : 'methods'}
+                      </span>
+                      <button
+                        onClick={() => scrollToSection(cat.id)}
+                        className="flex items-center gap-1.5 text-[12px] font-semibold transition-all duration-200 group-hover:gap-3"
+                        style={{ color: t.accent }}
+                      >
+                        {lang === 'sl' ? 'Preberi več' : 'Learn more'}
+                        <ArrowRight size={13} />
+                      </button>
+                    </div>
+                  </GlowCard>
+                </motion.div>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      </section>
 
-      {/* Main layout */}
-      <section className="relative w-full max-w-[1440px] px-6 lg:px-12 py-12 md:py-20 z-10">
-
-        <div className="flex flex-col lg:flex-row gap-12 items-start">
-
-          {/* Desktop sidebar */}
+      {/* ── STICKY NAV ── */}
+      <div className="sticky top-16 z-40 w-full border-b border-white/[0.06] bg-[#050505]/92 backdrop-blur-xl">
+        <div className="max-w-[1440px] mx-auto px-8 lg:px-16">
           <div
-            className="hidden lg:flex w-80 shrink-0 flex-col gap-3 sticky top-28 z-20"
+            className="flex items-center gap-1 py-3 overflow-x-auto scrollbar-hide"
             role="tablist"
             aria-label={lang === 'sl' ? 'Področja storitev' : 'Service areas'}
           >
-            <div className="text-[11px] text-slate-500 tracking-widest uppercase font-semibold mb-2 px-4">
-              {lang === 'sl' ? 'Področja ekspertize' : 'Areas of expertise'}
-            </div>
-            {servicesData.map((category) => {
-              const isActive = activeCategoryId === category.id;
-
+            {servicesData.map((cat) => {
+              const t = COLOR_THEMES[cat.id] || COLOR_THEMES.ndt;
+              const active = activeSection === cat.id;
               return (
                 <button
-                  key={category.id}
+                  key={cat.id}
                   role="tab"
-                  aria-selected={isActive}
-                  onClick={() => setActiveCategoryId(category.id)}
-                  className={`
-                    relative w-full text-left flex items-center gap-4 px-5 py-4 rounded-2xl transition-all duration-300
-                    border overflow-hidden group ${focusRing}
-                    ${isActive
-                      ? 'bg-white/5 border-white/20 shadow-[0_0_20px_rgba(19,146,236,0.1)]'
-                      : 'bg-transparent border-white/5 hover:bg-white/[0.02] hover:border-white/10'
-                    }
-                  `}
+                  aria-selected={active}
+                  onClick={() => scrollToSection(cat.id)}
+                  className={`shrink-0 flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${focusRing}`}
+                  style={active
+                    ? { background: t.bg, border: `1px solid ${t.border}`, color: t.accent }
+                    : { border: '1px solid transparent', color: '#6b7280' }}
                 >
-                  <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1 rounded-r-full transition-all duration-300 ${isActive ? 'bg-[#1392ec] h-2/3' : 'bg-transparent h-0'}`} />
-
-                  <div className={`p-2.5 rounded-xl transition-all duration-300 border ${isActive ? 'bg-[#1392ec]/10 border-[#1392ec]/20 text-[#1392ec]' : 'bg-white/[0.03] border-white/5 text-slate-400 group-hover:text-slate-200'}`}>
-                    {iconMap[category.icon]}
-                  </div>
-
-                  <div className="flex flex-col gap-0.5 flex-1 min-w-0">
-                     <div className={`text-base font-bold tracking-tight transition-colors ${isActive ? 'text-white' : 'text-slate-300 group-hover:text-white'}`}>
-                       {category.shortTitle}
-                     </div>
-                     <div className="text-xs text-slate-500 line-clamp-1">
-                       {category.items.length} {lang === 'sl' ? 'metod' : 'methods'}
-                     </div>
-                  </div>
-
-                  <ArrowRight
-                    size={16}
-                    className={`shrink-0 transition-all duration-300 ${isActive ? 'text-[#1392ec] translate-x-0 opacity-100' : 'text-slate-600 -translate-x-1 opacity-0 group-hover:opacity-100 group-hover:translate-x-0'}`}
-                  />
+                  <span style={{ color: active ? t.accent : '#4b5563' }}>{iconMap[cat.icon]}</span>
+                  {cat.shortTitle}
                 </button>
               );
             })}
+          </div>
+        </div>
+      </div>
 
-            {/* Certificate reassurance card */}
-            <div className="mt-6 p-5 rounded-2xl bg-gradient-to-br from-[#1392ec]/10 to-transparent border border-[#1392ec]/20">
-              <div className="flex items-center gap-2 text-[#1392ec] mb-2">
-                <ShieldCheck size={16} />
-                <span className="text-[11px] font-bold uppercase tracking-widest">
-                  {lang === 'sl' ? 'Akreditirano' : 'Accredited'}
-                </span>
-              </div>
-              <p className="text-xs text-slate-300 leading-relaxed">
-                {lang === 'sl'
-                  ? 'Vse preiskave izvajamo skladno z EN ISO 9712 s certificiranim osebjem.'
-                  : 'All inspections are performed per EN ISO 9712 by certified personnel.'}
-              </p>
+      {/* ── CERT STRIP ── */}
+      <div
+        className="border-b border-white/[0.04]"
+        style={{ background: '#04080f' }}
+      >
+        <div className="max-w-[1440px] mx-auto px-8 lg:px-16 py-4">
+          <div className="flex flex-wrap items-center gap-6">
+            <span className="text-[10px] uppercase tracking-widest text-slate-600 font-bold flex items-center gap-1.5 shrink-0">
+              <FileBadge size={12} className="text-[#4da8ff]" />
+              {lang === 'sl' ? 'Akreditirano' : 'Accredited'}
+            </span>
+            <div className="flex flex-wrap gap-5">
+              {CERTS.map((cert) => (
+                <div key={cert.code} className="flex items-baseline gap-2">
+                  <span className="font-mono text-[11px] text-white font-semibold">{cert.code}</span>
+                  <span className="text-[10px] text-slate-600">{lang === 'sl' ? cert.sl : cert.en}</span>
+                </div>
+              ))}
             </div>
           </div>
-
-          {/* Content */}
-          <div className="w-full lg:flex-1 relative min-h-[600px]">
-             <AnimatePresence mode="wait">
-               <motion.div
-                 key={activeCategory.id}
-                 initial={{ opacity: 0, x: 20 }}
-                 animate={{ opacity: 1, x: 0 }}
-                 exit={{ opacity: 0, x: -20 }}
-                 transition={{ duration: 0.4, ease: "easeOut" }}
-                 className="flex flex-col"
-               >
-                 {/* Category header */}
-                 <div className="mb-10 p-8 md:p-12 rounded-[2rem] bg-gradient-to-br from-white/5 to-transparent border border-white/10 relative overflow-hidden backdrop-blur-md">
-                    <div className="absolute right-0 top-0 w-1/2 h-full bg-[#1392ec]/5 blur-[100px] pointer-events-none" />
-
-                    <div className="flex flex-col md:flex-row md:items-start justify-between gap-8 relative z-10">
-                       <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-4 mb-5">
-                             <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-black/40 border border-white/10 text-[#1392ec] shrink-0">
-                                {iconMap[activeCategory.icon]}
-                             </div>
-                             <div className="min-w-0">
-                                <div className="text-[11px] text-slate-500 uppercase tracking-widest font-semibold mb-1">
-                                  {lang === 'sl' ? 'Področje' : 'Area'}
-                                </div>
-                                <h2 className="font-heading text-3xl md:text-4xl font-bold text-white tracking-tight">{activeCategory.title}</h2>
-                             </div>
-                          </div>
-                          <p className="text-slate-300 text-base md:text-lg leading-relaxed max-w-2xl font-light">
-                             {activeCategory.description}
-                          </p>
-                       </div>
-
-                       <div className="flex md:flex-col gap-2 shrink-0">
-                          <div className="px-4 py-3 rounded-xl bg-white/[0.03] border border-white/10 text-center md:min-w-[120px]">
-                            <div className="text-2xl font-bold text-white tabular-nums">{activeCategory.items.length}</div>
-                            <div className="text-[10px] text-slate-400 uppercase tracking-wider mt-0.5">
-                              {lang === 'sl' ? 'Metod' : 'Methods'}
-                            </div>
-                          </div>
-                       </div>
-                    </div>
-                 </div>
-
-                 {/* Service cards */}
-                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 md:gap-8">
-                   {activeCategory.items.map((item, idx) => (
-                     <motion.div
-                       key={item.id}
-                       initial={{ opacity: 0, y: 12 }}
-                       animate={{ opacity: 1, y: 0 }}
-                       transition={{ delay: idx * 0.05, duration: 0.35 }}
-                       className="group relative bg-[#0a0a0a] border border-white/5 hover:border-[#1392ec]/30 rounded-[1.75rem] overflow-hidden transition-all duration-300 flex flex-col h-full"
-                     >
-                        <div className="w-full h-48 md:h-64 relative bg-black/40 border-b border-white/5 overflow-hidden">
-                           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(19,146,236,0.05)_0%,transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                           <MethodIllustrations methodId={item.id} color="text-[#1392ec]" />
-
-                           <motion.div
-                             className="absolute left-0 w-full h-[1px] bg-[#1392ec]/20 z-10 pointer-events-none opacity-0 group-hover:opacity-100 motion-reduce:hidden"
-                             animate={{ top: ['0%', '100%', '0%'] }}
-                             transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
-                           />
-
-                           <div className="absolute top-5 left-5 z-20">
-                             <div className="p-2.5 rounded-xl bg-black/60 backdrop-blur-md border border-white/10 text-slate-300 group-hover:text-[#1392ec] transition-colors">
-                               {item.icon ? iconMap[item.icon] : <Settings size={20} />}
-                             </div>
-                           </div>
-
-                           <div className="absolute top-5 right-5 text-[11px] text-slate-500 font-mono tabular-nums">
-                             {String(idx + 1).padStart(2, '0')} / {String(activeCategory.items.length).padStart(2, '0')}
-                           </div>
-                        </div>
-
-                        <div className="p-6 md:p-8 flex flex-col flex-1">
-                           <h3 className="font-heading text-xl md:text-2xl font-bold text-white mb-3 group-hover:text-[#1392ec] transition-colors">
-                             {item.label}
-                           </h3>
-                           <p className="text-slate-400 text-sm leading-relaxed mb-6 flex-1 font-light">
-                             {item.description}
-                           </p>
-
-                           {item.details && item.details.length > 0 && (
-                             <div className="mt-auto space-y-2">
-                               <div className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider mb-3 flex items-center gap-2">
-                                 <CheckSquare size={12} className="text-[#1392ec]" />
-                                 {lang === 'sl' ? 'Metode & obseg' : 'Methods & scope'}
-                               </div>
-                               {item.details.map((detail, dIdx) => (
-                                 <div key={dIdx} className="flex items-start gap-3 py-1.5">
-                                    <div className="mt-1.5 w-1 h-1 rounded-full bg-[#1392ec] shrink-0" />
-                                    <span className="text-[13px] text-slate-300 leading-relaxed">{detail}</span>
-                                 </div>
-                               ))}
-                             </div>
-                           )}
-                        </div>
-                     </motion.div>
-                   ))}
-                 </div>
-
-                 {/* Contextual in-category CTA */}
-                 <div className="mt-12 p-8 md:p-10 rounded-[2rem] bg-gradient-to-br from-white/[0.03] to-transparent border border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div className="flex-1">
-                       <h3 className="font-heading text-xl md:text-2xl font-bold text-white mb-2 tracking-tight">
-                         {lang === 'sl'
-                           ? `Potrebujete ${activeCategory.shortTitle.toLowerCase()}?`
-                           : `Need ${activeCategory.shortTitle.toLowerCase()}?`}
-                       </h3>
-                       <p className="text-slate-400 text-sm leading-relaxed max-w-xl">
-                         {lang === 'sl'
-                           ? 'Pošljite povpraševanje — odgovorimo v 24 urah z oceno obsega in rokov.'
-                           : 'Send an inquiry — we respond within 24 hours with a scope and timeline estimate.'}
-                       </p>
-                    </div>
-                    <div className="flex flex-col sm:flex-row gap-3 shrink-0">
-                       <Link
-                         to="/#contact"
-                         state={{ service: activeCategory.id, serviceLabel: activeCategory.title }}
-                         className={`inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#1392ec] hover:bg-[#1392ec]/90 text-white rounded-full font-semibold text-sm transition-all hover:scale-[1.02] ${focusRing}`}
-                       >
-                         {lang === 'sl' ? 'Pošlji povpraševanje' : 'Send inquiry'}
-                         <ArrowRight size={16} />
-                       </Link>
-                       <Link
-                         to="/certifikati"
-                         className={`inline-flex items-center justify-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-full font-semibold text-sm transition-colors ${focusRing}`}
-                       >
-                         <FileBadge size={14} />
-                         {lang === 'sl' ? 'Certifikati' : 'Certificates'}
-                       </Link>
-                    </div>
-                 </div>
-
-               </motion.div>
-             </AnimatePresence>
-          </div>
-
         </div>
-      </section>
+      </div>
 
-      {/* Global CTA */}
-      <section className="w-full max-w-[1240px] px-6 py-20 md:py-24">
-         <div className="p-10 md:p-16 rounded-[2.5rem] bg-gradient-to-br from-[#1392ec]/10 via-[#1392ec]/5 to-transparent border border-[#1392ec]/20 flex flex-col items-center text-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(19,146,236,0.1)_0%,transparent_60%)] pointer-events-none" />
+      {/* ── SERVICE SECTIONS — unified pattern, soft-pour transitions ── */}
+      {servicesData.map((cat, i) => (
+        <ServiceSection
+          key={cat.id}
+          category={cat}
+          theme={COLOR_THEMES[cat.id] || COLOR_THEMES.ndt}
+          lang={lang}
+          focusRing={focusRing}
+          index={i}
+          sectionRef={(el) => { sectionRefs.current[cat.id] = el; }}
+        />
+      ))}
 
-            <div className="relative z-10 flex flex-col items-center">
-              <div className="flex items-center gap-2 text-[#1392ec] mb-4">
-                <Award size={18} />
-                <span className="text-[11px] font-bold uppercase tracking-widest">
+      {/* ── GLOBAL CTA ── */}
+      <section className="py-24 md:py-32" style={{ background: '#050505' }}>
+        <div className="max-w-[1440px] mx-auto px-8 lg:px-16">
+          <Reveal>
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-12">
+              <div>
+                <div className="font-mono text-[10px] tracking-[0.3em] uppercase text-slate-600 mb-5 flex items-center gap-2">
+                  <Award size={12} className="text-[#4da8ff]" />
                   {lang === 'sl' ? 'Akreditirani izvajalec' : 'Accredited provider'}
-                </span>
+                </div>
+                <h2
+                  className="font-heading font-bold text-white leading-[0.93] tracking-tight max-w-2xl"
+                  style={{ fontSize: 'clamp(2.5rem, 6vw, 5rem)' }}
+                >
+                  {lang === 'sl' ? 'Pripravljeni na sodelovanje?' : 'Ready to work with us?'}
+                </h2>
+                <p className="mt-5 text-slate-400 max-w-lg text-lg font-light leading-relaxed">
+                  {lang === 'sl'
+                    ? 'Pošljite nam opis projekta — pripravimo ponudbo s certificiranimi metodami in jasnim rokom.'
+                    : 'Send us your project brief — we prepare a proposal with certified methods and a clear timeline.'}
+                </p>
               </div>
-              <h2 className="font-heading text-3xl md:text-5xl font-bold text-white mb-4 tracking-tight max-w-2xl">
-                 {lang === 'sl' ? 'Pripravljeni na sodelovanje?' : 'Ready to work with us?'}
-              </h2>
-              <p className="text-slate-300 text-base md:text-lg max-w-xl mb-8 font-light leading-relaxed">
-                {lang === 'sl'
-                  ? 'Pošljite nam opis projekta — pripravimo vam ponudbo s certificiranimi metodami in jasnim rokom.'
-                  : 'Send us your project brief — we prepare a proposal with certified methods and a clear timeline.'}
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex flex-col sm:flex-row gap-3 shrink-0">
                 <Link
                   to="/#contact"
-                  className={`inline-flex items-center gap-3 px-8 py-4 bg-white text-black rounded-full font-bold text-sm transition-transform hover:scale-[1.03] ${focusRing}`}
+                  className={`inline-flex items-center gap-3 px-8 py-4 rounded-full font-bold text-sm transition-all hover:scale-[1.03] hover:brightness-110 ${focusRing}`}
+                  style={{ background: '#0071e3', color: '#fff' }}
                 >
-                   {lang === 'sl' ? 'Pošljite povpraševanje' : 'Send inquiry'} <ArrowRight size={16} />
+                  {lang === 'sl' ? 'Pošljite povpraševanje' : 'Send inquiry'}
+                  <ArrowRight size={16} />
                 </Link>
                 <Link
                   to="/certifikati"
-                  className={`inline-flex items-center gap-2 px-8 py-4 bg-transparent text-white border border-white/20 hover:bg-white/5 rounded-full font-semibold text-sm transition-colors ${focusRing}`}
+                  className={`inline-flex items-center gap-2 px-8 py-4 bg-transparent text-white border border-white/15 hover:bg-white/5 rounded-full font-semibold text-sm transition-colors ${focusRing}`}
                 >
                   <Download size={16} />
                   {lang === 'sl' ? 'Certifikati' : 'Certificates'}
                 </Link>
               </div>
             </div>
-         </div>
+          </Reveal>
+        </div>
       </section>
 
     </div>

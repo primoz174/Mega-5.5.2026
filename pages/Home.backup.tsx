@@ -1,366 +1,30 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence, useInView, animate } from 'framer-motion';
 import { ArrowRight, ArrowUpRight, Check, Globe2, Phone } from 'lucide-react';
-import { Helmet } from 'react-helmet-async';
 import { useLanguage } from '../context/LanguageContext';
 import IndustrySectors from '../components/IndustrySectors';
 import Services from '../components/Services';
-import TeamShowcase from '../components/ui/team-showcase';
-import { GlowCard } from '../components/ui/spotlight-card';
+import WhyMegama from '../components/WhyMegama';
+
 import { HoverBorderGradient } from '../components/ui/hover-border-gradient';
-import { Download, CheckCircle2, Shield } from 'lucide-react';
 
 const HERO_BG = '/images/home/hero-bg.webp';
 const RECIPIENT_EMAIL = 'info@megama.si';
-
-const certAccent = {
-  blue:    { inset: 'inset 0 2.5px 0 rgba(59,130,246,0.75)',  glow: 'blue' as const,  code: 'text-blue-400',    orb: 'rgba(0,113,227,0.09)' },
-  amber:   { inset: 'inset 0 2.5px 0 rgba(245,158,11,0.75)',  glow: 'amber' as const, code: 'text-amber-400',   orb: 'rgba(245,158,11,0.09)' },
-  emerald: { inset: 'inset 0 2.5px 0 rgba(16,185,129,0.75)',  glow: 'green' as const, code: 'text-emerald-400', orb: 'rgba(16,185,129,0.09)' },
-  cyan:    { inset: 'inset 0 2.5px 0 rgba(6,182,212,0.80)',   glow: 'cyan' as const,  code: 'text-cyan-400',    orb: 'rgba(6,182,212,0.11)' },
-};
-
-const certStatus = {
-  VALID:     { dot: 'bg-green-400', glow: 'shadow-[0_0_8px_rgba(74,222,128,0.7)]',   pill: 'bg-green-500/10 border-green-500/25 text-green-400',  label: 'VALID' },
-  VERIFIED:  { dot: 'bg-green-400', glow: 'shadow-[0_0_8px_rgba(74,222,128,0.7)]',   pill: 'bg-green-500/10 border-green-500/25 text-green-400',  label: 'VERIFIED' },
-  QUALIFIED: { dot: 'bg-cyan-400',  glow: 'shadow-[0_0_8px_rgba(34,211,238,0.7)]',   pill: 'bg-cyan-500/10 border-cyan-500/25 text-cyan-400',     label: 'QUALIFIED' },
-};
-
-const CERT_DATA = [
-  {
-    id: 'iso-9001', code: 'ISO 9001:2015', color: 'blue' as const, status: 'VALID' as const,
-    registry: 'Q-2318', validUntil: '2027-10-20', org: 'SIQ Ljubljana',
-    also: 'IQNET · Slovenska Akreditacija CS-001',
-    title: { sl: 'Sistem vodenja kakovosti', en: 'Quality Management System' },
-    desc: { sl: 'Neporušno preskušanje, nadzori in svetovanje pri izvedbi strojnih instalacij ter zagotavljanje kakovosti pri varjenju.', en: 'Non-destructive testing, inspection and consulting on mechanical installations, welding quality assurance.' },
-    images: ['/certs/iso-9001-siq.jpg', '/certs/iso-9001-iqnet.jpg'],
-    pdfUrl: '#',
-  },
-  {
-    id: 'asnt', code: 'ASNT Level III', color: 'amber' as const, status: 'VERIFIED' as const,
-    registry: 'ASNT-III', org: 'ASNT (USA)',
-    title: { sl: 'Ekspertiza nivoja III', en: 'Level III Expertise' },
-    desc: { sl: 'Najvišji mednarodni nivo NDT ekspertize, skladen z ameriškimi standardi SNT-TC-1A. Ključna prednost za UAE projekte.', en: 'Highest international NDT expertise, compliant with US standard SNT-TC-1A. Key differentiator for UAE projects.' },
-    pdfUrl: '#',
-  },
-  {
-    id: 'iso-9712', code: 'EN ISO 9712', color: 'emerald' as const, status: 'VALID' as const,
-    registry: 'ISO-9712', org: 'Sector Cert / ZKOT',
-    title: { sl: 'Certifikacija NDT osebja', en: 'NDT Personnel Certification' },
-    desc: { sl: 'Osebje certificirano za nivoje II in III v vseh disciplinah neporušnih preiskav.', en: 'Personnel certified for levels II and III in all non-destructive testing disciplines.' },
-    pdfUrl: '#',
-  },
-  {
-    id: 'asme', code: 'ASME Sec. XI', color: 'cyan' as const, status: 'QUALIFIED' as const,
-    registry: 'PDI-QP', org: 'ASME / PDI', nuclear: true,
-    title: { sl: 'Jedrska kodifikacija', en: 'Nuclear Code Qualification' },
-    desc: { sl: 'PDI kvaificiranost za varno delo v jedrski industriji. Nujna za projekte Barakah (UAE) in NEK. Naša najredkejša in najpomembnejša akreditacija.', en: 'PDI Qualified for safe operation in nuclear industry. Essential for Barakah (UAE) and NEK projects. Our rarest and most critical accreditation.' },
-    pdfUrl: '#',
-  },
-] as const;
-
-
-function CertsSection({ lang }: { lang: 'sl' | 'en' }) {
-  return (
-    <section id="certifikati" className="relative bg-black py-12 md:py-20 border-t border-white/[0.06] overflow-hidden">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[400px] bg-blue-600/[0.03] rounded-full blur-[120px] pointer-events-none" />
-      <div className="max-w-[1200px] mx-auto px-6 relative z-10">
-
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="flex items-end justify-between mb-10 flex-wrap gap-4"
-        >
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 mb-5">
-              <Shield className="w-3.5 h-3.5 text-blue-400" />
-              <span className="font-mono text-[10px] tracking-widest uppercase text-blue-400">
-                {lang === 'sl' ? 'Preverljiva kakovost' : 'Verified quality'}
-              </span>
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
-              {lang === 'sl' ? 'Certifikati & Akreditacije' : 'Certifications & Accreditations'}
-            </h2>
-          </div>
-        </motion.div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-          {CERT_DATA.map((cert, i) => {
-            const accent = certAccent[cert.color];
-            const status = certStatus[cert.status];
-            const isWide = i === 0 || i === 3;
-            return (
-              <motion.div
-                key={cert.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.55, delay: 0.1 + i * 0.1 }}
-                className={isWide ? 'lg:col-span-7' : 'lg:col-span-5'}
-              >
-                <GlowCard
-                  customSize
-                  glowColor={accent.glow}
-                  className="!flex !flex-col !p-0 !gap-0 w-full h-full"
-                  style={{
-                    '--backdrop': 'rgba(255,255,255,0.025)',
-                    '--backup-border': 'rgba(255,255,255,0.08)',
-                    '--size': '380',
-                    '--border': '1.5',
-                    '--radius': '16',
-                    boxShadow: accent.inset,
-                  } as React.CSSProperties}
-                >
-                  {'nuclear' in cert && cert.nuclear && (
-                    <div className="absolute inset-0 bg-cyan-500/[0.03] pointer-events-none rounded-2xl" />
-                  )}
-                  <div className="absolute -right-16 -top-16 w-52 h-52 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" style={{ background: accent.orb }} />
-
-                  <div className="relative z-10 p-7 md:p-9 flex flex-col h-full">
-                    <div className="flex items-start justify-between mb-7">
-                      <div>
-                        <span className="font-mono text-[9px] tracking-widest text-slate-600 uppercase">REG</span>
-                        <div className="font-mono text-[10px] text-slate-500 mt-0.5">{cert.registry}</div>
-                      </div>
-                      <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full border ${status.pill}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${status.dot} ${status.glow}`} />
-                        <span className="font-mono text-[9px] tracking-widest uppercase font-bold">{status.label}</span>
-                        {'nuclear' in cert && cert.nuclear && (
-                          <>
-                            <span className="w-px h-3 bg-cyan-500/30" />
-                            <span className="font-mono text-[9px] tracking-widest uppercase font-bold">NUCLEAR</span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className={`font-mono text-3xl md:text-4xl font-bold tracking-tight mb-1 ${accent.code}`}>{cert.code}</div>
-                    <div className="font-mono text-[10px] tracking-widest uppercase text-slate-500 mb-4">{cert.title[lang]}</div>
-                    <p className="text-sm text-slate-400 leading-relaxed mb-auto">{cert.desc[lang]}</p>
-
-                    <div className="mt-7 pt-5 border-t border-white/[0.07] flex items-center justify-between gap-4 flex-wrap">
-                      <div className="flex gap-5">
-                        <div>
-                          <div className="font-mono text-[9px] text-slate-600 uppercase tracking-widest mb-1">{lang === 'sl' ? 'Cert. organ' : 'Issuing Body'}</div>
-                          <div className="text-white text-sm font-semibold">{cert.org}</div>
-                        </div>
-                        {'validUntil' in cert && cert.validUntil && (
-                          <div>
-                            <div className="font-mono text-[9px] text-slate-600 uppercase tracking-widest mb-1">{lang === 'sl' ? 'Velja do' : 'Expires'}</div>
-                            <div className="font-mono text-sm text-green-400 font-semibold">{cert.validUntil}</div>
-                          </div>
-                        )}
-                      </div>
-                      <HoverBorderGradient
-                        as="a"
-                        href={cert.pdfUrl}
-                        containerClassName="rounded-xl shrink-0"
-                        className="flex items-center gap-2 px-5 py-2.5 text-xs font-bold tracking-widest uppercase"
-                      >
-                        <Download size={13} />
-                        {lang === 'sl' ? 'Prenesi PDF' : 'Download PDF'}
-                      </HoverBorderGradient>
-                    </div>
-                    {'also' in cert && cert.also && (
-                      <div className="mt-3 font-mono text-[9px] tracking-widest text-slate-600 uppercase">
-                        {lang === 'sl' ? 'Priznano' : 'Recognized'}: {cert.also}
-                      </div>
-                    )}
-                  </div>
-                </GlowCard>
-              </motion.div>
-            );
-          })}
-        </div>
-
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          className="mt-8 text-center font-mono text-[10px] tracking-widest text-slate-600 uppercase flex items-center justify-center gap-2"
-        >
-          <CheckCircle2 size={11} className="text-slate-600" />
-          {lang === 'sl' ? 'Originalni certifikati so na voljo za preverjanje na zahtevo' : 'Original certificates are available for verification on request'}
-        </motion.p>
-      </div>
-    </section>
-  );
-}
-
-const ORG_JSON_LD = JSON.stringify({
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: 'Megama NDT Preiskave d.o.o.',
-  url: 'https://megama.si',
-  logo: 'https://megama.si/wp-content/uploads/2021/01/cropped-cropped-website_logo_transparent_background-1-1.png',
-  description: 'Visoko specializiran partner za neporušne preiskave (NDT), nadzor kakovosti in varilni inženiring.',
-  foundingDate: '2021',
-  address: {
-    '@type': 'PostalAddress',
-    streetAddress: 'Cesta krških žrtev 44',
-    addressLocality: 'Krško',
-    postalCode: '8270',
-    addressCountry: 'SI',
-  },
-  contactPoint: {
-    '@type': 'ContactPoint',
-    telephone: '+386-31-694-806',
-    contactType: 'customer service',
-    email: 'info@megama.si',
-    availableLanguage: ['Slovenian', 'English'],
-  },
-  employee: [
-    { '@type': 'Person', name: 'Rok Topolnik', jobTitle: 'Direktor' },
-    { '@type': 'Person', name: 'Boris Plešac', jobTitle: 'Vodja kakovosti' },
-  ],
-  areaServed: [
-    { '@type': 'Country', name: 'Slovenia' },
-    { '@type': 'Country', name: 'Austria' },
-    { '@type': 'Country', name: 'Croatia' },
-    { '@type': 'Country', name: 'United Arab Emirates' },
-  ],
-  hasCredential: [
-    { '@type': 'EducationalOccupationalCredential', name: 'ISO 9001:2015' },
-    { '@type': 'EducationalOccupationalCredential', name: 'EN ISO 9712' },
-    { '@type': 'EducationalOccupationalCredential', name: 'ASNT Level III' },
-    { '@type': 'EducationalOccupationalCredential', name: 'ASME Section XI' },
-  ],
-});
-
-const VALUES = {
-  sl: [
-    { num: '01', title: 'Zadovoljstvo strank', text: 'Vsak korak naredimo z mislijo na naročnika. Prejme storitev, ki rešuje dejanski problem — ne generičen odgovor.' },
-    { num: '02', title: 'Odzivnost in prilagodljivost', text: 'Zavedamo se dinamike industrije. Hitro se odzovemo in poiščemo rešitve, prilagojene specifičnim zahtevam projekta.' },
-    { num: '03', title: 'Poštenost in partnerstvo', text: 'Z naročniki gradimo dolgoročne odnose, ki temeljijo na zaupanju in strokovnem poslovnem odnosu.' },
-  ],
-  en: [
-    { num: '01', title: 'Client satisfaction', text: 'Every step is taken with the client in mind. They receive a service that solves the real problem, not a generic response.' },
-    { num: '02', title: 'Responsiveness', text: 'We understand the pace of industry. We respond fast and adapt solutions to the specific demands of each project.' },
-    { num: '03', title: 'Honesty and partnership', text: 'We build long-term client relationships grounded in trust and professional integrity.' },
-  ],
-};
-
-const expo = [0.16, 1, 0.3, 1] as [number, number, number, number];
-
-function MegamaSection({ lang }: { lang: 'sl' | 'en' }) {
-  const values = VALUES[lang];
-
-  return (
-    <section
-      id="why-megama"
-      className="relative bg-black py-16 md:py-24 overflow-hidden"
-    >
-      {/* Top fade */}
-      <div className="absolute inset-x-0 top-0 h-32 md:h-44 bg-gradient-to-b from-black to-transparent pointer-events-none z-20" />
-
-      {/* Background */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:60px_60px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_50%,black_30%,transparent_100%)] pointer-events-none" />
-      <div className="absolute top-1/4 left-0 w-[500px] h-[500px] bg-[#0071e3]/4 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-blue-600/4 rounded-full blur-[100px] pointer-events-none" />
-
-      <div className="relative z-10 max-w-[1200px] mx-auto px-6">
-
-        {/* Team + Values */}
-        <div id="ekipa" className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start">
-
-          {/* Left: Team */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, ease: expo }}
-          >
-            <span className="font-mono text-[10px] tracking-widest uppercase text-[#0071e3] mb-8 block">
-              {lang === 'sl' ? 'Ekipa / Ljudje za standarde' : 'Team / People behind standards'}
-            </span>
-            <TeamShowcase />
-          </motion.div>
-
-          {/* Right: Values */}
-          <motion.div
-            id="vrednote"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.15, ease: expo }}
-          >
-            <h2 className="text-2xl md:text-3xl font-semibold text-white tracking-tight mb-8">
-              {lang === 'sl' ? 'Naše vrednote' : 'Our values'}
-            </h2>
-            <div className="divide-y divide-white/[0.06]">
-              {values.map((v, i) => (
-                <motion.div
-                  key={v.num}
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.45, delay: i * 0.1, ease: expo }}
-                  className="py-7 group flex items-start gap-5"
-                >
-                  <span className="font-mono text-xs text-[#0071e3]/40 tracking-widest shrink-0 pt-0.5 group-hover:text-[#0071e3]/80 transition-colors duration-300">{v.num}</span>
-                  <div>
-                    <h3 className="text-base font-semibold text-white tracking-tight mb-1.5">{v.title}</h3>
-                    <p className="text-sm text-white/45 leading-relaxed font-light">{v.text}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-        </div>
-      </div>
-    </section>
-  );
-}
 
 const Home: React.FC = () => {
   const { t, language } = useLanguage();
   const lang = language as 'sl' | 'en';
 
   return (
-    <>
-      <Helmet>
-        <title>
-          {lang === 'sl'
-            ? 'Megama NDT – Neporušne preiskave in nadzor kakovosti | Slovenija'
-            : 'Megama NDT – Non-Destructive Testing & Quality Control | Slovenia'}
-        </title>
-        <meta
-          name="description"
-          content={
-            lang === 'sl'
-              ? 'Visoko specializiran partner za NDT preiskave, nadzor kakovosti in varilni inženiring. ISO 9001:2015, ASNT Level III, ASME Sec. XI. Krško, Slovenija.'
-              : 'Highly specialized partner for NDT inspections, quality control and welding engineering. ISO 9001:2015, ASNT Level III, ASME Sec. XI certified. Krško, Slovenia.'
-          }
-        />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://megama.si" />
-        <meta
-          property="og:title"
-          content={lang === 'sl' ? 'Megama NDT – Neporušne preiskave | Slovenija' : 'Megama NDT – Non-Destructive Testing | Slovenia'}
-        />
-        <meta
-          property="og:description"
-          content={lang === 'sl'
-            ? 'Specialistične NDT preiskave, nadzor in zagotavljanje kakovosti po najvišjih mednarodnih standardih.'
-            : 'Specialist NDT inspections, supervision and quality assurance to the highest international standards.'}
-        />
-        <script type="application/ld+json">{ORG_JSON_LD}</script>
-      </Helmet>
-      <main className="w-full bg-black text-white antialiased">
-        <Hero lang={lang} />
-        <Stats lang={lang} />
-        <IndustrySectors lang={lang} />
-        <Services />
-        <GlobalPresence lang={lang} />
-        <MegamaSection lang={lang} />
-        <CertsSection lang={lang} />
-        <Contact t={t} />
-      </main>
-    </>
+    <main className="w-full bg-black text-white antialiased">
+      <Hero lang={lang} />
+      <Stats lang={lang} />
+      <IndustrySectors lang={lang} />
+      <Services />
+      <GlobalPresence lang={lang} />
+      <WhyMegama />
+      <Contact t={t} />
+    </main>
   );
 };
 
@@ -891,16 +555,12 @@ function Contact({ t }: ContactProps) {
 
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-150px' });
-  const formWrapperRef = useRef<HTMLDivElement>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email) {
       setValidationMsg(true);
       setTimeout(() => setValidationMsg(false), 3500);
-      if (formWrapperRef.current) {
-        animate(formWrapperRef.current, { x: [0, -10, 10, -6, 6, 0] }, { duration: 0.4 });
-      }
       return;
     }
     setSubmitting(true);
@@ -1005,13 +665,7 @@ function Contact({ t }: ContactProps) {
             />
             <div className="space-y-0">
               {PROCESS_STEPS[lang].map((step, i) => (
-                <motion.div
-                  key={step.id}
-                  initial={{ opacity: 0, x: -16 }}
-                  animate={inView ? { opacity: 1, x: 0 } : {}}
-                  transition={{ duration: 0.6, delay: 0.5 + i * 0.12, ease: [0.16, 1, 0.3, 1] }}
-                  className={`relative flex gap-5 ${i < PROCESS_STEPS[lang].length - 1 ? 'pb-8' : ''}`}
-                >
+                <div key={step.id} className={`relative flex gap-5 ${i < PROCESS_STEPS[lang].length - 1 ? 'pb-8' : ''}`}>
                   <div className={`relative z-10 w-[22px] h-[22px] rounded-full flex items-center justify-center shrink-0 mt-0.5 border transition-colors ${
                     i === 0
                       ? 'border-[#0071e3]/60 bg-[#0071e3]/15 shadow-[0_0_10px_rgba(0,113,227,0.3)]'
@@ -1029,7 +683,7 @@ function Contact({ t }: ContactProps) {
                       {step.description}
                     </p>
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>
@@ -1043,7 +697,6 @@ function Contact({ t }: ContactProps) {
           transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
           className="lg:col-span-7 relative z-10"
         >
-          <div ref={formWrapperRef}>
           <AnimatePresence mode="wait">
             {submitted ? (
               <motion.div
@@ -1091,10 +744,9 @@ function Contact({ t }: ContactProps) {
                     {services.map((svc: string) => {
                       const active = selectedServices.includes(svc);
                       return (
-                        <motion.button
+                        <button
                           key={svc}
                           type="button"
-                          whileTap={{ scale: 0.94 }}
                           onClick={() => toggleService(svc)}
                           className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border ${
                             active
@@ -1104,7 +756,7 @@ function Contact({ t }: ContactProps) {
                         >
                           {active && <Check size={11} className="shrink-0" />}
                           {svc}
-                        </motion.button>
+                        </button>
                       );
                     })}
                   </div>
@@ -1183,20 +835,10 @@ function Contact({ t }: ContactProps) {
                       disabled={submitting}
                       className="flex-1 inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-2xl text-sm font-medium transition-all duration-300 group/btn bg-[#0071e3]/[0.08] hover:bg-[#0071e3]/[0.16] border border-[#0071e3]/[0.25] hover:border-[#0071e3]/[0.45] text-[#0071e3] hover:text-[#4da3ff] shadow-[0_0_20px_rgba(0,113,227,0.06)] hover:shadow-[0_0_28px_rgba(0,113,227,0.18)]"
                     >
-                      {submitting ? (
-                        <>
-                          <svg className="animate-spin w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none">
-                            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" opacity={0.3} />
-                            <path d="M4 12a8 8 0 018-8" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-                          </svg>
-                          {lang === 'sl' ? 'Pošiljanje …' : 'Sending...'}
-                        </>
-                      ) : (
-                        <>
-                          {lang === 'sl' ? 'Oddajte povpraševanje' : 'Submit inquiry'}
-                          <ArrowUpRight size={18} className="transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
-                        </>
-                      )}
+                      {submitting
+                        ? (lang === 'sl' ? 'Pošiljanje …' : 'Sending...')
+                        : (lang === 'sl' ? 'Oddajte povpraševanje' : 'Submit inquiry')}
+                      <ArrowUpRight size={18} className="transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
                     </button>
                   </div>
 
@@ -1222,7 +864,6 @@ function Contact({ t }: ContactProps) {
               </motion.form>
             )}
           </AnimatePresence>
-          </div>
         </motion.div>
       </div>
     </section>

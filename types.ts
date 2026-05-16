@@ -1,9 +1,17 @@
+export interface QuickFacts {
+  standard: string;
+  application: string;
+  result: string;
+}
+
 export interface ServiceItem {
   id: string;
   label: string;
   description?: string;
   details?: string[];
   icon?: string;
+  quickFacts?: QuickFacts;
+  level3?: boolean;
 }
 
 export interface ServiceCategory {

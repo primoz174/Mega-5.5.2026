@@ -179,7 +179,7 @@ const References: React.FC = () => {
           {/* Dark overlay gradient */}
           <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a]/70 via-[#0a0a0a]/60 to-[#0a0a0a]" />
           {/* Blue tint overlay */}
-          <div className="absolute inset-0 bg-[#1392ec]/[0.06] mix-blend-overlay" />
+          <div className="absolute inset-0 bg-[#0071e3]/[0.06] mix-blend-overlay" />
         </div>
 
         {/* Subtle grid overlay */}
@@ -190,7 +190,7 @@ const References: React.FC = () => {
         {/* Scan line animation */}
         <div className="absolute inset-0 z-[2] pointer-events-none overflow-hidden">
           <motion.div
-            className="w-full h-px bg-gradient-to-r from-transparent via-[#1392ec]/40 to-transparent"
+            className="w-full h-px bg-gradient-to-r from-transparent via-[#0071e3]/40 to-transparent"
             animate={{ y: [0, 600, 0] }}
             transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
           />
@@ -203,7 +203,7 @@ const References: React.FC = () => {
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           >
             {/* Badge */}
-            <div className="inline-flex items-center justify-center gap-2.5 px-4 py-2 rounded-full bg-[#1392ec]/10 border border-[#1392ec]/20 text-[#1392ec] text-[10px] font-bold uppercase tracking-[0.3em] mb-8 font-mono backdrop-blur-sm">
+            <div className="inline-flex items-center justify-center gap-2.5 px-4 py-2 rounded-full bg-[#0071e3]/10 border border-[#0071e3]/20 text-[#0071e3] text-[10px] font-bold uppercase tracking-[0.3em] mb-8 font-mono backdrop-blur-sm">
               <Shield className="w-3.5 h-3.5" />
               {t.referencePage.hero_badge}
             </div>
@@ -233,7 +233,7 @@ const References: React.FC = () => {
 
       {/* ======= STATS STRIP ======= */}
       <section className="py-16 border-b border-white/5 bg-white/[0.015] relative">
-        <div className="absolute inset-0 bg-gradient-to-r from-[#1392ec]/[0.02] via-transparent to-[#1392ec]/[0.02]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0071e3]/[0.02] via-transparent to-[#0071e3]/[0.02]" />
         <div className="max-w-[1200px] mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 relative z-10">
           {stats.map((s, i) => (
             <motion.div
@@ -244,7 +244,7 @@ const References: React.FC = () => {
               transition={{ delay: i * 0.1, duration: 0.5 }}
               className="text-center group"
             >
-              <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-[#1392ec]/10 border border-[#1392ec]/20 text-[#1392ec] mb-4 group-hover:bg-[#1392ec]/20 transition-colors">
+              <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-[#0071e3]/10 border border-[#0071e3]/20 text-[#0071e3] mb-4 group-hover:bg-[#0071e3]/20 transition-colors">
                 {s.icon}
               </div>
               <div className="text-4xl md:text-5xl font-bold text-white mb-2 font-mono tracking-tight">
@@ -261,7 +261,7 @@ const References: React.FC = () => {
       {/* ======= PROJECT GRID ======= */}
       <section className="py-24 relative z-10">
         {/* Background atmosphere */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#1392ec]/[0.03] rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#0071e3]/[0.03] rounded-full blur-[120px] pointer-events-none" />
 
         <div className="max-w-[1200px] mx-auto px-6">
           {/* Section header */}
@@ -281,7 +281,7 @@ const References: React.FC = () => {
                 onClick={() => setActiveFilter(f.id)}
                 className={`px-6 py-2.5 rounded-full text-xs font-bold font-mono tracking-widest uppercase transition-all duration-300 border ${
                   activeFilter === f.id
-                    ? 'bg-[#1392ec]/10 text-[#1392ec] border-[#1392ec]/30 shadow-[0_0_20px_rgba(19,146,236,0.15)]'
+                    ? 'bg-[#0071e3]/10 text-[#0071e3] border-[#0071e3]/30 shadow-[0_0_20px_rgba(0,113,227,0.15)]'
                     : 'bg-transparent text-gray-500 border-white/5 hover:border-white/20 hover:text-gray-300'
                 }`}
               >
@@ -371,7 +371,7 @@ const References: React.FC = () => {
                         <CheckCircle className="w-3.5 h-3.5 text-green-500/70" />
                         <span>{project.scope[language]}</span>
                       </div>
-                      <ArrowRight className="w-4 h-4 text-gray-600 group-hover:text-[#1392ec] group-hover:translate-x-1 transition-all" />
+                      <ArrowRight className="w-4 h-4 text-gray-600 group-hover:text-[#0071e3] group-hover:translate-x-1 transition-all" />
                     </div>
                   </div>
                 </motion.article>
@@ -393,7 +393,7 @@ const References: React.FC = () => {
           >
             <div className="flex items-center justify-center gap-3 mb-4">
               <div className="h-px w-12 bg-gradient-to-r from-transparent to-white/10" />
-              <span className="font-mono text-[10px] tracking-[0.3em] text-[#1392ec] uppercase">[CERTIFICATIONS]</span>
+              <span className="font-mono text-[10px] tracking-[0.3em] text-[#0071e3] uppercase">[CERTIFICATIONS]</span>
               <div className="h-px w-12 bg-gradient-to-l from-transparent to-white/10" />
             </div>
             <h2 className="text-2xl md:text-4xl font-semibold text-white tracking-tight">
@@ -414,10 +414,10 @@ const References: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="group bg-white/[0.02] border border-white/10 rounded-xl p-6 text-center hover:border-[#1392ec]/30 transition-all duration-300 hover:-translate-y-0.5"
+                className="group bg-white/[0.02] border border-white/10 rounded-xl p-6 text-center hover:border-[#0071e3]/30 transition-all duration-300 hover:-translate-y-0.5"
               >
-                <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-[#1392ec]/10 border border-[#1392ec]/20 flex items-center justify-center group-hover:bg-[#1392ec]/20 transition-colors">
-                  <Award className="w-5 h-5 text-[#1392ec]" />
+                <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-[#0071e3]/10 border border-[#0071e3]/20 flex items-center justify-center group-hover:bg-[#0071e3]/20 transition-colors">
+                  <Award className="w-5 h-5 text-[#0071e3]" />
                 </div>
                 <div className="font-mono text-sm font-bold text-white mb-1">{cert.code}</div>
                 <div className="text-[11px] text-gray-500 leading-snug">{cert.desc}</div>
@@ -437,7 +437,7 @@ const References: React.FC = () => {
             className="w-full h-full object-cover opacity-30"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-[#0a0a0a]" />
-          <div className="absolute inset-0 bg-[#1392ec]/[0.04]" />
+          <div className="absolute inset-0 bg-[#0071e3]/[0.04]" />
         </div>
 
         {/* Grid */}
@@ -452,7 +452,7 @@ const References: React.FC = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
           >
-            <div className="inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-full bg-[#1392ec]/10 border border-[#1392ec]/20 text-[#1392ec] text-[9px] font-bold uppercase tracking-[0.3em] mb-8 font-mono backdrop-blur-sm">
+            <div className="inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-full bg-[#0071e3]/10 border border-[#0071e3]/20 text-[#0071e3] text-[9px] font-bold uppercase tracking-[0.3em] mb-8 font-mono backdrop-blur-sm">
               <Globe className="w-3.5 h-3.5" />
               {language === 'sl' ? 'Začnimo sodelovanje' : 'Start Collaboration'}
             </div>
@@ -470,7 +470,7 @@ const References: React.FC = () => {
 
             <Link
               to="/#contact"
-              className="group inline-flex items-center justify-center gap-3 min-w-[240px] h-14 bg-[#1392ec] hover:bg-[#1392ec]/90 text-white text-[11px] font-bold tracking-[0.25em] uppercase transition-all duration-300 rounded-lg hover:shadow-[0_0_30px_rgba(19,146,236,0.3)]"
+              className="group inline-flex items-center justify-center gap-3 min-w-[240px] h-14 bg-[#0071e3] hover:bg-[#0071e3]/90 text-white text-[11px] font-bold tracking-[0.25em] uppercase transition-all duration-300 rounded-lg hover:shadow-[0_0_30px_rgba(0,113,227,0.3)]"
             >
               {t.referencePage.cta_btn}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

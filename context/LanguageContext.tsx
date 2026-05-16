@@ -184,12 +184,22 @@ interface Translations {
     hero_title: string;
     hero_subtitle: string;
     hero_badge: string;
-    title_energy: string;
-    desc_energy: string;
+    title_nuclear: string;
+    desc_nuclear: string;
     title_pharma: string;
     desc_pharma: string;
+    title_power: string;
+    desc_power: string;
     title_steel: string;
     desc_steel: string;
+    title_foundry: string;
+    desc_foundry: string;
+    title_engineering: string;
+    desc_engineering: string;
+    title_construction: string;
+    desc_construction: string;
+    title_oil: string;
+    desc_oil: string;
   };
   equipmentPage: {
     hero_title: string;
@@ -375,14 +385,24 @@ const translations: Record<Language, Translations> = {
     },
     industriesPage: {
       hero_title: 'Industrijske Panoge',
-      hero_subtitle: 'Rešitve po meri za najzahtevnejše sektorje in kritično infrastrukturo.',
+      hero_subtitle: 'Specializirane NDT rešitve za sektorje, kjer ima vsaka napaka posledice.',
       hero_badge: 'SEKTORJI DELOVANJA',
-      title_energy: 'Energetika & Jedrska Ind.',
-      desc_energy: 'Nadzori in preiskave materialov v nuklearnih in termo objektih.',
+      title_nuclear: 'Jedrska energetika',
+      desc_nuclear: 'Specializirane preiskave v jedrskih objektih z najvišjimi varnostnimi zahtevami. Osebje certificirano po ASME Sec. XI in SNT-TC-1A za detekcijo IGSCC razpok in preiskave celovitosti primarnega kroga.',
       title_pharma: 'Farmacija',
-      desc_pharma: 'Sanitarni zvari, čiste sobe in kontrola procesne opreme.',
-      title_steel: 'Jeklene Konstrukcije',
-      desc_steel: 'Kontrola gradbenih konstrukcij, mostov in industrijskih hal.'
+      desc_pharma: 'Nadzor kakovosti procesne opreme in sanitarnih zvarov v čistih sobah. Zagotavljamo neporoznost in brezhibnost površin zvarov po GMP zahtevah, ki so pogoj za odobritev regulatorja.',
+      title_power: 'Konvencionalna energetika',
+      desc_power: 'Preiskave energetskih objektov in tlačne opreme med izgradnjo, obratovanjem in remontom. Kotli, turbine, cevovodi in posode pod tlakom certificirani po evropskih tlačnih direktivah in AD 2000.',
+      title_steel: 'Jeklene konstrukcije in tlačna oprema',
+      desc_steel: 'Zagotavljanje strukturne celovitosti mostov, halnih konstrukcij, rezervoarjev in industrijskih cevovodov. Preiskave v skladu z EN 1090 za jeklene konstrukcijske elemente razredov EXC1–EXC4.',
+      title_foundry: 'Livarstvo in jeklo',
+      desc_foundry: 'NDT kontrole na odlitkih in valjanih materialih v vseh fazah produkcije. Zaznavanje vključkov, poroznosti in lunkra v litih in jeklenih odlitkih z ultrazvokom in radiografijo po EN 12680.',
+      title_engineering: 'Splošna strojegradnja',
+      desc_engineering: 'Nadzor varjenja in kontrola kakovosti mehanskih komponent v serijski in posamični proizvodnji. Sistematičen pristop od preverjanja polizdelka do certificiranega nadzora končnega sestava.',
+      title_construction: 'Gradbeništvo',
+      desc_construction: 'Tehnični nadzori in svetovanje pri izvedbi jeklenih konstrukcij in strojnih inštalacij v nizkih in visokih gradnjah. Preiskave betonskih in jeklenih elementov po veljavnih gradbenih standardih.',
+      title_oil: 'Naftna, kemična in želežniška industrija',
+      desc_oil: 'Zagotavljanje varnosti infrastrukturnih elementov in transportnih poti. Preiskave cevovodov, rezervoarjev in želežniških komponent po API 570, EN 15085 in DIN 27201, kjer je okvara varnostno nesprejemljiva.',
     },
     equipmentPage: {
       hero_title: 'Najnaprednejša Oprema',
@@ -566,14 +586,24 @@ const translations: Record<Language, Translations> = {
     },
     industriesPage: {
       hero_title: 'Industrial Sectors',
-      hero_subtitle: 'Custom solutions for the most demanding sectors and critical infrastructure.',
+      hero_subtitle: 'Specialized NDT solutions for sectors where every defect has consequences.',
       hero_badge: 'SECTORS OF OPERATION',
-      title_energy: 'Energy & Nuclear Ind.',
-      desc_energy: 'Supervision and testing of materials in nuclear and thermal plants.',
+      title_nuclear: 'Nuclear Energy',
+      desc_nuclear: 'Specialized inspections in nuclear facilities under the most demanding safety requirements. Personnel certified per ASME Sec. XI and SNT-TC-1A for IGSCC crack detection and primary circuit integrity assessment.',
       title_pharma: 'Pharmaceuticals',
-      desc_pharma: 'Sanitary welds, clean-rooms, and process equipment inspection.',
-      title_steel: 'Steel Structures',
-      desc_steel: 'Inspection of building structures, bridges, and industrial halls.'
+      desc_pharma: 'Quality control of process equipment and sanitary welds in cleanrooms. We ensure porosity-free, smooth weld surfaces per GMP requirements as a prerequisite for regulatory approval.',
+      title_power: 'Power & Energy',
+      desc_power: 'Inspections of energy infrastructure and pressure equipment during construction, operation, and overhaul. Boilers, turbines, pipelines, and pressure vessels certified per European pressure equipment directives and AD 2000.',
+      title_steel: 'Steel Structures & Pressure Equipment',
+      desc_steel: 'Ensuring structural integrity of bridges, hall structures, tanks, and industrial pipelines. Inspections per EN 1090 for structural steel execution classes EXC1–EXC4.',
+      title_foundry: 'Foundry & Raw Steel',
+      desc_foundry: 'NDT controls on castings and rolled materials through all production phases. Detection of inclusions, porosity, and shrinkage voids in iron and steel castings using ultrasound and radiography per EN 12680.',
+      title_engineering: 'General Engineering',
+      desc_engineering: 'Welding supervision and quality control of mechanical components in serial and custom production. Systematic approach from semi-finished goods verification to certified final assembly inspection.',
+      title_construction: 'Construction',
+      desc_construction: 'Technical supervision and consulting for steel structures and mechanical installations in civil and high-rise construction. Inspection of concrete and steel elements per applicable construction standards.',
+      title_oil: 'Oil, Chemical & Railway',
+      desc_oil: 'Ensuring safety of infrastructure elements and transport corridors. Inspections of pipelines, tanks, and railway components per API 570, EN 15085, and DIN 27201 where failure carries safety implications.',
     },
     equipmentPage: {
       hero_title: 'Cutting-edge Equipment',

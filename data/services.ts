@@ -11,77 +11,137 @@ export const servicesData: ServiceCategory[] = [
     color: 'text-blue-500',
     icon: 'ScanEye',
     items: [
-      { 
-        id: 'vt', 
+      {
+        id: 'vt',
         label: 'Vizualna preiskava (VT)',
-        description: 'Osnovna in najpomembnejša neporušitvena preiskava. Z njo odkrivamo površinske napake, razpoke, poroznost in nepravilnosti v obliki zvara ali materiala.',
+        description: 'Z vizualno preiskavo odkrijemo napake pred in po varjenju, preden vas doletijo zamude ali popravila. Hiter, a nepogrešljiv korak za vsako varjeno konstrukcijo.',
         details: ['Pregled pred, med in po varjenju', 'Uporaba endoskopov za težko dostopna mesta', 'Merjenje dimenzij zvarov z merili', 'Skladnost z EN ISO 17637'],
-        icon: 'Eye'
+        icon: 'Eye',
+        level3: true,
+        quickFacts: {
+          standard: 'EN ISO 17637',
+          application: 'Zvari, odlitki, varjene konstrukcije',
+          result: 'Pisni izvid + fotografije',
+        },
       },
-      { 
-        id: 'pt', 
+      {
+        id: 'pt',
         label: 'Penetrantska preiskava (PT)',
-        description: 'Metoda za odkrivanje površinskih napak (razpok, poroznosti) na neporoznih materialih s pomočjo kapilarnega učinka barvnih ali fluorescentnih tekočin.',
+        description: 'Mikroskopske razpoke, ki jih oko ne vidi, odkrijemo z barvnimi ali fluorescentnimi tekočinami — preden ogrožajo varnost vaše opreme ali povzročijo drage odpovedi.',
         details: ['Primerno za vse neporozne materiale (jeklo, aluminij, plastika)', 'Visoka občutljivost za mikroskopske razpoke', 'Hitra in stroškovno učinkovita metoda', 'Skladnost z EN ISO 3452'],
-        icon: 'Droplet'
+        icon: 'Droplet',
+        level3: true,
+        quickFacts: {
+          standard: 'EN ISO 3452',
+          application: 'Jeklo, aluminij, nerjavno jeklo',
+          result: 'Poročilo z indikacijsko karto',
+        },
       },
-      { 
-        id: 'mt', 
+      {
+        id: 'mt',
         label: 'Magnetna preiskava (MT)',
-        description: 'Uporablja se za odkrivanje površinskih in tik podpovršinskih napak v feromagnetnih materialih z ustvarjanjem magnetnega polja in nanosom magnetnih delcev.',
+        description: 'Za jeklene zvare in komponente odkrijemo tako površinske kot podpovršinske napake, ki jih z vizualnim pregledom ne bi zaznali — brez zaustavitve vaše linije.',
         details: ['Zelo zanesljiva metoda za jeklene konstrukcije', 'Odkriva tudi napake tik pod površino', 'Uporaba barvnih ali fluorescentnih delcev', 'Skladnost z EN ISO 17638'],
-        icon: 'Magnet'
+        icon: 'Magnet',
+        level3: true,
+        quickFacts: {
+          standard: 'EN ISO 17638',
+          application: 'Feromagnetna jekla in zlitine',
+          result: 'Poročilo isti delovni dan',
+        },
       },
-      { 
-        id: 'ut', 
+      {
+        id: 'ut',
         label: 'Ultrazvočna preiskava (UT)',
-        description: 'Globinska preiskava materialov z uporabo visokofrekvenčnih zvočnih valov. Odlična za odkrivanje notranjih napak, kot so razpoke, žlindra in neprevarjenosti.',
+        description: 'Z ultrazvočno preiskavo odkrijemo notranje napake v zvarih brez zaustavitve vaše proizvodnje — poročilo z natančno lokacijo in velikostjo napake prejmete v 24 urah.',
         details: ['Zaznavanje napak v celotnem volumnu materiala', 'Določanje točne globine in velikosti napake', 'Primerno za debelejše materiale in zvare', 'Skladnost z EN ISO 17640'],
-        icon: 'Activity'
+        icon: 'Activity',
+        level3: true,
+        quickFacts: {
+          standard: 'EN ISO 17640',
+          application: 'Tlačne posode, cevovodi, I-nosilci',
+          result: 'Digitalno poročilo v 24h',
+        },
       },
-      { 
-        id: 'utt', 
+      {
+        id: 'utt',
         label: 'Merjenje debelin (UTT)',
-        description: 'Natančno merjenje debeline stene materialov (cevi, tlačnih posod, rezervoarjev) z ultrazvokom za spremljanje korozije in obrabe.',
+        description: 'Korozija in erozija stanjšujeta stene cevi in rezervoarjev, ne da bi to opazili. Z rednim merjenjem debelin predvidimo tveganja in preprečimo katastrofalne odpovedi.',
         details: ['Merjenje debeline brez uničenja materiala', 'Zaznavanje stanjšanja sten zaradi korozije/erozije', 'Sledenje življenjski dobi tlačne opreme', 'Digitalni prikaz in beleženje rezultatov'],
-        icon: 'Ruler' 
+        icon: 'Ruler',
+        level3: true,
+        quickFacts: {
+          standard: 'EN 15317',
+          application: 'Cevi, rezervoarji, korozijsko razgrajeni deli',
+          result: 'Tabela meritev + trend korozije',
+        },
       },
-      { 
-        id: 'lt', 
+      {
+        id: 'lt',
         label: 'Preiskava tesnosti (LT)',
-        description: 'Preverjanje tesnosti sistemov pod tlakom ali vakuuma za zagotavljanje varnega obratovanja cevovodov in posod brez puščanja.',
+        description: 'Vsako puščanje v tlačnem sistemu pomeni izgubo energije, onesnaženje okolja ali nevarnost za delavce. Lociramo netesnosti brez razgradnje sistema.',
         details: ['Mehurčkasta metoda (Vacuum box)', 'Preizkus s povišanim hidravličnim ali pnevmatskim tlakom', 'Odkrivanje mikroskopskih netesnosti', 'Ključno za tlačno opremo in rezervoarje'],
-        icon: 'Wind' 
+        icon: 'Wind',
+        level3: true,
+        quickFacts: {
+          standard: 'EN 1779 / EN 13185',
+          application: 'Tlačna oprema, vakuumski sistemi',
+          result: 'Protokol o tesnosti',
+        },
       },
-      { 
-        id: 'rt', 
+      {
+        id: 'rt',
         label: 'Radiografska preiskava (RT)*',
-        description: 'Zunanja izvedba preiskave, kjer z rentgenskimi ali gama žarki ožarimo material in posnamemo "sliko" (radiogram) notranjosti zvara ali odlitka.',
+        description: 'Radiografija naredi "rentgensko sliko" vašega zvara in razkrije pore, vključke ali neprevarjenosti — arhivski posnetek, ki dokazuje kakovost za leta naprej.',
         details: ['Nudenje podizvajalskih storitev slikanja z izotopi/X-ray', 'Daje trajen arhivski posnetek zvara', 'Odkrivanje volumskih napak (pore, vključki)', 'Zahteva varnostne ukrepe zaradi sevanja'],
-        icon: 'Radiation' 
+        icon: 'Radiation',
+        level3: true,
+        quickFacts: {
+          standard: 'EN ISO 17636 / ASME Sec. V',
+          application: 'Cevovodi, tlačne posode, odlitki',
+          result: 'Arhivski radiogram + poročilo',
+        },
       },
-      { 
-        id: 'rt-eval', 
+      {
+        id: 'rt-eval',
         label: 'Evaluacija radiografskih filmov',
-        description: 'Strokovno odčitavanje in ovrednotenje obstoječih radiografskih filmov glede na zahtevane mednarodne in evropske standarde.',
+        description: 'Obstoječe radiografske filme ovrednotimo po mednarodnih standardih in izdamo uradno poročilo — neodvisno mnenje, ki reši spore in zagotovi zaupanje kupcu.',
         details: ['Preverjanje kakovosti samega posnetka in IQI', 'Določanje stopnje sprejemljivosti napak po EN ISO 10675', 'Izdaja uradnega poročila in digitalizacija', 'Drugo mnenje in arbitraža pri spornih zvarih'],
-        icon: 'FileSearch' 
+        icon: 'FileSearch',
+        level3: true,
+        quickFacts: {
+          standard: 'EN ISO 10675',
+          application: 'Obstoječi RT filmi in digitalni posnetki',
+          result: 'Ovrednotenje in poročilo v 48h',
+        },
       },
-      { 
-        id: 'uci', 
+      {
+        id: 'uci',
         label: 'Trdota materiala (UCI)',
-        description: 'Metoda ultrazvočne trdote (Ultrasonic Contact Impedance) omogoča merjenje trdote s pomočjo majhne obremenitve diamantne konice, primerno za tanke in površinsko utrjene materiale.',
+        description: 'Preverite trdoto zvarnih spojev in toplotno prizadetih območij na terenu — brez laboratorija, z minimalnim sledjem na površini in takojšnim rezultatom.',
         details: ['Zelo majhna vizualna poškodba površine', 'Hitre in prenosne meritve na terenu', 'Primerno za območja toplotnega vpliva pri zvarih (HAZ)', 'Pretvorbe v različne skale (HV, HB, HRC)'],
-        icon: 'Hammer' 
+        icon: 'Hammer',
+        level3: true,
+        quickFacts: {
+          standard: 'DIN 50159 / ASTM E2175',
+          application: 'HAZ cone, tanke pločevine, orodja',
+          result: 'HV/HB/HRC v realnem času',
+        },
       },
-      { 
-        id: 'leeb', 
+      {
+        id: 'leeb',
         label: 'Trdota materiala (Leeb)',
-        description: 'Dinamična metoda merjenja odboja, pri kateri se merilno telo izstreli ob testno površino. Primerno za masivne kose in hitro pregledovanje večjih komponent.',
+        description: 'Za masivne odlitke, odkovanke in jeklene konstrukcije izmerimo trdoto na terenu v sekundah — brez laboratorija, brez demontaže, z zanesljivo pretvorbo v HV ali HB.',
         details: ['Hitro testiranje grobih odlitkov in odkovkov', 'Enostavna uporaba na terenu (prijemljivo z roko)', 'Cenovno učinkovito pri večjih presekih', 'Samodejni izračun odboja v obratovalno trdoto'],
-        icon: 'Hammer' 
+        icon: 'Hammer',
+        level3: true,
+        quickFacts: {
+          standard: 'EN ISO 16859 / ASTM A956',
+          application: 'Odlitki, odkovanki, masivne komponente',
+          result: 'HL vrednost + pretvorba v HV/HB',
+        },
       },
-    ]
+    ],
   },
   {
     id: 'nadzori',
@@ -93,42 +153,67 @@ export const servicesData: ServiceCategory[] = [
     color: 'text-orange-500',
     icon: 'ShieldCheck',
     items: [
-      { 
-        id: 'varilni', 
+      {
+        id: 'varilni',
         label: 'Storitve varilnega nadzora',
-        description: 'Strokovni nadzor nad varilnimi procesi v skladu z mednarodnimi standardi (EN ISO 3834, EN 1090).',
+        description: 'Napake, odkrite med varjenjem, stanejo 10× manj kot popravila na predanem projektu. Naš nadzor zagotavlja, da varilci sledijo WPS in da vsak zvar ustreza standardu.',
         details: ['Pregled varilne dokumentacije (WPS, WPQR)', 'Nadzor nad usposobljenostjo varilcev', 'Kontrola priprave zvarnih robov', 'Spremljanje varilnih parametrov med varjenjem'],
-        icon: 'Shield'
+        icon: 'Shield',
+        quickFacts: {
+          standard: 'EN ISO 3834 / EN 1090',
+          application: 'Jeklene konstrukcije, tlačna oprema, mostovi',
+          result: 'Potrditveni zapisnik + NCR poročilo',
+        },
       },
-      { 
-        id: 'prevzemi', 
+      {
+        id: 'prevzemi',
         label: 'Prevzemi izdelkov za kupce',
-        description: 'Neodvisni prevzemi in inšpekcije tlačne in druge procesne opreme pri proizvajalcih ali na terenu.',
+        description: 'Preverimo, ali je oprema res takšna, kot piše v dokumentaciji — preden jo sprejmete in plačate. Neodvisni prevzem zaščiti pred skritimi napakami in dragimi reklamacijami.',
         details: ['Pregled tehnične dokumentacije', 'Vizualna in dimenzijska kontrola', 'Nadzor nad tlačnimi preizkusi', 'Izdaja poročil o prevzemu'],
-        icon: 'CheckSquare'
+        icon: 'CheckSquare',
+        quickFacts: {
+          standard: 'EN 10204 3.1/3.2 / PED',
+          application: 'Tlačna in procesna oprema',
+          result: 'Prevzemni protokol + poročilo o napakah',
+        },
       },
-      { 
-        id: 'third-party', 
+      {
+        id: 'third-party',
         label: 'Tretja stranka (Third-party)',
-        description: 'Delujemo kot neodvisna tretja stranka z inšpekcijami za zagotovitev, da strojna oprema dosega projektne in normativne specifikacije.',
+        description: 'Ko kupec in dobavitelj potrebujeta nevtralno presojo, nastopimo kot neodvisna tretja stranka — brez interesnih konfliktov, z objektivnim poročilom, ki je sprejeto po vsem svetu.',
         details: ['Objektivno in neodvisno ocenjevanje', 'Preverjanje sledljivosti izdanih dokumentov in certifikatov', 'Prisotnost na testiranjih opreme', 'Poraba časa samo po potrebi brez stalnih stroškov'],
-        icon: 'Users' 
+        icon: 'Users',
+        quickFacts: {
+          standard: 'ISO/IEC 17020',
+          application: 'Mednarodne dobaviteljske verige',
+          result: 'Neodvisno poročilo inšpekcijskega organa',
+        },
       },
-      { 
-        id: 'vhodna', 
+      {
+        id: 'vhodna',
         label: 'Vhodna kontrola materialov',
-        description: 'Sistematičen pregled polizdelkov in materialov pred vstopom v proizvodnjo proti pripadajočim atestom (EN 10204 3.1, 3.2).',
+        description: 'Material z napako, ki vstopi v proizvodnjo, podraži celoten projekt. Sistematično preverimo vsakega dobavitelja in vsako serijo — preden kos pride do strojne obdelave.',
         details: ['Preventivno iskanje napak pred strojno obdelavo', 'Vizualni in dimenzijski pregled trdih mer ali toleranc', 'Potrditev ustreznosti z dokumentacijo', 'Sistematično označevanje in sledenje kosov'],
-        icon: 'PackageCheck' 
+        icon: 'PackageCheck',
+        quickFacts: {
+          standard: 'EN 10204 / ISO 2768',
+          application: 'Polizdelki, odkovki, pločevine',
+          result: 'Odobren material z etiketo sledljivosti',
+        },
       },
-      { 
-        id: 'koordinacija', 
+      {
+        id: 'koordinacija',
         label: 'Pogodbena varilna koordinacija',
-        description: 'Prevzem vloge glavnega varilnega koordinatorja v posameznem podjetju skladno s standardom SIST EN ISO 14731.',
+        description: 'Brez lastnega varilnega inženirja? Zagotovimo strokovno varilno koordinacijo po EN ISO 14731, ki vam odpre vrata do certifikatov EN ISO 3834 in EN 1090.',
         details: ['Nadzor nad strokovnostjo in nalogami v varilni proizvodnji', 'Optimizacija proizvodnega procesa obdržanja EN ISO 3834', 'Zunanja ekspertska ekspertiza v lokalno podjetje', 'Pristnost pri presojah certifikacijskih hiš'],
-        icon: 'Network' 
+        icon: 'Network',
+        quickFacts: {
+          standard: 'EN ISO 14731 / EN ISO 3834',
+          application: 'Podjetja z varilno proizvodnjo',
+          result: 'Vzpostavitev sistema kakovosti varjenja',
+        },
       },
-    ]
+    ],
   },
   {
     id: 'qa',
@@ -140,35 +225,55 @@ export const servicesData: ServiceCategory[] = [
     color: 'text-emerald-500',
     icon: 'ClipboardCheck',
     items: [
-      { 
-        id: 'izvedbena', 
+      {
+        id: 'izvedbena',
         label: 'Priprava izvedbene dokumentacije',
-        description: 'Strokovna priprava in pregled tehnične, varilne in kakovostne dokumentacije za projekte.',
+        description: 'Brez ustrezne dokumentacije ne morete predati projekta niti pridobiti certifikata. Mi pripravimo celotno mapo — od WPS do NDT navodil — prilagojeno vašim standardom.',
         details: ['Izdelava varilnih planov', 'Priprava navodil za NDT', 'Zbiranje certifikatov materialov', 'Kompletiranje končne mape (As-built)'],
-        icon: 'FileText'
+        icon: 'FileText',
+        quickFacts: {
+          standard: 'EN ISO 3834 / EN 1090',
+          application: 'Jeklene konstrukcije, procesna oprema',
+          result: 'Kompletna ITP in varilna mapa',
+        },
       },
-      { 
-        id: 'proizvodnja', 
+      {
+        id: 'proizvodnja',
         label: 'Spremljanje proizvodnje/montaže',
-        description: 'Nadzor nad operativnim postopkom med proizvodnjo za zgodnje odkrivanje odstopanj in vzdrževanje plana kakovosti (ITP).',
+        description: 'Odstopanja od plana kakovosti odkrijemo sproti med montažo — ne šele pri končnem prevzemu. Sledimo ITP točko po točko in dokumentiramo vsak korak.',
         details: ['In-process pregledi varjenja/montiranja', 'Označevanje postavk in sklopov', 'Kontrola pred oddajo naslednji delovni postaji', 'Sledenje neujemanjih (Non-conformance reports NCR)'],
-        icon: 'Factory' 
+        icon: 'Factory',
+        quickFacts: {
+          standard: 'ISO 9001 / EN ISO 3834',
+          application: 'Modularni in serijski projekti',
+          result: 'Tabelarno NCR poročilo + ITP status',
+        },
       },
-      { 
-        id: 'varilna-dok', 
+      {
+        id: 'varilna-dok',
         label: 'Priprava varilne dokumentacije',
-        description: 'Oblikovanje vseh potrebnih specifikacij postopkov varjenja (WPS), navodil za toplotno obdelavo (PWHT) in delovnih nalogov varilcem.',
+        description: 'Pravilni WPS pospeši varjenje in zmanjša škart. Pretvorimo vaše WPQR ateste v operativne WPS, ki jih varilci dejansko razumejo in jih je enostavno slediti.',
         details: ['Pretvorba WPQR atestov v obratovalne WPS', 'Popis vseh varjenih spojev in parametrov', 'Usmerjevanje optimalnih varilnih dodajnih materialov', 'Skrb za pravilno toplotno obdelavo'],
-        icon: 'FileSignature' 
+        icon: 'FileSignature',
+        quickFacts: {
+          standard: 'EN ISO 15614 / ASME IX',
+          application: 'Vse vrste varilnih postopkov',
+          result: 'Operativni WPS + PWHT navodila',
+        },
       },
-      { 
-        id: 'koncna-dok', 
+      {
+        id: 'koncna-dok',
         label: 'Priprava končne dokumentacije',
-        description: 'Strukturirano zbiranje vseh reportov, testnih listin, materialnih certifikatov v zaključno As-Built dokumentacijo, zahtevane za primopredajo objekta.',
+        description: 'Predaja brez popolne dokumentacije blokira plačila in povzroča zamude. Organiziramo Manufacturing Data Book točno po zahtevah naročnika in PED direktive.',
         details: ['Organizirano pošiljanje Manufacturing Data Book', 'Jasna poravnana z zahtevami po PED direktivi', 'Skeniranje in digitalizacija vseh posnetkov', 'Sledenje celotne verige izdelave produkta'],
-        icon: 'BookOpen' 
+        icon: 'BookOpen',
+        quickFacts: {
+          standard: 'PED 2014/68/EU / EN 13480',
+          application: 'Tlačna in procesna oprema',
+          result: 'Kompletni Manufacturing Data Book',
+        },
       },
-    ]
+    ],
   },
   {
     id: 'svetovanje',
@@ -180,41 +285,66 @@ export const servicesData: ServiceCategory[] = [
     color: 'text-purple-500',
     icon: 'Lightbulb',
     items: [
-      { 
-        id: 'tehnologija', 
+      {
+        id: 'tehnologija',
         label: 'Tehnologija varjenja in plani',
-        description: 'Svetovanje pri razvoju in izbiri najboljše tehnologije obločnega varjenja, izbiri žice in strategiji spajanja, da preprečite zvarne napake.',
+        description: 'Napačna varilna tehnika povzroča napake, ki se jih ne vidi takoj. Svetujemo pri izbiri postopka, parametrov in dodajnih materialov — preden začnete, ne po tem.',
         details: ['Optimizacija oblike zvarnega roba', 'Izbira TIG, MIG/MAG ali E-PP postopkov', 'Reševanje težav s pornostmi in napakami pri varjenju', 'Projektno svetovanje pred začetkom obsega del'],
-        icon: 'Settings' 
+        icon: 'Settings',
+        quickFacts: {
+          standard: 'EN ISO 4063 / EN ISO 15614',
+          application: 'Razvoj in optimizacija varilnih postopkov',
+          result: 'Optimizirani parametri + izbira dodajnega mat.',
+        },
       },
-      { 
-        id: 'atest', 
+      {
+        id: 'atest',
         label: 'Organizacija atestiranja (WPQR, WPS)',
-        description: 'Vodenje in priprava probnih kusov zvarov za izvajanje certificiranja postopkov s priglašenimi organi (TÜV, Bureau Veritas ipd.).',
+        description: 'Atestiranje varilnih postopkov je pogoj za vsak seriozni projekt. Vodimo vas od prvega preizkusnega zvara do izročitve WPQR in WPS dokumentacije.',
         details: ['Določitev zahtevanih preizkusov za pokritje področij delovanja podjetja', 'Nabava ustreznega materiala po certifikatih', 'Nadzor pri sami izdelavi specimena (priča standardne inšpekcije)', 'Skrb za analize in preizkuse v laboratorijih'],
-        icon: 'Award' 
+        icon: 'Award',
+        quickFacts: {
+          standard: 'EN ISO 15614 / ASME IX',
+          application: 'Postopkovni certifikati za WPQR/WPS',
+          result: 'Potrjeni WPQR + operativni WPS',
+        },
       },
-      { 
-        id: 'ndt-svet', 
+      {
+        id: 'ndt-svet',
         label: 'Svetovanje pri NDT preskušanju',
-        description: 'Pomoč pri izbiri najustreznejše metode neporušne preiskave glede na tip, lokacijo the geometrijo detajla kjer iščete razpoke.',
+        description: 'Predraga ali napačna NDT metoda je izguba časa in denarja. Svetujemo, katero preiskavo in kateri standard uporabiti — in vam pomagamo to uveljaviti pri naročniku.',
         details: ['Analiza, zakaj je ultrazvok boljši kot radiografija v določanem tipu spajanja', 'Tolmačenje rezultatov slabe kakovosti', 'Implementacije novih, naprednih metod v vaš delovni proces', 'Optimizacija in stroškovno učinkoviti inšpekcijski plani'],
-        icon: 'Lightbulb' 
+        icon: 'Lightbulb',
+        quickFacts: {
+          standard: 'EN ISO 9712 / ASME Sec. V',
+          application: 'Investicijski projekti in revizije',
+          result: 'Optimizirani NDT plan + specifikacija',
+        },
       },
-      { 
-        id: 'navodila', 
+      {
+        id: 'navodila',
         label: 'Priprava navodil (EN/ISO, ASME...)',
-        description: 'Prevajanje zahtevnih strokovnih standardov v enostavna praktična navodila, prilagojena konkretnemu obratu brez generičnega balasta.',
+        description: 'Standardi so pisani za pravnike, ne za varilce in kontrolorje. Prevedemo zahteve ASME ali EN ISO v jasna navodila za vaš obrat — konkretna, kratka in sledljiva.',
         details: ['Pisani postopki glede EN ISO industrije', 'Stroge specifikacije ASME zahtev za prekomorje in rafinerije', 'Priročniki in obratovalne ročne prakse', 'Navodila za izvedbo vizualnih pregledov in čiščenj'],
-        icon: 'Book' 
+        icon: 'Book',
+        quickFacts: {
+          standard: 'EN ISO / ASME / AD 2000',
+          application: 'Industrijski obrati in delavnice',
+          result: 'Prilagojeni postopki brez odvečnega balasta',
+        },
       },
-      { 
-        id: 'uvajanje', 
+      {
+        id: 'uvajanje',
         label: 'Praktično uvajanje osebja v NDT',
-        description: 'Trening neceritficiranega ali novo zaposlenega kadra s praktičnim vpogledom in »hands-on« tehnikami prepoznavanja vzorcev v realnem delovnem okolišu.',
+        description: 'Nov sodelavec v NDT-ju ne sme delovati brez ustreznega uvoda. Z mentoriranjem in hands-on treningom ga usposobimo za samostojno delo — preden ga pošljete na uradni tečaj.',
         details: ['Mentorstvo v delavnici nad defektnimi zvarnimi rebri', 'Učenje razumevanja odčitkov aparatov in zaslonov', 'Razlaga tipičnih lažnih indikacij', 'Utrjevanje baze pred pošiljanjem sodelavcev na uradne NDT tečaje'],
-        icon: 'GraduationCap' 
+        icon: 'GraduationCap',
+        quickFacts: {
+          standard: 'EN ISO 9712 / CSWIP',
+          application: 'Novo in notranje osebje',
+          result: 'Kompetentni kader za uradne NDT tečaje',
+        },
       },
-    ]
+    ],
   },
 ];

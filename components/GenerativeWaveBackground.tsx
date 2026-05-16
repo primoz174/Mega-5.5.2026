@@ -9,9 +9,9 @@ const GenerativeWaveBackground: React.FC = () => {
             <svg className="w-full h-full" viewBox="0 0 1440 800" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                     <linearGradient id="wave-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor="rgba(19, 146, 236, 0)" />
-                        <stop offset="50%" stopColor="rgba(19, 146, 236, 0.2)" />
-                        <stop offset="100%" stopColor="rgba(19, 146, 236, 0)" />
+                        <stop offset="0%" stopColor="rgba(0, 113, 227, 0)" />
+                        <stop offset="50%" stopColor="rgba(0, 113, 227, 0.2)" />
+                        <stop offset="100%" stopColor="rgba(0, 113, 227, 0)" />
                     </linearGradient>
                 </defs>
                 {waves.map((_, i) => (
@@ -42,14 +42,14 @@ const GenerativeWaveBackground: React.FC = () => {
                 {/* Subtle Scan Lines */}
                 <motion.line
                     x1="0" y1="0" x2="1440" y2="0"
-                    stroke="rgba(19, 146, 236, 0.1)"
+                    stroke="rgba(0, 113, 227, 0.1)"
                     strokeWidth="1"
                     animate={{ y: [0, 800, 0] }}
                     transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
                 />
             </svg>
             {/* Grid Overlay */}
-            <div className="absolute inset-0 bg-[linear-gradient(rgba(19,146,236,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(19,146,236,0.03)_1px,transparent_1px)] bg-[size:100px_100px] pointer-events-none" />
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(0,113,227,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,113,227,0.03)_1px,transparent_1px)] bg-[size:100px_100px] pointer-events-none" />
         </div>
     );
 };

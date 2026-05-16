@@ -55,7 +55,7 @@ const UltrasonicWaveOverlay = () => {
         <defs>
           <linearGradient id="scanGrad" x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" stopColor="transparent" />
-            <stop offset="80%" stopColor="#00a8ff" />
+            <stop offset="80%" stopColor="#0071e3" />
             <stop offset="100%" stopColor="transparent" />
           </linearGradient>
         </defs>
@@ -80,13 +80,13 @@ const UltrasonicWaveOverlay = () => {
           pathLength="1"
           style={{ strokeDasharray: 1, strokeDashoffset: 1, animation: 'ut-scan2 2s linear infinite 0.8s' }}
         />
-        <circle cx="40" cy="20" r="0" fill="transparent" stroke="#00a8ff" strokeWidth="0.2"
+        <circle cx="40" cy="20" r="0" fill="transparent" stroke="#0071e3" strokeWidth="0.2"
           style={{ animation: 'ut-ring1 2s ease-out infinite' }}
         />
-        <circle cx="60" cy="20" r="0" fill="transparent" stroke="#00a8ff" strokeWidth="0.2"
+        <circle cx="60" cy="20" r="0" fill="transparent" stroke="#0071e3" strokeWidth="0.2"
           style={{ animation: 'ut-ring2 2s ease-out infinite 0.8s' }}
         />
-        <g stroke="rgba(0, 168, 255, 0.08)" strokeWidth="0.2" opacity="0.6">
+        <g stroke="rgba(0, 113, 227, 0.08)" strokeWidth="0.2" opacity="0.6">
           {[10, 20, 30, 40, 50, 60, 70, 80, 90].map(x => <line key={`x-${x}`} x1={x} y1="0" x2={x} y2="100" />)}
           {[30, 40, 50, 60, 70].map(y => <line key={`y-${y}`} x1="0" y1={y} x2="100" y2={y} />)}
         </g>
@@ -260,7 +260,7 @@ export function VerticalTabs({
                               : "text-white/40 hover:text-white bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-md"
                           )}
                         >
-                          <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#00a8ff]/20 via-transparent to-transparent opacity-0 transition-opacity duration-300 pointer-events-none blur-2xl group-hover:opacity-100" />
+                          <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#0071e3]/20 via-transparent to-transparent opacity-0 transition-opacity duration-300 pointer-events-none blur-2xl group-hover:opacity-100" />
 
                           <StepProgressBar
                             scrollYProgress={scrollYProgress}
@@ -285,7 +285,7 @@ export function VerticalTabs({
                           <div className="flex flex-col gap-1.5 flex-1 overflow-hidden">
                             <span className={cn(
                               "text-xl font-semibold tracking-[-0.02em] transition-all duration-500 leading-tight",
-                              isActive ? "text-white translate-x-1 drop-shadow-[0_0_10px_rgba(0,168,255,0.6)]" : "translate-x-0"
+                              isActive ? "text-white translate-x-1 drop-shadow-[0_0_10px_rgba(0,113,227,0.6)]" : "translate-x-0"
                             )}>
                               {item.title}
                             </span>
