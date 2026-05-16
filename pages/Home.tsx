@@ -273,9 +273,12 @@ function MegamaSection({ lang }: { lang: 'sl' | 'en' }) {
             viewport={{ once: true }}
             transition={{ duration: 0.7, ease: expo }}
           >
-            <span className="font-mono text-[10px] tracking-widest uppercase text-[#0071e3] mb-8 block">
-              {lang === 'sl' ? 'Ekipa / Ljudje za standarde' : 'Team / People behind standards'}
-            </span>
+            <div className="flex items-center gap-3 mb-8">
+              <span className="h-px w-8 bg-[#0071e3]/60" />
+              <span className="font-mono text-[11px] font-semibold tracking-[0.22em] uppercase text-[#0071e3]">
+                {lang === 'sl' ? 'Ekipa — za standardi stojijo ljudje' : 'Team — standards stand on people'}
+              </span>
+            </div>
             <TeamShowcase />
           </motion.div>
 
@@ -300,10 +303,10 @@ function MegamaSection({ lang }: { lang: 'sl' | 'en' }) {
                   transition={{ duration: 0.45, delay: i * 0.1, ease: expo }}
                   className="py-7 group flex items-start gap-5"
                 >
-                  <span className="font-mono text-xs text-[#0071e3]/40 tracking-widest shrink-0 pt-0.5 group-hover:text-[#0071e3]/80 transition-colors duration-300">{v.num}</span>
+                  <span className="font-mono text-xs text-[#0071e3]/40 tracking-widest shrink-0 pt-1 group-hover:text-[#0071e3]/80 transition-colors duration-300">{v.num}</span>
                   <div>
-                    <h3 className="text-base font-semibold text-white tracking-tight mb-1.5">{v.title}</h3>
-                    <p className="text-sm text-white/45 leading-relaxed font-light">{v.text}</p>
+                    <h3 className="text-lg md:text-xl font-semibold text-white tracking-tight mb-2">{v.title}</h3>
+                    <p className="text-base text-white/55 leading-relaxed">{v.text}</p>
                   </div>
                 </motion.div>
               ))}
