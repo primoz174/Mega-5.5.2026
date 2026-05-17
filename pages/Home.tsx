@@ -620,7 +620,7 @@ function Hero({ lang }: { lang: "sl" | "en" }) {
   return (
     <section
       id="home"
-      className="relative w-full min-h-[100svh] flex items-end overflow-hidden bg-black"
+      className="relative w-full min-h-[120svh] md:min-h-[100svh] flex items-end overflow-hidden bg-black"
     >
       <style>{`
         @keyframes megama-kenburns {
@@ -670,12 +670,12 @@ function Hero({ lang }: { lang: "sl" | "en" }) {
       <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-transparent md:from-black/50 md:via-transparent" />
       <div className="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-black to-transparent z-0" />
 
-      {/* Location pill */}
+      {/* Location pill — desktop: absolute; mobile: flows before headline */}
       <motion.div
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.1 }}
-        className="absolute top-28 md:top-32 left-6 md:left-[max(1.5rem,calc(50%-600px+1.5rem))] z-10 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.06] backdrop-blur-md border border-white/10"
+        className="hidden md:flex absolute top-28 md:top-32 left-6 md:left-[max(1.5rem,calc(50%-600px+1.5rem))] z-10 items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.06] backdrop-blur-md border border-white/10"
       >
         <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
         <span className="font-mono text-[10px] tracking-widest text-white/60 uppercase">
@@ -684,6 +684,19 @@ function Hero({ lang }: { lang: "sl" | "en" }) {
       </motion.div>
 
       <div className="relative z-10 w-full max-w-[1200px] mx-auto px-6 pb-14 md:pb-20">
+        {/* Location pill — mobile only, inline before headline */}
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="md:hidden mb-5 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.06] backdrop-blur-md border border-white/10 w-fit"
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+          <span className="font-mono text-[10px] tracking-widest text-white/60 uppercase">
+            {HERO_COPY.location[lang]}
+          </span>
+        </motion.div>
+
         <AnimatedHeadline
           text={HERO_COPY.headline[lang]}
           className="text-[clamp(2.25rem,4.8vw,4.5rem)] font-semibold tracking-[-0.02em] leading-[1.06] text-white max-w-4xl"
@@ -1072,7 +1085,11 @@ function GlobalPresence({ lang }: { lang: "sl" | "en" }) {
                 <div
                   key={c.code}
                   onMouseEnter={() => c.detail && setHoveredCountry(c.code)}
-                  onMouseLeave={() => setHoveredCountry(null)}
+                  onMouseLeave={() => c.detail && setHoveredCountry(null)}
+                  onClick={() =>
+                    c.detail &&
+                    setHoveredCountry(hoveredCountry === c.code ? null : c.code)
+                  }
                   className={`flex items-center gap-3 px-5 py-3 rounded-2xl border transition-all duration-300 ${
                     c.detail ? "cursor-pointer" : "cursor-default"
                   } ${
@@ -1733,7 +1750,7 @@ function Contact({ t }: ContactProps) {
                       </button>
                     </div>
 
-                    <div className="mt-4 pt-4 border-t border-white/10 flex items-start justify-between gap-4">
+                    <div className="mt-4 pt-4 border-t border-white/10 flex flex-col sm:flex-row items-start justify-between gap-3">
                       <div className="flex items-start gap-2.5">
                         <MapPin size={13} className="text-white/45 mt-0.5 shrink-0" />
                         <div>
@@ -1745,7 +1762,7 @@ function Contact({ t }: ContactProps) {
                           </p>
                         </div>
                       </div>
-                      <p className="text-[11px] text-white/50 font-light text-right shrink-0">
+                      <p className="text-[11px] text-white/50 font-light sm:text-right">
                         {lang === "sl"
                           ? "100 % zaupnost tehničnih podatkov."
                           : "100% confidentiality of your data."}

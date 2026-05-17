@@ -327,8 +327,21 @@ function ServiceModal({
   const [currentCategory, setCurrentCategory] = useState(initialCategory);
   const [current, setCurrent] = useState(initialItem);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [stripDir, setStripDir] = useState<Dir>('BOTTOM');
   const { language } = useLanguage();
   const hex = CATEGORY_HEX[currentCategory.id] ?? '#3b82f6';
+
+  useEffect(() => {
+    const id = setInterval(() => setStripDir(d => DIRS[(DIRS.indexOf(d) - 1 + 4) % 4]), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const stripMovingMap: Record<Dir, string> = {
+    TOP:    `radial-gradient(20.7% 50% at 50% 0%,                   ${hex} 0%, rgba(255,255,255,0) 100%)`,
+    LEFT:   `radial-gradient(16.6% 43.1% at 0% 50%,                 ${hex} 0%, rgba(255,255,255,0) 100%)`,
+    BOTTOM: `radial-gradient(20.7% 50% at 50% 100%,                 ${hex} 0%, rgba(255,255,255,0) 100%)`,
+    RIGHT:  `radial-gradient(16.2% 41.2% at 100% 50%,               ${hex} 0%, rgba(255,255,255,0) 100%)`,
+  };
 
   const switchCategory = (cat: ServiceCategory) => {
     setCurrentCategory(cat);
@@ -368,7 +381,7 @@ function ServiceModal({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 md:p-6 bg-black/80 backdrop-blur-md"
+      className="fixed inset-0 z-50 flex items-center justify-center p-0 md:p-6 bg-black/80 backdrop-blur-md"
       onClick={onClose}
     >
       {/* Outer flex wrapper: sidebar + card */}
@@ -377,64 +390,109 @@ function ServiceModal({
         animate={{ opacity: 1, scale: 1, rotateX: 0, y: 0 }}
         exit={{ opacity: 0, scale: 0.92, rotateX: 5, y: 18 }}
         transition={{ duration: 0.38, ease: [0.23, 1, 0.32, 1] }}
-        style={{ perspective: '1200px' }}
-        className="flex flex-col md:flex-row md:items-start gap-2.5 w-full max-w-[820px] max-h-[92vh]"
+        style={{ perspective: '1200px', touchAction: 'pan-y' }}
+        className="flex flex-col md:flex-row md:items-start gap-2.5 w-full max-w-[820px] h-full md:h-auto md:max-h-[92vh] overflow-y-auto overflow-x-hidden md:overflow-visible"
         onClick={(e) => e.stopPropagation()}
       >
         {/* ── SIDEBAR ── */}
         <div
-          className="rounded-3xl p-px shrink-0 md:w-64 md:self-start md:max-h-[85vh]"
-          style={{
-            background: 'linear-gradient(160deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.03) 60%, rgba(255,255,255,0.07) 100%)',
-            boxShadow: '0 32px 80px rgba(0,0,0,0.85), 0 8px 20px rgba(0,0,0,0.6)',
-          }}
+          className="rounded-3xl max-md:p-0 p-px shrink-0 w-full md:w-64 md:self-start md:max-h-[85vh] md:[background:linear-gradient(160deg,rgba(255,255,255,0.10)_0%,rgba(255,255,255,0.05)_50%,rgba(255,255,255,0.20)_100%)] md:shadow-[0_32px_80px_rgba(0,0,0,0.85),0_8px_20px_rgba(0,0,0,0.6)]"
         >
-          <div className="rounded-3xl bg-[#0c0c0c] p-2.5 h-full overflow-y-auto">
+          <div className="rounded-3xl bg-[#0c0c0c] p-2.5 pb-0 md:pb-2.5 md:h-full md:overflow-y-auto max-md:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.09)]">
 
-            {/* Category switcher — 2×2 grid */}
-            <div className="grid grid-cols-2 gap-1 mb-2.5">
-              {allCategories.map((cat) => {
-                const catHex = CATEGORY_HEX[cat.id] ?? '#fff';
-                const isActive = cat.id === currentCategory.id;
-                return (
-                  <button
-                    key={cat.id}
-                    onClick={() => switchCategory(cat)}
-                    className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl text-[9px] font-bold uppercase tracking-wider transition-all duration-150"
-                    style={{
-                      backgroundColor: isActive ? `${catHex}20` : 'rgba(255,255,255,0.04)',
-                      color: isActive ? catHex : 'rgba(255,255,255,0.35)',
-                      border: `1px solid ${isActive ? `${catHex}40` : 'transparent'}`,
-                    }}
-                  >
-                    <div
-                      className="w-1.5 h-1.5 rounded-full shrink-0"
+            {/* Sticky top: category switcher + header + mobile label + icon strip */}
+            <div className="sticky top-0 z-10 bg-[#0c0c0c] -mt-2.5 pt-2.5 pb-2.5 md:-mx-2.5 md:px-2.5 md:border-b md:border-white/[0.04]">
+              {/* Category switcher — 2×2 grid */}
+              <div className="grid grid-cols-2 gap-1 mb-2.5">
+                {allCategories.map((cat) => {
+                  const catHex = CATEGORY_HEX[cat.id] ?? '#fff';
+                  const isActive = cat.id === currentCategory.id;
+                  return (
+                    <button
+                      key={cat.id}
+                      onClick={() => switchCategory(cat)}
+                      className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl text-[9px] font-bold uppercase tracking-wider transition-all duration-150"
                       style={{
-                        background: catHex,
-                        opacity: isActive ? 1 : 0.4,
-                        boxShadow: isActive ? `0 0 4px 1px ${catHex}60` : 'none',
+                        backgroundColor: isActive ? `${catHex}20` : 'rgba(255,255,255,0.04)',
+                        color: isActive ? catHex : 'rgba(255,255,255,0.35)',
+                        border: `1px solid ${isActive ? `${catHex}40` : 'transparent'}`,
                       }}
-                    />
-                    <span>{cat.shortTitle}</span>
-                  </button>
-                );
-              })}
-            </div>
+                    >
+                      <div
+                        className="w-1.5 h-1.5 rounded-full shrink-0"
+                        style={{
+                          background: catHex,
+                          opacity: isActive ? 1 : 0.4,
+                          boxShadow: isActive ? `0 0 4px 1px ${catHex}60` : 'none',
+                        }}
+                      />
+                      <span>{cat.shortTitle}</span>
+                    </button>
+                  );
+                })}
+              </div>
 
-            {/* Category header */}
-            <div className="relative rounded-2xl bg-[#141414] px-4 py-3.5 mb-2 overflow-hidden">
-              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
-              <span className={`text-[10px] font-bold uppercase tracking-[0.15em] ${currentCategory.color}`}>
-                {currentCategory.shortTitle}
-              </span>
-              <p className="text-xs text-white/40 mt-0.5 leading-snug line-clamp-2">{currentCategory.title}</p>
-            </div>
+              {/* Category header */}
+              <div className="relative rounded-2xl bg-[#141414] px-4 py-3.5 overflow-hidden mb-2.5">
+                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+                <span className={`text-[10px] font-bold uppercase tracking-[0.15em] ${currentCategory.color}`}>
+                  {currentCategory.shortTitle}
+                </span>
+                <p className="text-xs text-white/40 mt-0.5 leading-snug line-clamp-2">{currentCategory.title}</p>
+              </div>
 
-            {/* Items list — desktop */}
+              {/* Mobile: active label + icon strip (sticky with the rest) */}
+              <div className="md:hidden flex flex-col gap-2">
+                {/* Active item label */}
+                <div className="flex items-center gap-2 px-1">
+                  <ItemIcon name={current.icon} size={12} style={{ color: hex }} />
+                  <span className="text-[10px] font-semibold uppercase tracking-wider truncate" style={{ color: hex }}>
+                    {current.label}
+                  </span>
+                </div>
+                {/* Icon strip with rotating glow border */}
+                <div className="relative rounded-2xl border border-white/10 bg-white/10 p-[1px] overflow-hidden">
+                  <motion.div
+                    className="absolute inset-0 z-0 rounded-[inherit]"
+                    style={{ filter: 'blur(2px)', width: '100%', height: '100%' }}
+                    animate={{ background: stripMovingMap[stripDir] }}
+                    transition={{ ease: 'linear', duration: 1 }}
+                  />
+                  <div className="absolute inset-px z-[1] rounded-[inherit] bg-[#0c0c0c]" />
+                  <div className="relative z-[2] flex gap-1.5 overflow-x-auto scrollbar-none p-1">
+                    {currentCategory.items.map((item) => {
+                      const isActive = item.id === current.id;
+                      return (
+                        <button
+                          key={item.id}
+                          onClick={() => setCurrent(item)}
+                          title={item.label}
+                          style={{
+                            backgroundColor: isActive ? `${hex}22` : undefined,
+                            borderColor: isActive ? `${hex}50` : 'transparent',
+                          }}
+                          className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center border border-transparent bg-white/[0.04] transition-all duration-200"
+                        >
+                          <ItemIcon
+                            name={item.icon}
+                            size={15}
+                            style={{ color: isActive ? hex : undefined }}
+                            className={isActive ? '' : 'text-white/35'}
+                          />
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <div className="absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-[#0c0c0c] to-transparent pointer-events-none z-[3]" />
+                </div>
+              </div>
+            </div>{/* end sticky */}
+
+            {/* Items list — desktop only */}
             <motion.ul
               key={currentCategory.id}
               role="list"
-              className="space-y-1 md:block hidden"
+              className="space-y-1 md:block hidden mt-1"
               variants={sidebarListVariants}
               initial="hidden"
               animate="visible"
@@ -456,7 +514,6 @@ function ServiceModal({
                       }}
                       className="w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-left border"
                     >
-                      {/* Icon circle */}
                       <div
                         style={{
                           backgroundColor: lit ? `${hex}22` : 'rgba(255,255,255,0.04)',
@@ -483,42 +540,16 @@ function ServiceModal({
               })}
             </motion.ul>
 
-            {/* Mobile: horizontal icon strip */}
-            <div className="md:hidden flex gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
-              {currentCategory.items.map((item) => {
-                const isActive = item.id === current.id;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => setCurrent(item)}
-                    title={item.label}
-                    style={{
-                      backgroundColor: isActive ? `${hex}22` : undefined,
-                      borderColor: isActive ? `${hex}50` : 'transparent',
-                    }}
-                    className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center border border-transparent bg-white/[0.04] transition-all"
-                  >
-                    <ItemIcon
-                      name={item.icon}
-                      size={15}
-                      style={{ color: isActive ? hex : undefined }}
-                      className={isActive ? '' : 'text-white/40'}
-                    />
-                  </button>
-                );
-              })}
-            </div>
-
-          </div>
-        </div>
+          </div>{/* end inner sidebar */}
+        </div>{/* end p-px wrapper */}
 
         {/* ── MAIN CARD ── */}
         <GlowCard
           customSize
           glowColor={CATEGORY_GLOW[currentCategory.id] ?? 'blue'}
-          className="flex-1 min-w-0 overflow-hidden shadow-[0_48px_120px_rgba(0,0,0,0.9),0_16px_40px_rgba(0,0,0,0.7)]"
+          className="flex-1 min-w-0 overflow-visible md:overflow-hidden shadow-[0_48px_120px_rgba(0,0,0,0.9),0_16px_40px_rgba(0,0,0,0.7)]"
         >
-          <div className="rounded-[18px] bg-[#0c0c0c] p-2.5 max-h-[85vh] overflow-y-auto">
+          <div className="rounded-[18px] bg-[#0c0c0c] p-2.5 overflow-y-auto md:max-h-[85vh]" style={{ touchAction: 'pan-y' }}>
 
             <AnimatePresence mode="wait">
               <motion.div
@@ -534,8 +565,8 @@ function ServiceModal({
                   <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/18 to-transparent" />
 
                   <button onClick={onClose}
-                    className="absolute top-4 right-4 p-1.5 rounded-full text-white/30 hover:text-white hover:bg-white/8 transition-colors z-10">
-                    <X size={16} />
+                    className="absolute top-3 right-3 p-2 rounded-full text-white/70 hover:text-white bg-white/10 hover:bg-white/20 border border-white/15 hover:border-white/30 transition-all z-10">
+                    <X size={18} />
                   </button>
 
                   {/* Icon + badge row */}

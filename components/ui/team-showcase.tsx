@@ -48,7 +48,7 @@ export default function TeamShowcase({ members = MEGAMA_MEMBERS }: TeamShowcaseP
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   return (
-    <div className="flex flex-col gap-10 w-full select-none">
+    <div className="flex flex-col gap-10 w-full">
       {members.map((member) => (
         <MemberCard
           key={member.id}
@@ -71,17 +71,20 @@ function MemberCard({
   onHover: (id: string | null) => void;
 }) {
   const { language } = useLanguage();
+  const [isOpen, setIsOpen] = useState(false);
   const isActive = hoveredId === member.id;
   const isDimmed = hoveredId !== null && !isActive;
+  const showDetails = isActive || isOpen;
 
   return (
     <div
       className={cn(
-        'relative flex flex-col sm:flex-row items-start gap-5 sm:gap-6 transition-all duration-500 rounded-2xl p-3 -mx-3',
+        'relative flex flex-col sm:flex-row items-start gap-5 sm:gap-6 transition-all duration-500 rounded-2xl p-3 -mx-3 cursor-pointer',
         isDimmed ? 'opacity-35' : 'opacity-100',
       )}
       onMouseEnter={() => onHover(member.id)}
       onMouseLeave={() => onHover(null)}
+      onClick={() => setIsOpen((o) => !o)}
     >
       {/* Hover glow */}
       {isActive && (
@@ -157,7 +160,7 @@ function MemberCard({
         <div
           className={cn(
             'mt-4 pl-8 flex flex-wrap gap-1.5 transition-all duration-300 overflow-hidden',
-            isActive ? 'max-h-32 opacity-100' : 'max-h-0 opacity-0',
+            showDetails ? 'max-h-32 opacity-100' : 'max-h-0 opacity-0',
           )}
         >
           {member.certifications.map((cert) => (
@@ -174,7 +177,7 @@ function MemberCard({
         <div
           className={cn(
             'mt-3 pl-8 flex flex-col gap-1.5 transition-all duration-300 overflow-hidden',
-            isActive ? 'max-h-16 opacity-100' : 'max-h-0 opacity-0',
+            showDetails ? 'max-h-16 opacity-100' : 'max-h-0 opacity-0',
           )}
         >
           <a

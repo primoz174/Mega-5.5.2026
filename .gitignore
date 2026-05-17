@@ -26,8 +26,14 @@ dist-ssr
 .firecrawl/
 everything-claude-code/
 .gemini/
+_stare_ai_datoteke/
 
-# Scratch files
+# Scratch / temp files
 test-error.js
 test.cjs
-body.html
+*.bak
+*.zip
+
+# Cloud / tool internals
+.gcloudignore
+skills-lock.json
