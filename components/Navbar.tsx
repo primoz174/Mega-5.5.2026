@@ -38,18 +38,30 @@ const Navbar: React.FC = () => {
       threshold: 0,
     };
 
+    const visibleServiceSections = new Set<string>();
+
     const callback = (entries: IntersectionObserverEntry[]) => {
       entries.forEach((entry) => {
+        const id = entry.target.id;
         if (entry.isIntersecting) {
-          const id = entry.target.id;
           if (['home', 'services', 'certifikati', 'ekipa', 'vrednote', 'contact'].includes(id)) {
             setActiveSection(id);
           }
           if (id.startsWith('services-')) {
-            setActiveServiceSection(id);
+            visibleServiceSections.add(id);
+          }
+        } else {
+          if (id.startsWith('services-')) {
+            visibleServiceSections.delete(id);
           }
         }
       });
+      // Update active service section — clear when none visible
+      if (visibleServiceSections.size > 0) {
+        setActiveServiceSection([...visibleServiceSections].at(-1) ?? null);
+      } else {
+        setActiveServiceSection(null);
+      }
     };
 
     observerRef.current = new IntersectionObserver(callback, options);
@@ -157,18 +169,10 @@ const Navbar: React.FC = () => {
         },
       ],
     },
-    {
-      name: language === 'sl' ? 'Ekspertiza' : 'Expertise',
-      id: 'expertise',
-      isDropdown: true,
-      subLinks: [
-        { name: t.nav.certificates, scrollId: 'certifikati' },
-        { name: t.nav.industries, path: '/panoge' },
-        { name: t.nav.equipment, path: '/oprema' },
-      ],
-    },
-    { name: t.nav.blog, id: 'blog', isPage: true, path: '/blog' },
     { name: t.nav.about, id: 'ekipa' },
+    { name: t.nav.certificates, id: 'certifikati' },
+    { name: language === 'sl' ? 'Industrije' : 'Industries', id: 'panoge', isPage: true, path: '/panoge' },
+    { name: t.nav.blog, id: 'blog', isPage: true, path: '/blog' },
     { name: t.nav.contact, id: 'contact', isCta: true },
   ];
 
@@ -469,7 +473,7 @@ const Navbar: React.FC = () => {
           >
             <div className="flex items-center justify-between px-6 py-5 border-b border-white/[0.07]">
               <span className="font-mono text-[10px] tracking-[0.3em] text-white/25 uppercase">
-                Navigacija
+                {language === 'sl' ? 'Navigacija' : 'Navigation'}
               </span>
               <button
                 onClick={() => setIsMobileMenuOpen(false)}

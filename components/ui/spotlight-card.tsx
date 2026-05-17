@@ -11,14 +11,15 @@ interface GlowCardProps {
   customSize?: boolean;
 }
 
+// Narrowed spread values so hover glow stays close to base hue — no rainbow.
 const glowColorMap = {
-  blue:   { base: 220, spread: 200 },
-  purple: { base: 280, spread: 300 },
-  green:  { base: 140, spread: 180 },
-  red:    { base: 0,   spread: 200 },
-  orange: { base: 30,  spread: 200 },
-  cyan:   { base: 185, spread: 150 },
-  amber:  { base: 45,  spread: 160 },
+  blue:   { base: 220, spread: 40 },
+  purple: { base: 280, spread: 60 },
+  green:  { base: 140, spread: 40 },
+  red:    { base: 0,   spread: 40 },
+  orange: { base: 30,  spread: 40 },
+  cyan:   { base: 185, spread: 35 },
+  amber:  { base: 45,  spread: 35 },
 };
 
 const sizeMap = {

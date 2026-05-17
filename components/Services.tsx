@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import type { LucideProps } from 'lucide-react';
 import { GlowCard } from './ui/glow-card';
-import { servicesData } from '../data/services';
+import { getServicesData } from '../data/services';
 import { ServiceCategory, ServiceItem } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -55,6 +55,7 @@ type SelectedItem = { item: ServiceItem; category: ServiceCategory } | null;
 export default function Services() {
   const { language } = useLanguage();
   const lang = language as 'sl' | 'en';
+  const servicesData = getServicesData(lang);
   const [selected, setSelected] = useState<SelectedItem>(null);
 
   useEffect(() => {
@@ -120,9 +121,6 @@ function ServicesHeader({ lang }: { lang: 'sl' | 'en' }) {
   const stiriOpacity = useTransform(scrollYProgress, [0.02, 0.2], [0, 1]);
   const stiriY = useTransform(scrollYProgress, [0.02, 0.2], [40, 0]);
   const promiseOpacity = useTransform(scrollYProgress, [0.12, 0.42], [0, 1]);
-  const promiseBlur = useTransform(scrollYProgress, [0.12, 0.42], [28, 0]);
-  const promiseBrightness = useTransform(scrollYProgress, [0.12, 0.42], [0.05, 1]);
-  const promiseBrightnessFilter = useMotionTemplate`blur(${promiseBlur}px) brightness(${promiseBrightness})`;
   const lineScale = useTransform(scrollYProgress, [0.35, 0.52], [0, 1]);
   const lineOpacity = useTransform(scrollYProgress, [0.35, 0.52], [0, 1]);
   const descOpacity = useTransform(scrollYProgress, [0.42, 0.58], [0, 1]);
@@ -134,7 +132,7 @@ function ServicesHeader({ lang }: { lang: 'sl' | 'en' }) {
         className="text-4xl md:text-6xl lg:text-7xl font-semibold tracking-[-0.03em] leading-[1.0] text-white">
         {HEADER_COPY.line1[lang]}
       </motion.h2>
-      <motion.h2 style={{ opacity: promiseOpacity, filter: promiseBrightnessFilter }}
+      <motion.h2 style={{ opacity: promiseOpacity }}
         className="text-4xl md:text-6xl lg:text-7xl font-semibold tracking-[-0.03em] leading-[1.0] text-white mt-1">
         {HEADER_COPY.line2[lang]}
       </motion.h2>
@@ -209,6 +207,7 @@ interface RowProps {
 
 function CapabilityRow({ index, category, imageUrl, flip, onItemClick }: RowProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const { language } = useLanguage();
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
 
   const imageY = useTransform(scrollYProgress, [0, 1], ['0%', '-22%']);
@@ -279,7 +278,7 @@ function CapabilityRow({ index, category, imageUrl, flip, onItemClick }: RowProp
           {category.items && category.items.length > 0 && (
             <motion.div style={{ opacity: ctaOpacity, y: ctaY }} className="mt-6">
               <CategoryCTA onClick={() => onItemClick(category.items[0])} hex={hex}>
-                Preglej podrobnosti
+                {language === 'sl' ? 'Preglej podrobnosti' : 'View details'}
                 <ArrowRight size={15} />
               </CategoryCTA>
             </motion.div>
@@ -328,6 +327,7 @@ function ServiceModal({
   const [currentCategory, setCurrentCategory] = useState(initialCategory);
   const [current, setCurrent] = useState(initialItem);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const { language } = useLanguage();
   const hex = CATEGORY_HEX[currentCategory.id] ?? '#3b82f6';
 
   const switchCategory = (cat: ServiceCategory) => {
@@ -592,7 +592,7 @@ function ServiceModal({
                 <motion.div variants={cardItemVariants} className="mt-2">
                   <CategoryCTA onClick={handleInquiry} hex={hex} fullWidth>
                     <Send size={14} />
-                    Pošlji povpraševanje
+                    {language === 'sl' ? 'Pošlji povpraševanje' : 'Send inquiry'}
                   </CategoryCTA>
                 </motion.div>
 

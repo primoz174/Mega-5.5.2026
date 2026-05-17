@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Mail, Phone } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 function cn(...classes: (string | undefined | false | null)[]): string {
   return classes.filter(Boolean).join(' ');
@@ -8,7 +9,7 @@ function cn(...classes: (string | undefined | false | null)[]): string {
 export interface TeamMember {
   id: string;
   name: string;
-  role: string;
+  role: { sl: string; en: string };
   initials: string;
   image?: string;
   certifications: string[];
@@ -20,7 +21,7 @@ const MEGAMA_MEMBERS: TeamMember[] = [
   {
     id: '1',
     name: 'Rok Topolnik',
-    role: 'Direktor',
+    role: { sl: 'Direktor', en: 'Director' },
     initials: 'RT',
     image: '/images/Osebja/Rok-Topolnik-slika.jpeg',
     certifications: ['ASNT Level III · VT, UT', 'EN ISO 9712 Nivo III', 'PDI-UT · ASME Sec. XI', 'IWE · IIW/EWF'],
@@ -30,7 +31,7 @@ const MEGAMA_MEMBERS: TeamMember[] = [
   {
     id: '2',
     name: 'Boris Plešac',
-    role: 'Vodja kakovosti',
+    role: { sl: 'Vodja kakovosti', en: 'Quality Manager' },
     initials: 'BP',
     image: '/images/Osebja/Boris-Plesac_SLIKA.png',
     certifications: ['QC/QA · ISO 9001:2015', 'ASME Dokumentacija', 'IWI-C · Varilni inšpektor', 'Tehnično svetovanje'],
@@ -69,30 +70,39 @@ function MemberCard({
   hoveredId: string | null;
   onHover: (id: string | null) => void;
 }) {
+  const { language } = useLanguage();
   const isActive = hoveredId === member.id;
   const isDimmed = hoveredId !== null && !isActive;
 
   return (
     <div
       className={cn(
-        'flex items-start gap-6 transition-opacity duration-300',
-        isDimmed ? 'opacity-40' : 'opacity-100',
+        'relative flex flex-col sm:flex-row items-start gap-5 sm:gap-6 transition-all duration-500 rounded-2xl p-3 -mx-3',
+        isDimmed ? 'opacity-35' : 'opacity-100',
       )}
       onMouseEnter={() => onHover(member.id)}
       onMouseLeave={() => onHover(null)}
     >
+      {/* Hover glow */}
+      {isActive && (
+        <div
+          aria-hidden
+          className="absolute inset-0 rounded-2xl pointer-events-none"
+          style={{
+            background: 'radial-gradient(ellipse 80% 100% at 30% 50%, rgba(0,113,227,0.10) 0%, transparent 70%)',
+            boxShadow: 'inset 0 0 0 1px rgba(0,113,227,0.10)',
+          }}
+        />
+      )}
       {/* Photo */}
       <div
-        className={cn(
-          'relative shrink-0 w-[120px] h-[150px] md:w-[140px] md:h-[176px] rounded-2xl overflow-hidden border transition-all duration-300',
-          isActive ? 'border-[#0071e3]/40' : 'border-white/[0.08]',
-        )}
+        className="relative shrink-0 w-[140px] h-[176px] md:w-[140px] md:h-[176px] rounded-2xl overflow-hidden"
       >
         {member.image ? (
           <img
             src={member.image}
             alt={member.name}
-            className="w-full h-full object-cover object-top transition-[filter] duration-500"
+            className="w-full h-full object-cover object-center scale-105 transition-[filter] duration-500"
             style={{
               filter: isActive
                 ? 'grayscale(0) brightness(1)'
@@ -140,7 +150,7 @@ function MemberCard({
         </div>
 
         <p className="mt-2.5 pl-8 font-mono text-[10px] uppercase tracking-[0.2em] text-white/40">
-          {member.role}
+          {member.role[language as 'sl' | 'en']}
         </p>
 
         {/* Certifications */}

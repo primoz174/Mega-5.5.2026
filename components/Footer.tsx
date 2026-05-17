@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 const LOGO_URL = "https://megama.si/wp-content/uploads/2021/01/cropped-cropped-website_logo_transparent_background-1-1.png";
 
 const Footer: React.FC = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -68,7 +68,7 @@ const Footer: React.FC = () => {
               <div className="h-4 w-px bg-white/10" />
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/5 border border-green-500/20">
                 <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_#22c55e]" />
-                <span className="text-[9px] font-mono font-bold tracking-widest text-green-500/80 uppercase">All Systems Nominal</span>
+                <span className="text-[9px] font-mono font-bold tracking-widest text-green-500/80 uppercase">{language === 'sl' ? 'Vsi sistemi aktivni' : 'All Systems Nominal'}</span>
               </div>
             </div>
           </div>
@@ -81,7 +81,7 @@ const Footer: React.FC = () => {
                 <h4 className="text-white font-bold font-mono text-[10px] uppercase tracking-[0.3em]">{t.footer.sections_services}</h4>
               </div>
               <ul className="space-y-4">
-                {[t.contact.form_ndt, t.contact.form_supervision, "QA / QC"].map((item) => (
+                {[t.contact.form_ndt, t.contact.form_supervision, language === 'sl' ? 'Zagotavljanje kakovosti QA/QC' : 'Quality Assurance QA/QC'].map((item) => (
                   <li key={item}>
                     <button 
                       onClick={() => scrollToSection('services')} 
@@ -127,7 +127,7 @@ const Footer: React.FC = () => {
                     <MapPin size={14} className="text-[#0071e3]" />
                   </div>
                   <div className="text-slate-400 text-xs leading-relaxed">
-                    Cesta krških žrtev 44<br />8270 Krško, Slovenija
+                    Cesta krških žrtev 44<br />8270 Krško, {language === 'sl' ? 'Slovenija' : 'Slovenia'}
                   </div>
                 </div>
                 <div className="flex items-start gap-4 group">
@@ -153,12 +153,12 @@ const Footer: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
             <div className="space-y-4">
                <div className="font-mono text-[10px] text-[#0071e3] tracking-widest uppercase flex items-center gap-2">
-                 <ShieldCheck size={14} /> Registered Entity
+                 <ShieldCheck size={14} /> {language === 'sl' ? 'Registriran subjekt' : 'Registered Entity'}
                </div>
                <p className="text-white font-bold text-xs uppercase leading-tight font-mono">MEGAMA, NDT PREISKAVE D.O.O.</p>
                <p className="text-slate-500 text-[10px] leading-relaxed">
-                 Reg office: Cesta krških žrtev 44, 8270 Krško<br />
-                 MŠ: 8789622000 | Davčna: SI 69500177
+                 {language === 'sl' ? 'Sedež: ' : 'Reg. office: '}Cesta krških žrtev 44, 8270 Krško<br />
+                 {language === 'sl' ? 'MŠ' : 'Reg. No'}: 8789622000 | {language === 'sl' ? 'Davčna' : 'VAT'}: SI 69500177
                </p>
             </div>
             
@@ -189,7 +189,6 @@ const Footer: React.FC = () => {
         <div className="flex flex-col md:flex-row justify-between items-center text-[10px] font-mono text-slate-500 tracking-widest uppercase">
           <p>&copy; {new Date().getFullYear()} MEGAMA CENTER &bull; {t.footer.rights}</p>
           <div className="flex items-center gap-6 mt-4 md:mt-0">
-             <span className="text-[#0071e3]/50 hover:text-[#0071e3] cursor-default transition-colors">STABLE BUILD 2026.4.15</span>
              <p>{t.footer.designed}</p>
           </div>
         </div>

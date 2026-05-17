@@ -1,6 +1,6 @@
 import { ServiceCategory } from '../types';
 
-export const servicesData: ServiceCategory[] = [
+const servicesDataSl: ServiceCategory[] = [
   {
     id: 'ndt',
     title: 'NDT Preiskave in Kontrola Materialov',
@@ -18,11 +18,7 @@ export const servicesData: ServiceCategory[] = [
         details: ['Pregled pred, med in po varjenju', 'Uporaba endoskopov za težko dostopna mesta', 'Merjenje dimenzij zvarov z merili', 'Skladnost z EN ISO 17637'],
         icon: 'Eye',
         level3: true,
-        quickFacts: {
-          standard: 'EN ISO 17637',
-          application: 'Zvari, odlitki, varjene konstrukcije',
-          result: 'Pisni izvid + fotografije',
-        },
+        quickFacts: { standard: 'EN ISO 17637', application: 'Zvari, odlitki, varjene konstrukcije', result: 'Pisni izvid + fotografije' },
       },
       {
         id: 'pt',
@@ -31,11 +27,7 @@ export const servicesData: ServiceCategory[] = [
         details: ['Primerno za vse neporozne materiale (jeklo, aluminij, plastika)', 'Visoka občutljivost za mikroskopske razpoke', 'Hitra in stroškovno učinkovita metoda', 'Skladnost z EN ISO 3452'],
         icon: 'Droplet',
         level3: true,
-        quickFacts: {
-          standard: 'EN ISO 3452',
-          application: 'Jeklo, aluminij, nerjavno jeklo',
-          result: 'Poročilo z indikacijsko karto',
-        },
+        quickFacts: { standard: 'EN ISO 3452', application: 'Jeklo, aluminij, nerjavno jeklo', result: 'Poročilo z indikacijsko karto' },
       },
       {
         id: 'mt',
@@ -44,11 +36,7 @@ export const servicesData: ServiceCategory[] = [
         details: ['Zelo zanesljiva metoda za jeklene konstrukcije', 'Odkriva tudi napake tik pod površino', 'Uporaba barvnih ali fluorescentnih delcev', 'Skladnost z EN ISO 17638'],
         icon: 'Magnet',
         level3: true,
-        quickFacts: {
-          standard: 'EN ISO 17638',
-          application: 'Feromagnetna jekla in zlitine',
-          result: 'Poročilo isti delovni dan',
-        },
+        quickFacts: { standard: 'EN ISO 17638', application: 'Feromagnetna jekla in zlitine', result: 'Poročilo isti delovni dan' },
       },
       {
         id: 'ut',
@@ -57,11 +45,7 @@ export const servicesData: ServiceCategory[] = [
         details: ['Zaznavanje napak v celotnem volumnu materiala', 'Določanje točne globine in velikosti napake', 'Primerno za debelejše materiale in zvare', 'Skladnost z EN ISO 17640'],
         icon: 'Activity',
         level3: true,
-        quickFacts: {
-          standard: 'EN ISO 17640',
-          application: 'Tlačne posode, cevovodi, I-nosilci',
-          result: 'Digitalno poročilo v 24h',
-        },
+        quickFacts: { standard: 'EN ISO 17640', application: 'Tlačne posode, cevovodi, I-nosilci', result: 'Digitalno poročilo v 24h' },
       },
       {
         id: 'utt',
@@ -70,11 +54,7 @@ export const servicesData: ServiceCategory[] = [
         details: ['Merjenje debeline brez uničenja materiala', 'Zaznavanje stanjšanja sten zaradi korozije/erozije', 'Sledenje življenjski dobi tlačne opreme', 'Digitalni prikaz in beleženje rezultatov'],
         icon: 'Ruler',
         level3: true,
-        quickFacts: {
-          standard: 'EN 15317',
-          application: 'Cevi, rezervoarji, korozijsko razgrajeni deli',
-          result: 'Tabela meritev + trend korozije',
-        },
+        quickFacts: { standard: 'EN 15317', application: 'Cevi, rezervoarji, korozijsko razgrajeni deli', result: 'Tabela meritev + trend korozije' },
       },
       {
         id: 'lt',
@@ -83,11 +63,7 @@ export const servicesData: ServiceCategory[] = [
         details: ['Mehurčkasta metoda (Vacuum box)', 'Preizkus s povišanim hidravličnim ali pnevmatskim tlakom', 'Odkrivanje mikroskopskih netesnosti', 'Ključno za tlačno opremo in rezervoarje'],
         icon: 'Wind',
         level3: true,
-        quickFacts: {
-          standard: 'EN 1779 / EN 13185',
-          application: 'Tlačna oprema, vakuumski sistemi',
-          result: 'Protokol o tesnosti',
-        },
+        quickFacts: { standard: 'EN 1779 / EN 13185', application: 'Tlačna oprema, vakuumski sistemi', result: 'Protokol o tesnosti' },
       },
       {
         id: 'rt',
@@ -96,11 +72,7 @@ export const servicesData: ServiceCategory[] = [
         details: ['Nudenje podizvajalskih storitev slikanja z izotopi/X-ray', 'Daje trajen arhivski posnetek zvara', 'Odkrivanje volumskih napak (pore, vključki)', 'Zahteva varnostne ukrepe zaradi sevanja'],
         icon: 'Radiation',
         level3: true,
-        quickFacts: {
-          standard: 'EN ISO 17636 / ASME Sec. V',
-          application: 'Cevovodi, tlačne posode, odlitki',
-          result: 'Arhivski radiogram + poročilo',
-        },
+        quickFacts: { standard: 'EN ISO 17636 / ASME Sec. V', application: 'Cevovodi, tlačne posode, odlitki', result: 'Arhivski radiogram + poročilo' },
       },
       {
         id: 'rt-eval',
@@ -109,11 +81,7 @@ export const servicesData: ServiceCategory[] = [
         details: ['Preverjanje kakovosti samega posnetka in IQI', 'Določanje stopnje sprejemljivosti napak po EN ISO 10675', 'Izdaja uradnega poročila in digitalizacija', 'Drugo mnenje in arbitraža pri spornih zvarih'],
         icon: 'FileSearch',
         level3: true,
-        quickFacts: {
-          standard: 'EN ISO 10675',
-          application: 'Obstoječi RT filmi in digitalni posnetki',
-          result: 'Ovrednotenje in poročilo v 48h',
-        },
+        quickFacts: { standard: 'EN ISO 10675', application: 'Obstoječi RT filmi in digitalni posnetki', result: 'Ovrednotenje in poročilo v 48h' },
       },
       {
         id: 'uci',
@@ -122,11 +90,7 @@ export const servicesData: ServiceCategory[] = [
         details: ['Zelo majhna vizualna poškodba površine', 'Hitre in prenosne meritve na terenu', 'Primerno za območja toplotnega vpliva pri zvarih (HAZ)', 'Pretvorbe v različne skale (HV, HB, HRC)'],
         icon: 'Hammer',
         level3: true,
-        quickFacts: {
-          standard: 'DIN 50159 / ASTM E2175',
-          application: 'HAZ cone, tanke pločevine, orodja',
-          result: 'HV/HB/HRC v realnem času',
-        },
+        quickFacts: { standard: 'DIN 50159 / ASTM E2175', application: 'HAZ cone, tanke pločevine, orodja', result: 'HV/HB/HRC v realnem času' },
       },
       {
         id: 'leeb',
@@ -135,11 +99,7 @@ export const servicesData: ServiceCategory[] = [
         details: ['Hitro testiranje grobih odlitkov in odkovkov', 'Enostavna uporaba na terenu (prijemljivo z roko)', 'Cenovno učinkovito pri večjih presekih', 'Samodejni izračun odboja v obratovalno trdoto'],
         icon: 'Hammer',
         level3: true,
-        quickFacts: {
-          standard: 'EN ISO 16859 / ASTM A956',
-          application: 'Odlitki, odkovanki, masivne komponente',
-          result: 'HL vrednost + pretvorba v HV/HB',
-        },
+        quickFacts: { standard: 'EN ISO 16859 / ASTM A956', application: 'Odlitki, odkovanki, masivne komponente', result: 'HL vrednost + pretvorba v HV/HB' },
       },
     ],
   },
@@ -159,11 +119,7 @@ export const servicesData: ServiceCategory[] = [
         description: 'Napake, odkrite med varjenjem, stanejo 10× manj kot popravila na predanem projektu. Naš nadzor zagotavlja, da varilci sledijo WPS in da vsak zvar ustreza standardu.',
         details: ['Pregled varilne dokumentacije (WPS, WPQR)', 'Nadzor nad usposobljenostjo varilcev', 'Kontrola priprave zvarnih robov', 'Spremljanje varilnih parametrov med varjenjem'],
         icon: 'Shield',
-        quickFacts: {
-          standard: 'EN ISO 3834 / EN 1090',
-          application: 'Jeklene konstrukcije, tlačna oprema, mostovi',
-          result: 'Potrditveni zapisnik + NCR poročilo',
-        },
+        quickFacts: { standard: 'EN ISO 3834 / EN 1090', application: 'Jeklene konstrukcije, tlačna oprema, mostovi', result: 'Potrditveni zapisnik + NCR poročilo' },
       },
       {
         id: 'prevzemi',
@@ -171,11 +127,7 @@ export const servicesData: ServiceCategory[] = [
         description: 'Preverimo, ali je oprema res takšna, kot piše v dokumentaciji — preden jo sprejmete in plačate. Neodvisni prevzem zaščiti pred skritimi napakami in dragimi reklamacijami.',
         details: ['Pregled tehnične dokumentacije', 'Vizualna in dimenzijska kontrola', 'Nadzor nad tlačnimi preizkusi', 'Izdaja poročil o prevzemu'],
         icon: 'CheckSquare',
-        quickFacts: {
-          standard: 'EN 10204 3.1/3.2 / PED',
-          application: 'Tlačna in procesna oprema',
-          result: 'Prevzemni protokol + poročilo o napakah',
-        },
+        quickFacts: { standard: 'EN 10204 3.1/3.2 / PED', application: 'Tlačna in procesna oprema', result: 'Prevzemni protokol + poročilo o napakah' },
       },
       {
         id: 'third-party',
@@ -183,11 +135,7 @@ export const servicesData: ServiceCategory[] = [
         description: 'Ko kupec in dobavitelj potrebujeta nevtralno presojo, nastopimo kot neodvisna tretja stranka — brez interesnih konfliktov, z objektivnim poročilom, ki je sprejeto po vsem svetu.',
         details: ['Objektivno in neodvisno ocenjevanje', 'Preverjanje sledljivosti izdanih dokumentov in certifikatov', 'Prisotnost na testiranjih opreme', 'Poraba časa samo po potrebi brez stalnih stroškov'],
         icon: 'Users',
-        quickFacts: {
-          standard: 'ISO/IEC 17020',
-          application: 'Mednarodne dobaviteljske verige',
-          result: 'Neodvisno poročilo inšpekcijskega organa',
-        },
+        quickFacts: { standard: 'ISO/IEC 17020', application: 'Mednarodne dobaviteljske verige', result: 'Neodvisno poročilo inšpekcijskega organa' },
       },
       {
         id: 'vhodna',
@@ -195,11 +143,7 @@ export const servicesData: ServiceCategory[] = [
         description: 'Material z napako, ki vstopi v proizvodnjo, podraži celoten projekt. Sistematično preverimo vsakega dobavitelja in vsako serijo — preden kos pride do strojne obdelave.',
         details: ['Preventivno iskanje napak pred strojno obdelavo', 'Vizualni in dimenzijski pregled trdih mer ali toleranc', 'Potrditev ustreznosti z dokumentacijo', 'Sistematično označevanje in sledenje kosov'],
         icon: 'PackageCheck',
-        quickFacts: {
-          standard: 'EN 10204 / ISO 2768',
-          application: 'Polizdelki, odkovki, pločevine',
-          result: 'Odobren material z etiketo sledljivosti',
-        },
+        quickFacts: { standard: 'EN 10204 / ISO 2768', application: 'Polizdelki, odkovki, pločevine', result: 'Odobren material z etiketo sledljivosti' },
       },
       {
         id: 'koordinacija',
@@ -207,11 +151,7 @@ export const servicesData: ServiceCategory[] = [
         description: 'Brez lastnega varilnega inženirja? Zagotovimo strokovno varilno koordinacijo po EN ISO 14731, ki vam odpre vrata do certifikatov EN ISO 3834 in EN 1090.',
         details: ['Nadzor nad strokovnostjo in nalogami v varilni proizvodnji', 'Optimizacija proizvodnega procesa obdržanja EN ISO 3834', 'Zunanja ekspertska ekspertiza v lokalno podjetje', 'Pristnost pri presojah certifikacijskih hiš'],
         icon: 'Network',
-        quickFacts: {
-          standard: 'EN ISO 14731 / EN ISO 3834',
-          application: 'Podjetja z varilno proizvodnjo',
-          result: 'Vzpostavitev sistema kakovosti varjenja',
-        },
+        quickFacts: { standard: 'EN ISO 14731 / EN ISO 3834', application: 'Podjetja z varilno proizvodnjo', result: 'Vzpostavitev sistema kakovosti varjenja' },
       },
     ],
   },
@@ -231,11 +171,7 @@ export const servicesData: ServiceCategory[] = [
         description: 'Brez ustrezne dokumentacije ne morete predati projekta niti pridobiti certifikata. Mi pripravimo celotno mapo — od WPS do NDT navodil — prilagojeno vašim standardom.',
         details: ['Izdelava varilnih planov', 'Priprava navodil za NDT', 'Zbiranje certifikatov materialov', 'Kompletiranje končne mape (As-built)'],
         icon: 'FileText',
-        quickFacts: {
-          standard: 'EN ISO 3834 / EN 1090',
-          application: 'Jeklene konstrukcije, procesna oprema',
-          result: 'Kompletna ITP in varilna mapa',
-        },
+        quickFacts: { standard: 'EN ISO 3834 / EN 1090', application: 'Jeklene konstrukcije, procesna oprema', result: 'Kompletna ITP in varilna mapa' },
       },
       {
         id: 'proizvodnja',
@@ -243,11 +179,7 @@ export const servicesData: ServiceCategory[] = [
         description: 'Odstopanja od plana kakovosti odkrijemo sproti med montažo — ne šele pri končnem prevzemu. Sledimo ITP točko po točko in dokumentiramo vsak korak.',
         details: ['In-process pregledi varjenja/montiranja', 'Označevanje postavk in sklopov', 'Kontrola pred oddajo naslednji delovni postaji', 'Sledenje neujemanjih (Non-conformance reports NCR)'],
         icon: 'Factory',
-        quickFacts: {
-          standard: 'ISO 9001 / EN ISO 3834',
-          application: 'Modularni in serijski projekti',
-          result: 'Tabelarno NCR poročilo + ITP status',
-        },
+        quickFacts: { standard: 'ISO 9001 / EN ISO 3834', application: 'Modularni in serijski projekti', result: 'Tabelarno NCR poročilo + ITP status' },
       },
       {
         id: 'varilna-dok',
@@ -255,11 +187,7 @@ export const servicesData: ServiceCategory[] = [
         description: 'Pravilni WPS pospeši varjenje in zmanjša škart. Pretvorimo vaše WPQR ateste v operativne WPS, ki jih varilci dejansko razumejo in jih je enostavno slediti.',
         details: ['Pretvorba WPQR atestov v obratovalne WPS', 'Popis vseh varjenih spojev in parametrov', 'Usmerjevanje optimalnih varilnih dodajnih materialov', 'Skrb za pravilno toplotno obdelavo'],
         icon: 'FileSignature',
-        quickFacts: {
-          standard: 'EN ISO 15614 / ASME IX',
-          application: 'Vse vrste varilnih postopkov',
-          result: 'Operativni WPS + PWHT navodila',
-        },
+        quickFacts: { standard: 'EN ISO 15614 / ASME IX', application: 'Vse vrste varilnih postopkov', result: 'Operativni WPS + PWHT navodila' },
       },
       {
         id: 'koncna-dok',
@@ -267,11 +195,7 @@ export const servicesData: ServiceCategory[] = [
         description: 'Predaja brez popolne dokumentacije blokira plačila in povzroča zamude. Organiziramo Manufacturing Data Book točno po zahtevah naročnika in PED direktive.',
         details: ['Organizirano pošiljanje Manufacturing Data Book', 'Jasna poravnana z zahtevami po PED direktivi', 'Skeniranje in digitalizacija vseh posnetkov', 'Sledenje celotne verige izdelave produkta'],
         icon: 'BookOpen',
-        quickFacts: {
-          standard: 'PED 2014/68/EU / EN 13480',
-          application: 'Tlačna in procesna oprema',
-          result: 'Kompletni Manufacturing Data Book',
-        },
+        quickFacts: { standard: 'PED 2014/68/EU / EN 13480', application: 'Tlačna in procesna oprema', result: 'Kompletni Manufacturing Data Book' },
       },
     ],
   },
@@ -291,11 +215,7 @@ export const servicesData: ServiceCategory[] = [
         description: 'Napačna varilna tehnika povzroča napake, ki se jih ne vidi takoj. Svetujemo pri izbiri postopka, parametrov in dodajnih materialov — preden začnete, ne po tem.',
         details: ['Optimizacija oblike zvarnega roba', 'Izbira TIG, MIG/MAG ali E-PP postopkov', 'Reševanje težav s pornostmi in napakami pri varjenju', 'Projektno svetovanje pred začetkom obsega del'],
         icon: 'Settings',
-        quickFacts: {
-          standard: 'EN ISO 4063 / EN ISO 15614',
-          application: 'Razvoj in optimizacija varilnih postopkov',
-          result: 'Optimizirani parametri + izbira dodajnega mat.',
-        },
+        quickFacts: { standard: 'EN ISO 4063 / EN ISO 15614', application: 'Razvoj in optimizacija varilnih postopkov', result: 'Optimizirani parametri + izbira dodajnega mat.' },
       },
       {
         id: 'atest',
@@ -303,11 +223,7 @@ export const servicesData: ServiceCategory[] = [
         description: 'Atestiranje varilnih postopkov je pogoj za vsak seriozni projekt. Vodimo vas od prvega preizkusnega zvara do izročitve WPQR in WPS dokumentacije.',
         details: ['Določitev zahtevanih preizkusov za pokritje področij delovanja podjetja', 'Nabava ustreznega materiala po certifikatih', 'Nadzor pri sami izdelavi specimena (priča standardne inšpekcije)', 'Skrb za analize in preizkuse v laboratorijih'],
         icon: 'Award',
-        quickFacts: {
-          standard: 'EN ISO 15614 / ASME IX',
-          application: 'Postopkovni certifikati za WPQR/WPS',
-          result: 'Potrjeni WPQR + operativni WPS',
-        },
+        quickFacts: { standard: 'EN ISO 15614 / ASME IX', application: 'Postopkovni certifikati za WPQR/WPS', result: 'Potrjeni WPQR + operativni WPS' },
       },
       {
         id: 'ndt-svet',
@@ -315,11 +231,7 @@ export const servicesData: ServiceCategory[] = [
         description: 'Predraga ali napačna NDT metoda je izguba časa in denarja. Svetujemo, katero preiskavo in kateri standard uporabiti — in vam pomagamo to uveljaviti pri naročniku.',
         details: ['Analiza, zakaj je ultrazvok boljši kot radiografija v določanem tipu spajanja', 'Tolmačenje rezultatov slabe kakovosti', 'Implementacije novih, naprednih metod v vaš delovni proces', 'Optimizacija in stroškovno učinkoviti inšpekcijski plani'],
         icon: 'Lightbulb',
-        quickFacts: {
-          standard: 'EN ISO 9712 / ASME Sec. V',
-          application: 'Investicijski projekti in revizije',
-          result: 'Optimizirani NDT plan + specifikacija',
-        },
+        quickFacts: { standard: 'EN ISO 9712 / ASME Sec. V', application: 'Investicijski projekti in revizije', result: 'Optimizirani NDT plan + specifikacija' },
       },
       {
         id: 'navodila',
@@ -327,11 +239,7 @@ export const servicesData: ServiceCategory[] = [
         description: 'Standardi so pisani za pravnike, ne za varilce in kontrolorje. Prevedemo zahteve ASME ali EN ISO v jasna navodila za vaš obrat — konkretna, kratka in sledljiva.',
         details: ['Pisani postopki glede EN ISO industrije', 'Stroge specifikacije ASME zahtev za prekomorje in rafinerije', 'Priročniki in obratovalne ročne prakse', 'Navodila za izvedbo vizualnih pregledov in čiščenj'],
         icon: 'Book',
-        quickFacts: {
-          standard: 'EN ISO / ASME / AD 2000',
-          application: 'Industrijski obrati in delavnice',
-          result: 'Prilagojeni postopki brez odvečnega balasta',
-        },
+        quickFacts: { standard: 'EN ISO / ASME / AD 2000', application: 'Industrijski obrati in delavnice', result: 'Prilagojeni postopki brez odvečnega balasta' },
       },
       {
         id: 'uvajanje',
@@ -339,12 +247,266 @@ export const servicesData: ServiceCategory[] = [
         description: 'Nov sodelavec v NDT-ju ne sme delovati brez ustreznega uvoda. Z mentoriranjem in hands-on treningom ga usposobimo za samostojno delo — preden ga pošljete na uradni tečaj.',
         details: ['Mentorstvo v delavnici nad defektnimi zvarnimi rebri', 'Učenje razumevanja odčitkov aparatov in zaslonov', 'Razlaga tipičnih lažnih indikacij', 'Utrjevanje baze pred pošiljanjem sodelavcev na uradne NDT tečaje'],
         icon: 'GraduationCap',
-        quickFacts: {
-          standard: 'EN ISO 9712 / CSWIP',
-          application: 'Novo in notranje osebje',
-          result: 'Kompetentni kader za uradne NDT tečaje',
-        },
+        quickFacts: { standard: 'EN ISO 9712 / CSWIP', application: 'Novo in notranje osebje', result: 'Kompetentni kader za uradne NDT tečaje' },
       },
     ],
   },
 ];
+
+const servicesDataEn: ServiceCategory[] = [
+  {
+    id: 'ndt',
+    title: 'NDT Inspections & Material Testing',
+    subtitle: 'Certified reliability without material damage.',
+    shortTitle: 'NDT',
+    ctaText: 'View technical specifications',
+    description: 'We perform high-quality non-destructive testing of welds and base materials. With a team certified to ISO 9712 (levels II and III), we ensure 100% safety of your equipment and compliance with international standards.',
+    color: 'text-blue-500',
+    icon: 'ScanEye',
+    items: [
+      {
+        id: 'vt',
+        label: 'Visual Testing (VT)',
+        description: 'We detect defects before and after welding, before delays or repairs occur. A fast yet indispensable step for every welded structure.',
+        details: ['Inspection before, during and after welding', 'Endoscope use for hard-to-reach areas', 'Weld dimension measurement with gauges', 'Compliance with EN ISO 17637'],
+        icon: 'Eye',
+        level3: true,
+        quickFacts: { standard: 'EN ISO 17637', application: 'Welds, castings, welded structures', result: 'Written report + photographs' },
+      },
+      {
+        id: 'pt',
+        label: 'Penetrant Testing (PT)',
+        description: 'Microscopic cracks invisible to the naked eye are detected with colored or fluorescent liquids — before they threaten the safety of your equipment or cause costly failures.',
+        details: ['Suitable for all non-porous materials (steel, aluminium, plastics)', 'High sensitivity to microscopic cracks', 'Fast and cost-effective method', 'Compliance with EN ISO 3452'],
+        icon: 'Droplet',
+        level3: true,
+        quickFacts: { standard: 'EN ISO 3452', application: 'Steel, aluminium, stainless steel', result: 'Report with indication map' },
+      },
+      {
+        id: 'mt',
+        label: 'Magnetic Particle Testing (MT)',
+        description: 'For steel welds and components we detect both surface and subsurface defects that visual inspection would miss — without stopping your production line.',
+        details: ['Highly reliable method for steel structures', 'Detects defects just below the surface', 'Use of colored or fluorescent particles', 'Compliance with EN ISO 17638'],
+        icon: 'Magnet',
+        level3: true,
+        quickFacts: { standard: 'EN ISO 17638', application: 'Ferromagnetic steels and alloys', result: 'Report on the same working day' },
+      },
+      {
+        id: 'ut',
+        label: 'Ultrasonic Testing (UT)',
+        description: 'We detect internal weld defects without stopping your production — report with exact defect location and size delivered within 24 hours.',
+        details: ['Defect detection throughout the full material volume', 'Precise determination of defect depth and size', 'Suitable for thicker materials and welds', 'Compliance with EN ISO 17640'],
+        icon: 'Activity',
+        level3: true,
+        quickFacts: { standard: 'EN ISO 17640', application: 'Pressure vessels, pipelines, I-beams', result: 'Digital report within 24h' },
+      },
+      {
+        id: 'utt',
+        label: 'Wall Thickness Measurement (UTT)',
+        description: 'Corrosion and erosion thin pipe walls and vessel shells without you noticing. Regular thickness measurements help predict risks and prevent catastrophic failures.',
+        details: ['Thickness measurement without material destruction', 'Detection of wall thinning due to corrosion/erosion', 'Lifecycle tracking of pressure equipment', 'Digital display and recording of results'],
+        icon: 'Ruler',
+        level3: true,
+        quickFacts: { standard: 'EN 15317', application: 'Pipes, tanks, corrosion-degraded parts', result: 'Measurement table + corrosion trend' },
+      },
+      {
+        id: 'lt',
+        label: 'Leak Testing (LT)',
+        description: 'Every leak in a pressure system means energy loss, environmental pollution or risk to workers. We locate leaks without disassembling the system.',
+        details: ['Bubble method (Vacuum box)', 'Hydraulic or pneumatic pressure testing', 'Detection of microscopic leaks', 'Critical for pressure equipment and tanks'],
+        icon: 'Wind',
+        level3: true,
+        quickFacts: { standard: 'EN 1779 / EN 13185', application: 'Pressure equipment, vacuum systems', result: 'Leak tightness protocol' },
+      },
+      {
+        id: 'rt',
+        label: 'Radiographic Testing (RT)*',
+        description: 'Radiography produces an X-ray image of your weld revealing pores, inclusions or lack of fusion — an archival record proving quality for years to come.',
+        details: ['Subcontracting of isotope/X-ray imaging services', 'Provides a permanent archival weld record', 'Detection of volumetric defects (pores, inclusions)', 'Requires safety measures due to radiation'],
+        icon: 'Radiation',
+        level3: true,
+        quickFacts: { standard: 'EN ISO 17636 / ASME Sec. V', application: 'Pipelines, pressure vessels, castings', result: 'Archival radiograph + report' },
+      },
+      {
+        id: 'rt-eval',
+        label: 'Radiographic Film Evaluation',
+        description: 'We evaluate existing radiographic films to international standards and issue an official report — an independent opinion that resolves disputes and ensures buyer confidence.',
+        details: ['Image and IQI quality verification', 'Acceptance level assessment per EN ISO 10675', 'Issuance of official report and digitization', 'Second opinion and arbitration for disputed welds'],
+        icon: 'FileSearch',
+        level3: true,
+        quickFacts: { standard: 'EN ISO 10675', application: 'Existing RT films and digital images', result: 'Evaluation and report within 48h' },
+      },
+      {
+        id: 'uci',
+        label: 'Material Hardness (UCI)',
+        description: 'Verify weld joint and heat-affected zone hardness in the field — without a laboratory, with minimal surface marking and immediate results.',
+        details: ['Very small visual surface damage', 'Fast portable field measurements', 'Suitable for weld heat-affected zones (HAZ)', 'Conversions between scales (HV, HB, HRC)'],
+        icon: 'Hammer',
+        level3: true,
+        quickFacts: { standard: 'DIN 50159 / ASTM E2175', application: 'HAZ zones, thin sheets, tooling', result: 'HV/HB/HRC in real time' },
+      },
+      {
+        id: 'leeb',
+        label: 'Material Hardness (Leeb)',
+        description: 'For massive castings, forgings and steel structures we measure hardness in the field within seconds — without a laboratory, without disassembly, with reliable HV or HB conversion.',
+        details: ['Fast testing of rough castings and forgings', 'Easy handheld field use', 'Cost-effective for larger cross-sections', 'Automatic rebound calculation to operational hardness'],
+        icon: 'Hammer',
+        level3: true,
+        quickFacts: { standard: 'EN ISO 16859 / ASTM A956', application: 'Castings, forgings, massive components', result: 'HL value + HV/HB conversion' },
+      },
+    ],
+  },
+  {
+    id: 'nadzori',
+    title: 'Engineering Supervision & Acceptance',
+    subtitle: 'Independent assessment for flawless execution.',
+    shortTitle: 'Supervision',
+    ctaText: 'Request a supervision quote',
+    description: 'We provide expert supervision of welding processes and component acceptance. As an independent third party we prevent costly assembly errors and ensure all products are ready for safe operation.',
+    color: 'text-orange-500',
+    icon: 'ShieldCheck',
+    items: [
+      {
+        id: 'varilni',
+        label: 'Welding Supervision Services',
+        description: 'Defects found during welding cost 10× less than repairs on a delivered project. Our supervision ensures welders follow the WPS and every weld meets the standard.',
+        details: ['Review of welding documentation (WPS, WPQR)', 'Supervision of welder qualification', 'Control of weld edge preparation', 'Monitoring of welding parameters during welding'],
+        icon: 'Shield',
+        quickFacts: { standard: 'EN ISO 3834 / EN 1090', application: 'Steel structures, pressure equipment, bridges', result: 'Confirmation record + NCR report' },
+      },
+      {
+        id: 'prevzemi',
+        label: 'Product Acceptance for Clients',
+        description: 'We verify that the equipment is exactly as described in the documentation — before you accept and pay for it. Independent acceptance protects against hidden defects and costly complaints.',
+        details: ['Review of technical documentation', 'Visual and dimensional inspection', 'Supervision of pressure tests', 'Issuance of acceptance reports'],
+        icon: 'CheckSquare',
+        quickFacts: { standard: 'EN 10204 3.1/3.2 / PED', application: 'Pressure and process equipment', result: 'Acceptance protocol + defect report' },
+      },
+      {
+        id: 'third-party',
+        label: 'Third-Party Inspection',
+        description: 'When buyer and supplier need a neutral assessment, we act as an independent third party — without conflicts of interest, with an objective report accepted worldwide.',
+        details: ['Objective and independent assessment', 'Verification of traceability of issued documents and certificates', 'Attendance at equipment testing', 'Time spent only as needed with no fixed overhead'],
+        icon: 'Users',
+        quickFacts: { standard: 'ISO/IEC 17020', application: 'International supply chains', result: 'Independent inspection body report' },
+      },
+      {
+        id: 'vhodna',
+        label: 'Incoming Material Inspection',
+        description: 'Material with a defect entering production inflates the entire project cost. We systematically check every supplier and every batch — before the part reaches machining.',
+        details: ['Preventive defect detection before machining', 'Visual and dimensional inspection of hard dimensions and tolerances', 'Documentation compliance confirmation', 'Systematic marking and part tracking'],
+        icon: 'PackageCheck',
+        quickFacts: { standard: 'EN 10204 / ISO 2768', application: 'Semi-finished parts, forgings, plates', result: 'Approved material with traceability label' },
+      },
+      {
+        id: 'koordinacija',
+        label: 'Contract Welding Coordination',
+        description: 'No welding engineer in-house? We provide expert welding coordination per EN ISO 14731, opening the door to EN ISO 3834 and EN 1090 certification.',
+        details: ['Supervision of expertise and tasks in welding production', 'Production process optimization for maintaining EN ISO 3834', 'External expert expertise brought in-house', 'Attendance at certification body audits'],
+        icon: 'Network',
+        quickFacts: { standard: 'EN ISO 14731 / EN ISO 3834', application: 'Companies with welding production', result: 'Welding quality system implementation' },
+      },
+    ],
+  },
+  {
+    id: 'qa',
+    title: 'Comprehensive Quality Management (QC/QA)',
+    subtitle: 'Documentation that passes every audit.',
+    shortTitle: 'Quality',
+    ctaText: 'View QA/QC services',
+    description: 'We manage the entire quality of your project — from preparation of execution plans to final documentation. Our production monitoring systems ensure all processes comply with the project specification and regulations.',
+    color: 'text-emerald-500',
+    icon: 'ClipboardCheck',
+    items: [
+      {
+        id: 'izvedbena',
+        label: 'Execution Documentation Preparation',
+        description: 'Without proper documentation you cannot hand over a project or obtain a certificate. We prepare the complete dossier — from WPS to NDT instructions — tailored to your standards.',
+        details: ['Preparation of welding plans', 'Preparation of NDT instructions', 'Collection of material certificates', 'Compilation of final dossier (As-built)'],
+        icon: 'FileText',
+        quickFacts: { standard: 'EN ISO 3834 / EN 1090', application: 'Steel structures, process equipment', result: 'Complete ITP and welding dossier' },
+      },
+      {
+        id: 'proizvodnja',
+        label: 'Production/Assembly Monitoring',
+        description: 'Deviations from the quality plan are caught as they occur during assembly — not only at final acceptance. We follow the ITP point by point and document every step.',
+        details: ['In-process welding/assembly inspections', 'Marking of items and assemblies', 'Inspection before handover to next workstation', 'Non-conformance report (NCR) tracking'],
+        icon: 'Factory',
+        quickFacts: { standard: 'ISO 9001 / EN ISO 3834', application: 'Modular and serial projects', result: 'Tabular NCR report + ITP status' },
+      },
+      {
+        id: 'varilna-dok',
+        label: 'Welding Documentation Preparation',
+        description: 'The right WPS speeds up welding and reduces scrap. We convert your WPQR records into operational WPS documents that welders actually understand and are easy to follow.',
+        details: ['Conversion of WPQR records into operational WPS', 'Register of all welded joints and parameters', 'Guidance on optimal welding filler materials', 'Management of proper post-weld heat treatment'],
+        icon: 'FileSignature',
+        quickFacts: { standard: 'EN ISO 15614 / ASME IX', application: 'All welding process types', result: 'Operational WPS + PWHT instructions' },
+      },
+      {
+        id: 'koncna-dok',
+        label: 'Final Documentation Preparation',
+        description: 'Handover without complete documentation blocks payments and causes delays. We organize the Manufacturing Data Book exactly to client and PED directive requirements.',
+        details: ['Organized compilation of Manufacturing Data Book', 'Clear alignment with PED directive requirements', 'Scanning and digitization of all records', 'Tracking of the complete product manufacturing chain'],
+        icon: 'BookOpen',
+        quickFacts: { standard: 'PED 2014/68/EU / EN 13480', application: 'Pressure and process equipment', result: 'Complete Manufacturing Data Book' },
+      },
+    ],
+  },
+  {
+    id: 'svetovanje',
+    title: 'Technical Consulting & Development',
+    subtitle: 'Your expert resource for the most demanding challenges.',
+    shortTitle: 'Consulting',
+    ctaText: 'Contact our specialists',
+    description: 'We provide expert support for preparation of welding plans (WPS/WPQR) and NDT instructions to EN/ISO and ASME standards. We train your personnel in the latest testing methods and help optimize your production.',
+    color: 'text-purple-500',
+    icon: 'Lightbulb',
+    items: [
+      {
+        id: 'tehnologija',
+        label: 'Welding Technology & Plans',
+        description: 'Wrong welding technique causes defects that are not immediately visible. We advise on process selection, parameters and filler materials — before you start, not after.',
+        details: ['Weld groove geometry optimization', 'Selection of TIG, MIG/MAG or SMAW processes', 'Troubleshooting porosity and welding defects', 'Project consultation before scope commencement'],
+        icon: 'Settings',
+        quickFacts: { standard: 'EN ISO 4063 / EN ISO 15614', application: 'Welding process development and optimization', result: 'Optimized parameters + filler material selection' },
+      },
+      {
+        id: 'atest',
+        label: 'Procedure Qualification (WPQR, WPS)',
+        description: 'Welding procedure qualification is a prerequisite for every serious project. We guide you from the first test weld to delivery of WPQR and WPS documentation.',
+        details: ['Determination of required tests to cover the company scope of application', 'Procurement of suitable certified material', 'Supervision of specimen production (standard inspection witness)', 'Management of analyses and laboratory tests'],
+        icon: 'Award',
+        quickFacts: { standard: 'EN ISO 15614 / ASME IX', application: 'Procedure certificates for WPQR/WPS', result: 'Approved WPQR + operational WPS' },
+      },
+      {
+        id: 'ndt-svet',
+        label: 'NDT Testing Consultation',
+        description: 'An overpriced or wrong NDT method wastes time and money. We advise on which inspection method and standard to use — and help you enforce it with the client.',
+        details: ['Analysis of why ultrasound outperforms radiography for a given joint type', 'Interpretation of poor-quality results', 'Implementation of new advanced methods in your workflow', 'Optimization and cost-effective inspection plans'],
+        icon: 'Lightbulb',
+        quickFacts: { standard: 'EN ISO 9712 / ASME Sec. V', application: 'Investment projects and audits', result: 'Optimized NDT plan + specification' },
+      },
+      {
+        id: 'navodila',
+        label: 'Procedure Writing (EN/ISO, ASME...)',
+        description: 'Standards are written for lawyers, not for welders and inspectors. We translate ASME or EN ISO requirements into clear instructions for your plant — specific, concise and traceable.',
+        details: ['Written procedures per EN ISO industry requirements', 'Strict ASME specification requirements for overseas and refinery projects', 'Manuals and operational handbooks', 'Instructions for visual inspections and cleanings'],
+        icon: 'Book',
+        quickFacts: { standard: 'EN ISO / ASME / AD 2000', application: 'Industrial plants and workshops', result: 'Tailored procedures without unnecessary bulk' },
+      },
+      {
+        id: 'uvajanje',
+        label: 'Hands-on NDT Personnel Training',
+        description: 'A new NDT employee must not work without proper orientation. With mentoring and hands-on training we qualify them for independent work — before sending them to an official course.',
+        details: ['Workshop mentoring over defective weld specimens', 'Learning to read instrument and screen outputs', 'Explanation of typical false indications', 'Building the knowledge base before sending staff to official NDT courses'],
+        icon: 'GraduationCap',
+        quickFacts: { standard: 'EN ISO 9712 / CSWIP', application: 'New and internal personnel', result: 'Competent staff ready for official NDT courses' },
+      },
+    ],
+  },
+];
+
+export const getServicesData = (lang: 'sl' | 'en'): ServiceCategory[] =>
+  lang === 'sl' ? servicesDataSl : servicesDataEn;
+
+export const servicesData = servicesDataSl;

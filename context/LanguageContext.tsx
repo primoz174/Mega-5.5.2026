@@ -273,7 +273,7 @@ const translations: Record<Language, Translations> = {
       form_other: 'Drugo'
     },
     footer: {
-      company_desc: 'Strokovne NDT storitve, nadzori in svetovanje za industrijo. Zavezani natančnosti od leta 2008.',
+      company_desc: 'Strokovne NDT storitve, nadzori in svetovanje za industrijo. Zavezani natančnosti od leta 2021.',
       sections_services: 'Storitve',
       sections_company: 'Podjetje',
       sections_contact: 'Kontakt',
@@ -474,7 +474,7 @@ const translations: Record<Language, Translations> = {
       form_other: 'Other'
     },
     footer: {
-      company_desc: 'Expert NDT services, supervision, and consulting for industry. Committed to precision since 2008.',
+      company_desc: 'Expert NDT services, supervision, and consulting for industry. Committed to precision since 2021.',
       sections_services: 'Services',
       sections_company: 'Company',
       sections_contact: 'Contact',
