@@ -893,7 +893,7 @@ function Stats({ lang }: { lang: "sl" | "en" }) {
       {/* Faint grid */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:60px_60px] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_50%,black_30%,transparent_100%)] pointer-events-none" />
       <div className="max-w-[1200px] mx-auto px-6 relative z-10">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-10 md:gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-6">
           {stats.map((s, i) => (
             <StatCell key={i} item={s} delay={i * 0.12} />
           ))}
@@ -906,21 +906,60 @@ function Stats({ lang }: { lang: "sl" | "en" }) {
 function StatCell({ item, delay }: { item: StatItem; delay: number }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
-  const [count, setCount] = useState(0);
+  const [displayText, setDisplayText] = useState("");
 
   useEffect(() => {
-    if (!inView) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setCount(item.value);
+    if (!inView) {
+      // Prior to appearing in viewport, initialize with scrambling-like zero placeholders
+      setDisplayText(Array.from({ length: item.value.toString().length }, () => "0").join(""));
       return;
     }
-    const controls = animate(0, item.value, {
-      duration: 1.8,
-      delay,
-      ease: [0.16, 1, 0.3, 1],
-      onUpdate: (v) => setCount(Math.round(v)),
-    });
-    return () => controls.stop();
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setDisplayText(item.value.toString());
+      return;
+    }
+
+    const targetStr = item.value.toString();
+    const len = targetStr.length;
+    let frameId: number;
+    const duration = 1800; // 1.8 seconds matching sweep line animation
+    const start = performance.now() + (delay * 1000);
+
+    const updateScramble = (now: number) => {
+      if (now < start) {
+        // Scramble rapidly before actual resolving starts (simulating scanning warmup)
+        const temp = Array.from({ length: len }, () => Math.floor(Math.random() * 10).toString()).join("");
+        setDisplayText(temp);
+        frameId = requestAnimationFrame(updateScramble);
+        return;
+      }
+
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+
+      // Digits are resolved from left to right as the laser scan sweeps down
+      const resolvedCount = Math.floor(progress * len);
+
+      let current = "";
+      for (let i = 0; i < len; i++) {
+        if (i < resolvedCount || progress === 1) {
+          current += targetStr[i];
+        } else {
+          // Rapid randomized scramble representing ultrasonic gauge signal noise
+          current += Math.floor(Math.random() * 10).toString();
+        }
+      }
+
+      setDisplayText(current);
+
+      if (progress < 1) {
+        frameId = requestAnimationFrame(updateScramble);
+      }
+    };
+
+    frameId = requestAnimationFrame(updateScramble);
+    return () => cancelAnimationFrame(frameId);
   }, [inView, item.value, delay]);
 
   return (
@@ -929,17 +968,61 @@ function StatCell({ item, delay }: { item: StatItem; delay: number }) {
       initial={{ opacity: 0, y: 24 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.8, delay, ease: [0.16, 1, 0.3, 1] }}
-      className="text-left group"
+      className="relative overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.015] hover:bg-white/[0.03] transition-colors duration-500 p-5 md:p-8 flex flex-col justify-between min-h-[180px] md:min-h-[220px] group select-none"
     >
-      <div className="text-[clamp(3rem,7vw,5.5rem)] font-semibold tracking-[-0.04em] leading-none text-white tabular-nums group-hover:drop-shadow-[0_0_30px_rgba(0,113,227,0.4)] transition-all duration-500">
-        {count}
-        <span className="text-white/35">{item.suffix}</span>
+      {/* Absolute top-right green LED status dot */}
+      <div className="absolute top-4 right-4 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/10 border border-green-500/20 pointer-events-none z-10">
+        <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.7)]" />
+        <span className="font-mono text-[7px] tracking-wider text-green-400 font-bold uppercase leading-none">
+          ACTIVE
+        </span>
       </div>
-      <div className="mt-4 text-base text-white font-medium leading-snug">
-        {item.label}
-      </div>
-      <div className="mt-1.5 text-sm text-white/45 font-light leading-relaxed">
-        {item.sub}
+
+      {/* Ultrasonic dynamic laser scan sweep lines */}
+      {inView && (
+        <>
+          <motion.div
+            initial={{ top: "-10%" }}
+            animate={{ top: "110%" }}
+            transition={{
+              duration: 1.8,
+              delay,
+              ease: [0.16, 1, 0.3, 1],
+            }}
+            className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#0071e3] to-transparent pointer-events-none z-10"
+            style={{
+              boxShadow: "0 0 12px 2px rgba(0, 113, 227, 0.6), 0 0 24px 4px rgba(0, 113, 227, 0.3)",
+            }}
+          />
+          <motion.div
+            initial={{ top: "-30%", opacity: 0.4 }}
+            animate={{ top: "110%", opacity: 0 }}
+            transition={{
+              duration: 1.8,
+              delay,
+              ease: [0.16, 1, 0.3, 1],
+            }}
+            className="absolute inset-x-0 h-20 bg-gradient-to-b from-[#0071e3]/8 to-transparent pointer-events-none z-0"
+          />
+        </>
+      )}
+
+      {/* Card Content wrapper */}
+      <div className="relative z-10 flex flex-col justify-between h-full w-full">
+        <div>
+          <div className="text-[clamp(2.25rem,5.2vw,4.2rem)] font-mono font-semibold tracking-tight leading-none text-white tabular-nums group-hover:text-[#0071e3] transition-colors duration-500">
+            {displayText}
+            <span className="text-white/35 font-sans ml-0.5 text-[0.45em] select-none vertical-align-top">
+              {item.suffix}
+            </span>
+          </div>
+          <div className="mt-5 text-sm md:text-base text-white font-medium leading-snug">
+            {item.label}
+          </div>
+        </div>
+        <div className="mt-3 text-xs md:text-sm text-white/45 font-light leading-relaxed">
+          {item.sub}
+        </div>
       </div>
     </motion.div>
   );

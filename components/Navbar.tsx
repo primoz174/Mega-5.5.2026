@@ -30,6 +30,29 @@ const Navbar: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const navbarRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isScrolled) return;
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!navbarRef.current) return;
+      const rect = navbarRef.current.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      navbarRef.current.style.setProperty('--mouse-x', `${x}px`);
+      navbarRef.current.style.setProperty('--mouse-y', `${y}px`);
+    };
+    const el = navbarRef.current;
+    if (el) {
+      el.addEventListener('mousemove', handleMouseMove, { passive: true });
+    }
+    return () => {
+      if (el) {
+        el.removeEventListener('mousemove', handleMouseMove);
+      }
+    };
+  }, [isScrolled]);
+
   useEffect(() => {
     // IntersectionObserver for active section highlighting
     const options = {
@@ -192,12 +215,13 @@ const Navbar: React.FC = () => {
         style={{ pointerEvents: 'none' }}
       >
         <motion.div
+          ref={navbarRef}
           style={{
             pointerEvents: 'auto',
             border: '1px solid',
             position: 'relative',
           }}
-          className="w-full max-w-[1200px] flex items-center justify-between"
+          className="w-full max-w-[1200px] flex items-center justify-between group/nav"
           animate={
             isScrolled
               ? {
@@ -229,6 +253,29 @@ const Navbar: React.FC = () => {
             className={`absolute inset-0 pointer-events-none transition-opacity duration-500 ${isScrolled ? 'opacity-100' : 'opacity-0'}`}
             style={{ backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderRadius: 'inherit', zIndex: 0 }}
           />
+          {/* Moving spotlight background glow */}
+          {isScrolled && (
+            <div
+              className="absolute inset-0 pointer-events-none rounded-[inherit] transition-opacity duration-500 opacity-0 group-hover/nav:opacity-100"
+              style={{
+                zIndex: 0,
+                background: `radial-gradient(150px circle at var(--mouse-x, 0px) var(--mouse-y, 0px), rgba(0, 113, 227, 0.08), transparent 80%)`,
+              }}
+            />
+          )}
+          {/* Moving border glowing spotlight */}
+          {isScrolled && (
+            <div
+              className="absolute inset-[-1px] pointer-events-none rounded-[inherit] transition-opacity duration-500 opacity-0 group-hover/nav:opacity-100"
+              style={{
+                zIndex: 0,
+                border: '1px solid transparent',
+                backgroundImage: `linear-gradient(transparent, transparent), radial-gradient(130px circle at var(--mouse-x, 0px) var(--mouse-y, 0px), rgba(0, 113, 227, 0.5), transparent 80%)`,
+                backgroundOrigin: 'border-box',
+                backgroundClip: 'padding-box, border-box',
+              }}
+            />
+          )}
           {/* Logo */}
           <div className="relative z-10 flex-1 flex items-center justify-start min-w-[70px] h-10 md:h-12">
             <button
