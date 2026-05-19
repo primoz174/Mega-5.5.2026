@@ -9,6 +9,7 @@ import TeamShowcase from "../components/ui/team-showcase";
 import { GlowCard } from "../components/ui/spotlight-card";
 import { HoverBorderGradient } from "../components/ui/hover-border-gradient";
 import { Download, CheckCircle2, Shield } from "lucide-react";
+import InteractiveWeldLab from "../components/InteractiveWeldLab";
 
 const HERO_BG = "/images/home/hero-bg.webp";
 const RECIPIENT_EMAIL = "info@megama.si";
@@ -547,6 +548,7 @@ const Home: React.FC = () => {
       <main className="w-full bg-black text-white antialiased">
         <Hero lang={lang} />
         <Stats lang={lang} />
+        <InteractiveWeldLab lang={lang} />
         <IndustrySectors lang={lang} />
         <Services />
         <GlobalPresence lang={lang} />

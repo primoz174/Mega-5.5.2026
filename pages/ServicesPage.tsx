@@ -369,6 +369,200 @@ function MethodCard({
   );
 }
 
+interface TelemetryData {
+  logTitle: string;
+  blockLabel: string;
+  blockVal: string;
+  deviceLabel: string;
+  deviceVal: string;
+  paramLabel: string;
+  paramVal: string;
+  statusLabel: string;
+  statusVal: string;
+  ledBlink: boolean;
+}
+
+const getMethodStandards = (id: string, lang: 'sl' | 'en'): Array<{ code: string; desc: string }> => {
+  const isEn = lang === 'en';
+  const map: Record<string, Array<{ code: string; desc: string }>> = {
+    vt: [
+      { code: 'EN ISO 17637', desc: lang === 'sl' ? 'Vizualna kontrola zvarnih spojev' : 'NDT of welds — Visual testing of fusion-welded joints' },
+      { code: 'ASME Sec. V Art. 9', desc: lang === 'sl' ? 'Vizualni pregled tlačne opreme' : 'ASME Section V Article 9 — Visual Examination' }
+    ],
+    pt: [
+      { code: 'EN ISO 3452-1', desc: lang === 'sl' ? 'Preiskave s penetranti — Splošna načela' : 'NDT — Penetrant testing — General principles' },
+      { code: 'ASME Sec. V Art. 6', desc: lang === 'sl' ? 'Preiskava s tekočimi penetranti' : 'ASME Section V Article 6 — Liquid Penetrant Examination' }
+    ],
+    mt: [
+      { code: 'EN ISO 17638', desc: lang === 'sl' ? 'Magnetnofluksna kontrola zvarov' : 'NDT of welds — Magnetic particle testing' },
+      { code: 'ASME Sec. V Art. 7', desc: lang === 'sl' ? 'Magnetna preiskava' : 'ASME Section V Article 7 — Magnetic Particle Examination' }
+    ],
+    ut: [
+      { code: 'EN ISO 17640', desc: lang === 'sl' ? 'Ultrazvočna preiskava zvarnih spojev' : 'NDT of welds — Ultrasonic testing — Techniques' },
+      { code: 'ASME Sec. V Art. 5', desc: lang === 'sl' ? 'Ultrazvočna preiskava materiala in zvarov' : 'ASME Section V Article 5 — Ultrasonic Examination' }
+    ],
+    utt: [
+      { code: 'EN 15317', desc: lang === 'sl' ? 'Ultrazvočno merjenje debeline stene' : 'NDT — Ultrasonic testing — Thickness measurement' },
+      { code: 'ASTM E797', desc: lang === 'sl' ? 'Standardna praksa za merjenje debeline z ultrazvokom' : 'Standard Practice for Measuring Thickness by Manual Ultrasonic' }
+    ],
+    lt: [
+      { code: 'EN 1779 / 13185', desc: lang === 'sl' ? 'Preiskava tesnosti — Izbira metode' : 'NDT — Leak testing — Criteria for method selection' },
+      { code: 'ASME Sec. V Art. 10', desc: lang === 'sl' ? 'Preiskava tesnosti tlačne opreme' : 'ASME Section V Article 10 — Leak Testing' }
+    ],
+    rt: [
+      { code: 'EN ISO 17636-1', desc: lang === 'sl' ? 'Radiografska kontrola zvarov — Rentgenski in gama žarki s filmom' : 'NDT of welds — Radiographic testing — Film techniques' },
+      { code: 'ASME Sec. V Art. 2', desc: lang === 'sl' ? 'Radiografska preiskava' : 'ASME Section V Article 2 — Radiographic Examination' }
+    ],
+    'rt-eval': [
+      { code: 'EN ISO 10675-1', desc: lang === 'sl' ? 'Sprejemni nivoji za radiografsko kontrolo jekla' : 'NDT of welds — Acceptance levels for radiographic testing' },
+      { code: 'EN ISO 5817', desc: lang === 'sl' ? 'Stopnje kakovosti glede na nepravilnosti' : 'Welding — Quality levels for imperfections in steel' }
+    ],
+    uci: [
+      { code: 'DIN 50159-1', desc: lang === 'sl' ? 'Merjenje trdote po UCI metodi' : 'Metallic materials — Hardness testing to the UCI method' },
+      { code: 'ASTM A1038', desc: lang === 'sl' ? 'Standardna metoda za testiranje trdote z UCI' : 'Standard Test Method for Portable Hardness Testing by UCI' }
+    ],
+    leeb: [
+      { code: 'EN ISO 16859-1', desc: lang === 'sl' ? 'Merjenje trdote po Leebovi metodi' : 'Metallic materials — Leeb hardness test' },
+      { code: 'ASTM A956', desc: lang === 'sl' ? 'Standardna metoda za testiranje trdote po Leebu' : 'Standard Test Method for Leeb Hardness Testing' }
+    ],
+    varilni: [
+      { code: 'EN ISO 3834', desc: lang === 'sl' ? 'Zahteve za kakovost pri talilnem varjenju kovinskih materialov' : 'Quality requirements for fusion welding of metallic materials' },
+      { code: 'EN 1090-2', desc: lang === 'sl' ? 'Izvedba jeklenih konstrukcij' : 'Execution of steel structures and aluminium structures' }
+    ],
+    prevzemi: [
+      { code: 'EN 10204 3.1/3.2', desc: lang === 'sl' ? 'Kovinski izdelki — Vrste inšpekcijskih dokumentov' : 'Metallic products — Types of inspection documents' },
+      { code: 'PED 2014/68/EU', desc: lang === 'sl' ? 'Direktiva o tlačni opremi' : 'Pressure Equipment Directive (PED)' }
+    ],
+    'third-party': [
+      { code: 'EN ISO/IEC 17020', desc: lang === 'sl' ? 'Zahteve za delovanje različnih organov, ki izvajajo kontrolne preglede' : 'Requirements for the operation of various types of bodies performing inspection' }
+    ],
+    vhodna: [
+      { code: 'EN 10204', desc: lang === 'sl' ? 'Vrste inšpekcijskih dokumentov za materiale' : 'Types of inspection documents for materials' },
+      { code: 'ISO 2768', desc: lang === 'sl' ? 'Splošne tolerance za linearne in kotne mere' : 'General tolerances for linear and angular dimensions' }
+    ],
+    koordinacija: [
+      { code: 'EN ISO 14731', desc: lang === 'sl' ? 'Koordinacija varjenja — Naloge in odgovornosti' : 'Welding coordination — Tasks and responsibilities' },
+      { code: 'EN ISO 3834-2', desc: lang === 'sl' ? 'Celovite zahteve za kakovost varjenja' : 'Comprehensive quality requirements for welding' }
+    ]
+  };
+  return map[id] || [
+    { code: 'EN ISO 9001', desc: lang === 'sl' ? 'Sistemi vodenja kakovosti' : 'Quality management systems' }
+  ];
+};
+
+const getMethodTelemetry = (id: string, lang: 'sl' | 'en'): TelemetryData => {
+  const isEn = lang === 'en';
+  switch (id) {
+    case 'ut':
+    case 'utt':
+      return {
+        logTitle: isEn ? "ULTRASONIC TELEMETRY LOG" : "ULTRAZVOČNA TELEMETRIJA",
+        blockLabel: isEn ? "Cal. Block" : "Kalibr. blok",
+        blockVal: "V1 (EN 12223) / V2",
+        deviceLabel: isEn ? "Transducer" : "Sonda",
+        deviceVal: "4MHz Dual-Element (SE)",
+        paramLabel: isEn ? "Velocity" : "Hitrost",
+        paramVal: "5920 m/s (Steel)",
+        statusLabel: isEn ? "System status" : "Stanje sistema",
+        statusVal: isEn ? "CALIBRATED & SECURE" : "KALIBRIRANO & VARNO",
+        ledBlink: true,
+      };
+    case 'vt':
+      return {
+        logTitle: isEn ? "VISUAL AUDIT LOG" : "VIZUALNI REVIZIJSKI DNEVNIK",
+        blockLabel: isEn ? "Lux Level" : "Osvetljenost",
+        blockVal: "> 550 Lux (ISO 3059)",
+        deviceLabel: isEn ? "Optics" : "Optika",
+        deviceVal: "6.0mm HD Endoscope / Weld Gauge",
+        paramLabel: isEn ? "Contrast" : "Kontrast",
+        paramVal: isEn ? "Visual ratio > 1:10" : "Vizualno razmerje > 1:10",
+        statusLabel: isEn ? "Illumination" : "Osvetlitev",
+        statusVal: isEn ? "OPTIMAL ILLUMINANCE" : "OPTIMALNA OSVETLITEV",
+        ledBlink: true,
+      };
+    case 'pt':
+      return {
+        logTitle: isEn ? "PENETRANT TELEMETRY" : "PENETRANTSKA TELEMETRIJA",
+        blockLabel: isEn ? "TAM Panel" : "Kontrolna ploščica",
+        blockVal: "ISO 3452-3 TAM Panel",
+        deviceLabel: isEn ? "Chemicals" : "Kemikalije",
+        deviceVal: "Class 2 Solvent / Red Dye",
+        paramLabel: isEn ? "Dwell Time" : "Čas delovanja",
+        paramVal: "10 min @ 20°C",
+        statusLabel: isEn ? "Capillary action" : "Kapilarni vlek",
+        statusVal: isEn ? "CAPILLARY ACTIVE" : "KAPILARNO AKTIVNO",
+        ledBlink: true,
+      };
+    case 'mt':
+      return {
+        logTitle: isEn ? "MAGNETIC PARTICLE TELEMETRY" : "MAGNETNA TELEMETRIJA",
+        blockLabel: isEn ? "Field Indicator" : "Indikator polja",
+        blockVal: "Castrol Strip / Berthold Ring",
+        deviceLabel: isEn ? "Yoke Device" : "Magnetni jarem",
+        deviceVal: "AC Yoke Y-2 (4.5kg Lift)",
+        paramLabel: isEn ? "Suspension" : "Suspenzija",
+        paramVal: isEn ? "Fluorescent / Water suspension" : "Fluorescentna / Vodna",
+        statusLabel: isEn ? "Field intensity" : "Jakost polja",
+        statusVal: isEn ? "MAGNETIC FIELD ACTIVE" : "MAGNETNO POLJE AKTIVNO",
+        ledBlink: true,
+      };
+    case 'rt':
+    case 'rt-eval':
+      return {
+        logTitle: isEn ? "RADIOGRAPHIC TELEMETRY" : "RADIOGRAFSKA TELEMETRIJA",
+        blockLabel: isEn ? "Source/Tube" : "Izvor sevanja",
+        blockVal: "Ir-192 (Gamma) / X-Ray 220kV",
+        deviceLabel: isEn ? "IQI Indicator" : "IQI indikator",
+        deviceVal: "EN ISO 19232-1 Fe 10/16 W",
+        paramLabel: isEn ? "Density" : "Optična gostota",
+        paramVal: "2.35 - 2.50 H&D (Target)",
+        statusLabel: isEn ? "Dosimetry" : "Dozimetrija",
+        statusVal: isEn ? "DOSIMETRY STABLE" : "DOZIMETRIJA STABILNA",
+        ledBlink: true,
+      };
+    case 'lt':
+      return {
+        logTitle: isEn ? "LEAK TESTING COMPLIANCE" : "PREISKAVA TESNOSTI",
+        blockLabel: isEn ? "Cal. Leak" : "Kalibr. puščanje",
+        blockVal: "10^-5 Pa m^3/s Cal.",
+        deviceLabel: isEn ? "Apparatus" : "Aparatura",
+        deviceVal: "Vacuum Box / Surfactant Formulation",
+        paramLabel: isEn ? "Pressure" : "Tlak / Vakuum",
+        paramVal: "-0.3 bar vacuum (Target)",
+        statusLabel: isEn ? "Tightness status" : "Stanje tesnosti",
+        statusVal: isEn ? "PRESSURE SEAL SECURE" : "TLAK STABILEN / TESNO",
+        ledBlink: true,
+      };
+    case 'uci':
+    case 'leeb':
+      return {
+        logTitle: isEn ? "HARDNESS TESTING LOG" : "MERJENJE TRDOTE",
+        blockLabel: isEn ? "Cal. Block" : "Kalibr. ploščica",
+        blockVal: "Test Block (240 HV5)",
+        deviceLabel: isEn ? "Method / Probe" : "Metoda / Sonda",
+        deviceVal: id === 'uci' ? "UCI 10N Rod" : "Leeb Type D Impact Device",
+        paramLabel: isEn ? "Scale conversion" : "Konverzija lestvic",
+        paramVal: "HV / HB / HRC (Automatic)",
+        statusLabel: isEn ? "Sensor alignment" : "Poravnava sonde",
+        statusVal: isEn ? "REBOUND READY" : "PRIPRAVLJEN NA MERITEV",
+        ledBlink: true,
+      };
+    default:
+      return {
+        logTitle: isEn ? "COMPLIANCE & SUPERVISION AUDIT" : "REVIZIJA SKLADNOSTI & NADZORA",
+        blockLabel: isEn ? "Framework" : "Okvir delovanja",
+        blockVal: "EN ISO 3834 / ISO/IEC 17020",
+        deviceLabel: isEn ? "Auditor Role" : "Vloga auditorja",
+        deviceVal: "IWE / NDT Level III Inspector",
+        paramLabel: isEn ? "Assessment" : "Ocenjevanje",
+        paramVal: isEn ? "Third-Party Neutrality" : "Nevtralnost tretje stranke",
+        statusLabel: isEn ? "Compliance status" : "Status skladnosti",
+        statusVal: isEn ? "AUDIT ACTIVE / EN ISO SECURE" : "REVIZIJA AKTIVNA / SKLADNO",
+        ledBlink: true,
+      };
+  }
+};
+
 /* ── Active method detail panel ── */
 function ActiveMethodPanel({
   item, theme, lang, focusRing,
@@ -380,6 +574,8 @@ function ActiveMethodPanel({
 }) {
   const abbrev = getParenAbbr(item.label);
   const name = abbrev ? getMethodName(item.label) : item.label;
+  const standards = getMethodStandards(item.id, lang);
+  const tele = getMethodTelemetry(item.id, lang);
 
   return (
     <motion.div
@@ -401,69 +597,155 @@ function ActiveMethodPanel({
         style={{ background: `radial-gradient(ellipse 50% 80% at 80% 50%, ${theme.glow}, transparent 65%)` }}
       />
 
-      <div className="relative z-10 flex flex-col lg:flex-row gap-8">
-        {/* Left: description + bullet details */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-3 mb-5">
-            {abbrev && (
-              <span
-                className="font-mono text-[13px] font-bold tracking-widest px-3 py-1.5 rounded-lg border shrink-0"
-                style={{ color: theme.accent, background: 'rgba(255,255,255,0.06)', borderColor: theme.border }}
-              >
-                {abbrev}
-              </span>
+      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+        {/* Left Column: Description & Compliance Standards */}
+        <div className="lg:col-span-7 flex flex-col justify-between min-w-0">
+          <div>
+            <div className="flex items-center gap-3 mb-5">
+              {abbrev && (
+                <span
+                  className="font-mono text-[13px] font-bold tracking-widest px-3 py-1.5 rounded-lg border shrink-0"
+                  style={{ color: theme.accent, background: 'rgba(255,255,255,0.06)', borderColor: theme.border }}
+                >
+                  {abbrev}
+                </span>
+              )}
+              <h4 className="font-heading font-bold text-white text-xl md:text-2xl tracking-tight leading-snug">{name}</h4>
+            </div>
+
+            <p className="text-slate-400 text-[14px] leading-relaxed mb-6 font-light">{item.description}</p>
+
+            {item.details && item.details.length > 0 && (
+              <div className="grid sm:grid-cols-2 gap-x-8 gap-y-2.5 mb-6">
+                {item.details.map((d, i) => (
+                  <div key={i} className="flex items-start gap-2.5">
+                    <div className="mt-[7px] w-[4px] h-[4px] rounded-full shrink-0" style={{ background: theme.accent }} />
+                    <span className="text-[13px] text-slate-400 leading-relaxed font-light">{d}</span>
+                  </div>
+                ))}
+              </div>
             )}
-            <h4 className="font-heading font-bold text-white text-xl tracking-tight leading-snug">{name}</h4>
           </div>
 
-          <p className="text-slate-400 text-[14px] leading-relaxed mb-6">{item.description}</p>
-
-          {item.details && item.details.length > 0 && (
-            <div className="grid sm:grid-cols-2 gap-x-8 gap-y-2.5">
-              {item.details.map((d, i) => (
-                <div key={i} className="flex items-start gap-2.5">
-                  <div className="mt-[7px] w-[4px] h-[4px] rounded-full shrink-0" style={{ background: theme.accent }} />
-                  <span className="text-[13px] text-slate-400 leading-relaxed">{d}</span>
-                </div>
-              ))}
+          <div>
+            {/* Dynamic Standards Block */}
+            <div className="mt-6 pt-6 border-t border-white/[0.06]">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="font-mono text-[10px] uppercase tracking-widest text-slate-500 font-bold">
+                  {lang === 'sl' ? '// VELJAVNI STANDARDI IN SKLADNOST' : '// APPLICABLE STANDARDS & COMPLIANCE'}
+                </span>
+              </div>
+              <div className="grid sm:grid-cols-2 gap-3">
+                {standards.map((std, i) => (
+                  <div
+                    key={i}
+                    className="flex flex-col gap-1 p-3 rounded-lg border border-white/[0.04] bg-white/[0.01] hover:bg-white/[0.02] transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full" style={{ background: theme.accent }} />
+                      <span className="font-mono text-[12px] font-bold text-white tracking-wide">{std.code}</span>
+                    </div>
+                    <span className="text-[11px] text-slate-400 font-light leading-relaxed">{std.desc}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-          )}
+
+            {/* Level III indicator */}
+            {item.level3 && (
+              <div className="mt-5 flex items-center gap-2">
+                <span
+                  className="flex items-center gap-1.5 font-mono text-[10px] px-3 py-1.5 rounded-lg border"
+                  style={{ color: theme.accentMuted, borderColor: theme.border, background: 'rgba(255,255,255,0.02)' }}
+                >
+                  <ShieldCheck size={11} style={{ color: theme.accent }} />
+                  {lang === 'sl' ? 'EN ISO 9712 Nivo III Certifikacija' : 'EN ISO 9712 Level III Certified'}
+                </span>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Right: quick facts + badges + CTA */}
-        <div className="lg:w-64 xl:w-72 flex flex-col gap-5 shrink-0">
-          {item.quickFacts && (
-            <div className="flex flex-col gap-3 p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]">
-              {[
-                { key: lang === 'sl' ? 'Standard' : 'Standard', val: item.quickFacts.standard },
-                { key: lang === 'sl' ? 'Uporaba' : 'Application', val: item.quickFacts.application },
-                { key: lang === 'sl' ? 'Rezultat' : 'Result', val: item.quickFacts.result },
-              ].filter(f => f.val).map(({ key, val }) => (
-                <div key={key} className="flex flex-col gap-0.5">
-                  <span className="text-[9px] uppercase tracking-widest text-slate-600 font-bold">{key}</span>
-                  <span className="text-[12px] text-slate-300">{val}</span>
-                </div>
-              ))}
+        {/* Right Column: 3D Visualization, Diagnostics, Inquiry CTA */}
+        <div className="lg:col-span-5 flex flex-col justify-between gap-6">
+          {/* 3D Visual Section */}
+          <div className="flex flex-col gap-2.5">
+            <div className="flex items-center justify-between">
+              <span className="font-mono text-[10px] uppercase tracking-widest text-slate-500 font-bold">
+                {lang === 'sl' ? '// 3D INTERAKTIVNA VIZUALIZACIJA' : '// 3D INTERACTIVE VISUALIZATION'}
+              </span>
+              <span className="flex items-center gap-1.5 font-mono text-[9px] px-2 py-0.5 rounded border border-white/10 bg-white/5 text-slate-400">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-cyan-500"></span>
+                </span>
+                R3F GLSL
+              </span>
             </div>
-          )}
 
-          {item.level3 && (
-            <span
-              className="flex items-center gap-1.5 font-mono text-[10px] px-3 py-2 rounded-lg border self-start"
-              style={{ color: theme.accentMuted, borderColor: theme.border }}
-            >
-              <ShieldCheck size={11} style={{ color: theme.accent }} />
-              Level III
-            </span>
-          )}
+            <div className="relative w-full h-[280px] rounded-xl bg-black/60 border border-white/5 overflow-hidden flex items-center justify-center group/viewfinder shadow-inner">
+              <MethodIllustrations methodId={item.id} color={theme.accent} />
+              
+              {/* Telemetry Grid overlay */}
+              <div className="absolute inset-0 border border-white/[0.03] pointer-events-none rounded-xl" />
+              
+              {/* Interaction Hint */}
+              <div className="absolute bottom-3 left-3 right-3 text-center pointer-events-none opacity-0 group-hover/viewfinder:opacity-100 transition-opacity duration-300 bg-black/80 backdrop-blur border border-white/10 rounded-md py-1 text-[10px] font-mono tracking-wider text-slate-400">
+                {lang === 'sl' 
+                  ? 'Povlecite za rotacijo 3D modela | Premaknite miško za video' 
+                  : 'Drag to rotate 3D model | Hover for video demonstration'}
+              </div>
+            </div>
+          </div>
 
+          {/* Telemetry Calibration Block */}
+          <div className="flex flex-col gap-3 p-4 rounded-xl border border-white/[0.05] bg-black/50 font-mono text-[11px] relative overflow-hidden">
+            {/* Diagonal grid lines background effect */}
+            <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(to_right,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none opacity-40" />
+            
+            <div className="flex items-center justify-between border-b border-white/5 pb-2 relative z-10">
+              <span className="font-bold text-slate-400 tracking-wider">[{tele.logTitle}]</span>
+              <span className="text-[9px] text-slate-600">SYS_V2.1.0</span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-y-2 relative z-10">
+              <div className="text-slate-500">{tele.blockLabel}:</div>
+              <div className="text-slate-300 text-right font-semibold">{tele.blockVal}</div>
+
+              <div className="text-slate-500">{tele.deviceLabel}:</div>
+              <div className="text-slate-300 text-right font-semibold">{tele.deviceVal}</div>
+
+              <div className="text-slate-500">{tele.paramLabel}:</div>
+              <div className="text-slate-300 text-right font-semibold">{tele.paramVal}</div>
+            </div>
+
+            <div className="flex items-center justify-between pt-2 border-t border-white/5 mt-1 relative z-10">
+              <span className="text-slate-500">{tele.statusLabel}:</span>
+              <span className="flex items-center text-[10px] font-bold text-emerald-400 tracking-wide">
+                {tele.ledBlink && (
+                  <span className="relative flex h-2 w-2 mr-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </span>
+                )}
+                {tele.statusVal}
+              </span>
+            </div>
+          </div>
+
+          {/* Action Button */}
           <Link
             to="/#contact"
             state={{ service: item.id, serviceLabel: name }}
-            className={`inline-flex items-center gap-2 px-5 py-3 rounded-full font-semibold text-sm mt-auto hover:scale-[1.02] transition-transform ${focusRing}`}
-            style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${theme.border}`, color: theme.accent }}
+            className={`inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-full font-bold text-sm hover:scale-[1.02] transition-transform ${focusRing} w-full text-center`}
+            style={{ 
+              background: theme.bg, 
+              border: `1px solid ${theme.border}`, 
+              color: theme.accent,
+              boxShadow: `0 0 15px -5px ${theme.glow}`
+            }}
           >
-            {lang === 'sl' ? 'Povpraševanje' : 'Send inquiry'}
+            {lang === 'sl' ? 'Pošlji povpraševanje za to metodo' : 'Send inquiry for this method'}
             <ArrowRight size={14} />
           </Link>
         </div>
