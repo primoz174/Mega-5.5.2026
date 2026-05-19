@@ -413,14 +413,14 @@ function ServiceModal({
         exit={{ opacity: 0, scale: 0.94, rotateX: 4, y: 20 }}
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
         style={{ perspective: '1200px', touchAction: 'pan-y' }}
-        className="flex flex-col md:flex-row md:items-start gap-3 w-full max-w-[840px] h-full md:h-auto md:max-h-[92vh] overflow-y-auto overflow-x-hidden md:overflow-visible relative z-10"
+        className="flex flex-col md:flex-row md:items-start gap-3 w-full max-w-[840px] h-full md:h-auto md:max-h-[92vh] overflow-y-auto overflow-x-hidden md:overflow-visible p-3 pb-24 md:p-0 relative z-10"
         onClick={(e) => e.stopPropagation()}
       >
         {/* ── SIDEBAR ── */}
         <div
           className="rounded-3xl max-md:p-0 p-px shrink-0 w-full md:w-[270px] md:self-start md:max-h-[85vh] md:[background:linear-gradient(160deg,rgba(255,255,255,0.08)_0%,rgba(255,255,255,0.03)_50%,rgba(255,255,255,0.12)_100%)] md:shadow-[0_32px_80px_rgba(0,0,0,0.85),0_8px_20px_rgba(0,0,0,0.6)]"
         >
-          <div className="rounded-3xl bg-[#080808]/95 backdrop-blur-md p-3 pb-0 md:pb-3 md:h-full md:overflow-y-auto max-md:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]">
+          <div className="rounded-3xl bg-[#080808] p-3 pb-0 md:pb-3 md:h-full md:overflow-y-auto max-md:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]">
 
             {/* Sticky top: category switcher + header + mobile label + icon strip */}
             <div className="sticky top-0 z-10 bg-[#080808] -mt-3 pt-3 pb-3 md:-mx-3 md:px-3 md:border-b md:border-white/[0.04]">
@@ -603,7 +603,7 @@ function ServiceModal({
           glowColor={CATEGORY_GLOW[currentCategory.id] ?? 'blue'}
           className="flex-1 min-w-0 overflow-visible md:overflow-hidden shadow-[0_48px_120px_rgba(0,0,0,0.9),0_16px_40px_rgba(0,0,0,0.7)]"
         >
-          <div className="rounded-[18px] bg-[#080808]/98 p-3 overflow-y-auto md:max-h-[85vh] relative" style={{ touchAction: 'pan-y' }}>
+          <div className="rounded-[18px] bg-[#080808] p-3 pb-20 md:pb-3 overflow-y-auto md:max-h-[85vh] relative" style={{ touchAction: 'pan-y' }}>
             
             {/* Engineering technical blueprint layout underlay */}
             <div className="absolute inset-0 pointer-events-none opacity-[0.035] select-none z-0">
@@ -633,7 +633,7 @@ function ServiceModal({
               >
 
                 {/* Header */}
-                <div className="relative rounded-2xl bg-[#121212]/90 backdrop-blur-md p-6 mb-2 overflow-hidden border border-white/[0.03]">
+                <div className="relative rounded-2xl bg-[#121212] p-6 mb-2 overflow-hidden border border-white/[0.03]">
                   <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
 
                   <button onClick={onClose}
@@ -664,7 +664,7 @@ function ServiceModal({
 
                 {/* Details */}
                 {current.details && current.details.length > 0 && (
-                  <div className="relative rounded-2xl bg-[#121212]/90 backdrop-blur-md p-6 mb-2 overflow-hidden border border-white/[0.03]">
+                  <div className="relative rounded-2xl bg-[#121212] p-6 mb-2 overflow-hidden border border-white/[0.03]">
                     <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                     <motion.ul role="list" className="space-y-2.5" variants={cardVariants} initial="hidden" animate="visible">
                       {current.details.map((detail, i) => (
@@ -695,7 +695,7 @@ function ServiceModal({
 
                 {/* Quick facts (Instrument Telemetry Card) */}
                 {quickFacts.length > 0 && (
-                  <div className="relative rounded-2xl bg-[#121212]/90 backdrop-blur-md p-6 overflow-hidden border border-white/[0.03]">
+                  <div className="relative rounded-2xl bg-[#121212] p-6 overflow-hidden border border-white/[0.03]">
                     <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                     
                     {/* Glowing LED banner for standard verification */}
