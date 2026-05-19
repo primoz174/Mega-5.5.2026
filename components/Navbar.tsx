@@ -92,15 +92,18 @@ const Navbar: React.FC = () => {
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
       // @ts-ignore
       window.__lenis?.stop();
     } else {
       document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
       // @ts-ignore
       window.__lenis?.start();
     }
     return () => {
       document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
       // @ts-ignore
       window.__lenis?.start();
     };
@@ -483,28 +486,18 @@ const Navbar: React.FC = () => {
               </button>
             </div>
 
-            <nav className="flex flex-col px-4 py-5 gap-1 overflow-y-auto flex-1">
+            <nav className="flex flex-col px-4 py-2 gap-0 overflow-y-auto flex-1">
               {navLinks.map((link) => {
                 const isActive = link.isPage
                   ? location.pathname === link.path
                   : activeSection === link.id && location.pathname === '/';
 
-                if (link.isCta) {
-                  return (
-                    <button
-                      key={link.name}
-                      onClick={() => scrollToSection(link.id)}
-                      className="mt-3 w-full text-left px-5 py-4 rounded-2xl text-[15px] font-semibold tracking-tight text-[#4da3ff] bg-[#0071e3]/[0.1] border border-[#0071e3]/[0.28] hover:bg-[#0071e3]/[0.18] hover:border-[#0071e3]/[0.5] hover:text-white transition-all duration-200"
-                    >
-                      {link.name}
-                    </button>
-                  );
-                }
+
 
                 if (link.isDropdown) {
                   return (
                     <div key={link.id} className="flex flex-col">
-                      <div className="px-5 py-2.5 text-[10px] font-semibold tracking-[0.15em] uppercase text-white/35">
+                      <div className="px-5 py-2 text-[10px] font-semibold tracking-[0.15em] uppercase text-white/35">
                         {link.name}
                       </div>
                       <div className="flex flex-col gap-0.5 pl-4 border-l border-white/[0.07] ml-5 mb-1">
@@ -513,7 +506,7 @@ const Navbar: React.FC = () => {
                             <button
                               key={sub.name}
                               onClick={() => { scrollToSection(sub.scrollId); setIsMobileMenuOpen(false); }}
-                              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-[13px] font-medium text-white/65 hover:text-[#4da3ff] hover:bg-[#0071e3]/[0.07] transition-colors duration-150"
+                              className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-left text-[13px] font-medium text-white/65 hover:text-[#4da3ff] hover:bg-[#0071e3]/[0.07] transition-colors duration-150"
                             >
                               {sub.color && <div className="w-2 h-2 rounded-full shrink-0" style={{ background: sub.color }} />}
                               {sub.name}
@@ -523,7 +516,7 @@ const Navbar: React.FC = () => {
                               key={sub.name}
                               to={sub.path}
                               onClick={() => setIsMobileMenuOpen(false)}
-                              className="px-4 py-3 rounded-xl text-[13px] font-medium text-white/65 hover:text-[#4da3ff] hover:bg-[#0071e3]/[0.07] transition-colors duration-150"
+                              className="px-4 py-2.5 rounded-xl text-[13px] font-medium text-white/65 hover:text-[#4da3ff] hover:bg-[#0071e3]/[0.07] transition-colors duration-150"
                             >
                               {sub.name}
                             </Link>
@@ -539,7 +532,7 @@ const Navbar: React.FC = () => {
                     key={link.name}
                     to={link.path || '/'}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className={`px-5 py-3.5 rounded-2xl text-[15px] font-medium transition-colors duration-150 ${
+                    className={`px-5 py-3 rounded-2xl text-[15px] font-medium transition-colors duration-150 ${
                       isActive
                         ? 'text-white bg-white/[0.07] border border-white/[0.09]'
                         : 'text-white/75 hover:text-[#4da3ff] hover:bg-[#0071e3]/[0.07]'
@@ -551,7 +544,7 @@ const Navbar: React.FC = () => {
                   <button
                     key={link.name}
                     onClick={() => scrollToSection(link.id)}
-                    className={`text-left px-5 py-3.5 rounded-2xl text-[15px] font-medium transition-colors duration-150 ${
+                    className={`text-left px-5 py-3 rounded-2xl text-[15px] font-medium transition-colors duration-150 ${
                       isActive
                         ? 'text-white bg-white/[0.07] border border-white/[0.09]'
                         : 'text-white/75 hover:text-[#4da3ff] hover:bg-[#0071e3]/[0.07]'
@@ -563,27 +556,7 @@ const Navbar: React.FC = () => {
               })}
             </nav>
 
-            <div className="px-4 py-5 border-t border-white/[0.07]">
-              <button
-                onClick={() => { toggleLanguage(); setIsMobileMenuOpen(false); }}
-                className="w-full flex items-center justify-between px-5 py-4 rounded-2xl bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.07] hover:border-white/[0.15] transition-all duration-200"
-              >
-                <div className="flex items-center gap-2.5">
-                  <Globe className="w-4 h-4 text-white/45" />
-                  <span className="text-[13px] font-medium text-white/70">
-                    {language === 'sl' ? 'Jezik' : 'Language'}
-                  </span>
-                </div>
-                <div className="flex items-center gap-0.5 p-1 rounded-xl bg-black/40 border border-white/[0.06]">
-                  <span className={`px-3 py-1.5 rounded-[9px] text-[10px] font-bold tracking-[0.1em] transition-all duration-200 ${language === 'sl' ? 'bg-[#0071e3] text-white shadow-[0_2px_8px_rgba(0,113,227,0.3)]' : 'text-white/35'}`}>
-                    SL
-                  </span>
-                  <span className={`px-3 py-1.5 rounded-[9px] text-[10px] font-bold tracking-[0.1em] transition-all duration-200 ${language === 'en' ? 'bg-[#0071e3] text-white shadow-[0_2px_8px_rgba(0,113,227,0.3)]' : 'text-white/35'}`}>
-                    EN
-                  </span>
-                </div>
-              </button>
-            </div>
+
           </motion.div>
         )}
       </AnimatePresence>

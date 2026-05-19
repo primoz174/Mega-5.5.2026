@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Mail, Phone } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 
@@ -46,6 +46,24 @@ interface TeamShowcaseProps {
 
 export default function TeamShowcase({ members = MEGAMA_MEMBERS }: TeamShowcaseProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [mobileActiveId, setMobileActiveId] = useState<string | null>(null);
+  const [activatedIds, setActivatedIds] = useState<Set<string>>(new Set());
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)');
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+
+  const handleScrollActivate = (id: string) => {
+    setMobileActiveId(id);
+    setActivatedIds(prev => new Set(prev).add(id));
+  };
+
+  const effectiveActiveId = isMobile ? mobileActiveId : hoveredId;
 
   return (
     <div className="flex flex-col gap-10 w-full">
@@ -53,8 +71,11 @@ export default function TeamShowcase({ members = MEGAMA_MEMBERS }: TeamShowcaseP
         <MemberCard
           key={member.id}
           member={member}
-          hoveredId={hoveredId}
+          activeId={effectiveActiveId}
+          activatedIds={activatedIds}
           onHover={setHoveredId}
+          onScrollActivate={handleScrollActivate}
+          isMobile={isMobile}
         />
       ))}
     </div>
@@ -63,23 +84,48 @@ export default function TeamShowcase({ members = MEGAMA_MEMBERS }: TeamShowcaseP
 
 function MemberCard({
   member,
-  hoveredId,
+  activeId,
+  activatedIds,
   onHover,
+  onScrollActivate,
+  isMobile,
 }: {
   member: TeamMember;
-  hoveredId: string | null;
+  activeId: string | null;
+  activatedIds: Set<string>;
   onHover: (id: string | null) => void;
+  onScrollActivate: (id: string) => void;
+  isMobile: boolean;
 }) {
   const { language } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
-  const isActive = hoveredId === member.id;
-  const isDimmed = hoveredId !== null && !isActive;
-  const showDetails = isActive || isOpen;
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = cardRef.current;
+    if (!el) return;
+    // Trigger when card enters the middle band of the screen
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (!isMobile) return;
+        if (entry.isIntersecting) onScrollActivate(member.id);
+      },
+      { rootMargin: '-25% 0px -25% 0px', threshold: 0 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [isMobile, member.id, onScrollActivate]);
+
+  const isActive = activeId === member.id;
+  const hasBeenActivated = activatedIds.has(member.id);
+  const isDimmed = activeId !== null && !isActive && !hasBeenActivated;
+  const showDetails = isActive || isOpen || hasBeenActivated;
 
   return (
     <div
+      ref={cardRef}
       className={cn(
-        'relative flex flex-col sm:flex-row items-start gap-5 sm:gap-6 transition-all duration-500 rounded-2xl p-3 -mx-3 cursor-pointer',
+        'relative flex flex-col sm:flex-row items-start gap-5 sm:gap-6 transition-all duration-500 rounded-2xl p-3 -mx-3 cursor-pointer [touch-action:pan-y]',
         isDimmed ? 'opacity-35' : 'opacity-100',
       )}
       onMouseEnter={() => onHover(member.id)}
@@ -98,9 +144,7 @@ function MemberCard({
         />
       )}
       {/* Photo */}
-      <div
-        className="relative shrink-0 w-[140px] h-[176px] md:w-[140px] md:h-[176px] rounded-2xl overflow-hidden"
-      >
+      <div className="relative shrink-0 w-[140px] h-[176px] md:w-[140px] md:h-[176px] rounded-2xl overflow-hidden">
         {member.image ? (
           <img
             src={member.image}
@@ -159,7 +203,7 @@ function MemberCard({
         {/* Certifications */}
         <div
           className={cn(
-            'mt-4 pl-8 flex flex-wrap gap-1.5 transition-all duration-300 overflow-hidden',
+            'mt-4 pl-8 flex flex-wrap gap-1.5 transition-all duration-300 [overflow:clip]',
             showDetails ? 'max-h-32 opacity-100' : 'max-h-0 opacity-0',
           )}
         >
@@ -176,7 +220,7 @@ function MemberCard({
         {/* Contact */}
         <div
           className={cn(
-            'mt-3 pl-8 flex flex-col gap-1.5 transition-all duration-300 overflow-hidden',
+            'mt-3 pl-8 flex flex-col gap-1.5 transition-all duration-300 [overflow:clip]',
             showDetails ? 'max-h-16 opacity-100' : 'max-h-0 opacity-0',
           )}
         >

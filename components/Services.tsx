@@ -35,6 +35,15 @@ const CAPABILITY_IMAGES: Record<string, string> = {
   svetovanje: '/images/home/cap-04-svetovanje.webp',
 };
 
+// Mobile focal point per image — keeps the key subject in view when the
+// section becomes a tall narrow viewport.
+const MOBILE_FOCAL: Record<string, string> = {
+  ndt: '32% 62%',         // Olympus tablet measuring weld on pipe
+  nadzori: '68% 50%',     // welder with sparks
+  qa: '40% 50%',          // "Quality Assurance / Project Specs" booklet
+  svetovanje: '50% 60%',  // two engineers + pressure-vessel schematic
+};
+
 type IconComponent = React.ComponentType<LucideProps>;
 
 const ICON_MAP: Record<string, IconComponent> = {
@@ -210,8 +219,17 @@ function CapabilityRow({ index, category, imageUrl, flip, onItemClick }: RowProp
   const { language } = useLanguage();
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
 
-  const imageY = useTransform(scrollYProgress, [0, 1], ['0%', '-22%']);
-  const imageScale = useTransform(scrollYProgress, [0, 0.3, 1], [1.12, 1.0, 1.0]);
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)');
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+
+  const imageY = useTransform(scrollYProgress, [0, 1], isMobile ? ['0%', '-8%'] : ['0%', '-22%']);
+  const imageScale = useTransform(scrollYProgress, [0, 0.3, 1], isMobile ? [1.0, 1.0, 1.0] : [1.12, 1.0, 1.0]);
   const contentY = useTransform(scrollYProgress, [0, 1], ['3%', '-3%']);
   const numOpacity = useTransform(scrollYProgress, [0.05, 0.18], [0, 1]);
   const numY = useTransform(scrollYProgress, [0.05, 0.18], [20, 0]);
@@ -231,16 +249,17 @@ function CapabilityRow({ index, category, imageUrl, flip, onItemClick }: RowProp
   return (
     <div ref={ref} id={`services-${category.id}`} className="relative w-full min-h-screen overflow-hidden bg-black">
       {imageUrl && (
-        <motion.div className="absolute inset-x-0 top-0 w-full h-[130%] pointer-events-none" style={{ y: imageY, scale: imageScale }}>
+        <motion.div className="absolute inset-x-0 top-0 w-full h-full md:h-[130%] pointer-events-none" style={{ y: imageY, scale: imageScale }}>
           <img src={imageUrl} alt="" loading="lazy" decoding="async"
-            className={`w-full h-full object-cover ${flip ? 'object-left' : 'object-right'} opacity-80 md:opacity-85`}
+            style={isMobile ? { objectPosition: MOBILE_FOCAL[category.id] ?? '50% 50%' } : undefined}
+            className={`w-full h-full object-cover ${flip ? 'md:object-left' : 'md:object-right'} opacity-80 md:opacity-85`}
             onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
         </motion.div>
       )}
       <div className="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-black via-black/50 to-transparent pointer-events-none z-10" />
       <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-black via-black/50 to-transparent pointer-events-none z-10" />
       <div className={`hidden md:block absolute inset-0 z-10 ${flip ? 'bg-gradient-to-l from-black via-black/85 to-transparent' : 'bg-gradient-to-r from-black via-black/85 to-transparent'}`} />
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10 md:hidden z-10" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/25 md:hidden z-10" />
 
       <motion.div style={{ y: contentY }}
         className={`relative z-20 w-full max-w-[1200px] mx-auto px-6 min-h-screen flex flex-col justify-center py-24 md:py-40 ${flip ? 'md:items-end md:text-right' : 'md:items-start md:text-left'}`}>
@@ -250,17 +269,17 @@ function CapabilityRow({ index, category, imageUrl, flip, onItemClick }: RowProp
             {numStr}
           </motion.div>
           <motion.h3 style={{ opacity: titleOpacity, y: titleY }}
-            className="text-4xl md:text-5xl lg:text-7xl font-semibold tracking-[-0.03em] text-white mb-4 leading-[1.05]">
+            className="text-4xl md:text-5xl lg:text-7xl font-semibold tracking-[-0.03em] text-white mb-4 leading-[1.05] max-md:[text-shadow:0_2px_16px_rgba(0,0,0,1),0_8px_40px_rgba(0,0,0,0.8)]">
             {category.title}
           </motion.h3>
           {category.subtitle && (
             <motion.h4 style={{ opacity: subtitleOpacity, y: subtitleY }}
-              className="text-xl md:text-2xl text-white/90 font-medium mb-6">
+              className="text-xl md:text-2xl text-white/90 font-medium mb-6 max-md:[text-shadow:0_1px_10px_rgba(0,0,0,0.9)]">
               {category.subtitle}
             </motion.h4>
           )}
           <motion.p style={{ opacity: descOpacity, y: descY }}
-            className={`text-lg md:text-xl text-white/60 leading-snug mb-10 font-light max-w-lg ${flip ? 'md:text-right' : 'md:text-left'}`}>
+            className={`text-lg md:text-xl text-white/60 max-md:text-white/95 leading-snug mb-10 font-light max-w-lg max-md:[text-shadow:0_1px_8px_rgba(0,0,0,0.9)] ${flip ? 'md:text-right' : 'md:text-left'}`}>
             {category.description}
           </motion.p>
           {category.items && category.items.length > 0 && (
@@ -268,7 +287,7 @@ function CapabilityRow({ index, category, imageUrl, flip, onItemClick }: RowProp
               className={`flex flex-wrap gap-2 max-w-lg ${flip ? 'md:justify-end' : ''}`}>
               {category.items.map((item) => (
                 <button key={item.id} onClick={() => onItemClick(item)}
-                  className="px-4 py-2 rounded-xl bg-white/5 backdrop-blur-md text-sm text-white/80 font-medium hover:bg-white/10 hover:text-white transition-colors cursor-pointer text-left">
+                  className="px-4 py-2 rounded-xl bg-white/5 max-md:bg-neutral-700/70 text-sm text-white/80 font-medium hover:bg-white/10 hover:text-white transition-colors cursor-pointer text-left">
                   {item.label}
                 </button>
               ))}
