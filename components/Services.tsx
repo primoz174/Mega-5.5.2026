@@ -388,9 +388,9 @@ function ServiceModal({
 
   const quickFacts = current.quickFacts
     ? [
-        { label: 'Standard', value: current.quickFacts.standard },
-        { label: 'Področje', value: current.quickFacts.application },
-        { label: 'Rezultat', value: current.quickFacts.result },
+        { label: language === 'sl' ? 'Standard' : 'Standard', value: current.quickFacts.standard },
+        { label: language === 'sl' ? 'Področje' : 'Application', value: current.quickFacts.application },
+        { label: language === 'sl' ? 'Rezultat' : 'Result', value: current.quickFacts.result },
       ]
     : [];
 
@@ -399,30 +399,33 @@ function ServiceModal({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.2 }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-0 md:p-6 bg-black/80 backdrop-blur-md"
+      transition={{ duration: 0.25 }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-0 md:p-6 bg-black/85 backdrop-blur-xl transition-all duration-300"
+      style={{
+        backgroundImage: `radial-gradient(circle at center, ${hex}0f 0%, transparent 65%)`
+      }}
       onClick={onClose}
     >
       {/* Outer flex wrapper: sidebar + card */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.9, rotateX: 8, y: 28 }}
+        initial={{ opacity: 0, scale: 0.94, rotateX: 6, y: 30 }}
         animate={{ opacity: 1, scale: 1, rotateX: 0, y: 0 }}
-        exit={{ opacity: 0, scale: 0.92, rotateX: 5, y: 18 }}
-        transition={{ duration: 0.38, ease: [0.23, 1, 0.32, 1] }}
+        exit={{ opacity: 0, scale: 0.94, rotateX: 4, y: 20 }}
+        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
         style={{ perspective: '1200px', touchAction: 'pan-y' }}
-        className="flex flex-col md:flex-row md:items-start gap-2.5 w-full max-w-[820px] h-full md:h-auto md:max-h-[92vh] overflow-y-auto overflow-x-hidden md:overflow-visible"
+        className="flex flex-col md:flex-row md:items-start gap-3 w-full max-w-[840px] h-full md:h-auto md:max-h-[92vh] overflow-y-auto overflow-x-hidden md:overflow-visible relative z-10"
         onClick={(e) => e.stopPropagation()}
       >
         {/* ── SIDEBAR ── */}
         <div
-          className="rounded-3xl max-md:p-0 p-px shrink-0 w-full md:w-64 md:self-start md:max-h-[85vh] md:[background:linear-gradient(160deg,rgba(255,255,255,0.10)_0%,rgba(255,255,255,0.05)_50%,rgba(255,255,255,0.20)_100%)] md:shadow-[0_32px_80px_rgba(0,0,0,0.85),0_8px_20px_rgba(0,0,0,0.6)]"
+          className="rounded-3xl max-md:p-0 p-px shrink-0 w-full md:w-[270px] md:self-start md:max-h-[85vh] md:[background:linear-gradient(160deg,rgba(255,255,255,0.08)_0%,rgba(255,255,255,0.03)_50%,rgba(255,255,255,0.12)_100%)] md:shadow-[0_32px_80px_rgba(0,0,0,0.85),0_8px_20px_rgba(0,0,0,0.6)]"
         >
-          <div className="rounded-3xl bg-[#0c0c0c] p-2.5 pb-0 md:pb-2.5 md:h-full md:overflow-y-auto max-md:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.09)]">
+          <div className="rounded-3xl bg-[#080808]/95 backdrop-blur-md p-3 pb-0 md:pb-3 md:h-full md:overflow-y-auto max-md:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]">
 
             {/* Sticky top: category switcher + header + mobile label + icon strip */}
-            <div className="sticky top-0 z-10 bg-[#0c0c0c] -mt-2.5 pt-2.5 pb-2.5 md:-mx-2.5 md:px-2.5 md:border-b md:border-white/[0.04]">
+            <div className="sticky top-0 z-10 bg-[#080808] -mt-3 pt-3 pb-3 md:-mx-3 md:px-3 md:border-b md:border-white/[0.04]">
               {/* Category switcher — 2×2 grid */}
-              <div className="grid grid-cols-2 gap-1 mb-2.5">
+              <div className="grid grid-cols-2 gap-1.5 mb-3">
                 {allCategories.map((cat) => {
                   const catHex = CATEGORY_HEX[cat.id] ?? '#fff';
                   const isActive = cat.id === currentCategory.id;
@@ -430,11 +433,11 @@ function ServiceModal({
                     <button
                       key={cat.id}
                       onClick={() => switchCategory(cat)}
-                      className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl text-[9px] font-bold uppercase tracking-wider transition-all duration-150"
+                      className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl text-[9px] font-bold uppercase tracking-wider transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
                       style={{
-                        backgroundColor: isActive ? `${catHex}20` : 'rgba(255,255,255,0.04)',
-                        color: isActive ? catHex : 'rgba(255,255,255,0.35)',
-                        border: `1px solid ${isActive ? `${catHex}40` : 'transparent'}`,
+                        backgroundColor: isActive ? `${catHex}18` : 'rgba(255,255,255,0.03)',
+                        color: isActive ? catHex : 'rgba(255,255,255,0.4)',
+                        border: `1px solid ${isActive ? `${catHex}35` : 'rgba(255,255,255,0.04)'}`,
                       }}
                     >
                       <div
@@ -442,7 +445,7 @@ function ServiceModal({
                         style={{
                           background: catHex,
                           opacity: isActive ? 1 : 0.4,
-                          boxShadow: isActive ? `0 0 4px 1px ${catHex}60` : 'none',
+                          boxShadow: isActive ? `0 0 5px 1.5px ${catHex}70` : 'none',
                         }}
                       />
                       <span>{cat.shortTitle}</span>
@@ -452,8 +455,8 @@ function ServiceModal({
               </div>
 
               {/* Category header */}
-              <div className="relative rounded-2xl bg-[#141414] px-4 py-3.5 overflow-hidden mb-2.5">
-                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+              <div className="relative rounded-2xl bg-[#121212] px-4 py-3.5 overflow-hidden border border-white/[0.03] mb-3">
+                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                 <span className={`text-[10px] font-bold uppercase tracking-[0.15em] ${currentCategory.color}`}>
                   {currentCategory.shortTitle}
                 </span>
@@ -477,7 +480,7 @@ function ServiceModal({
                     animate={{ background: stripMovingMap[stripDir] }}
                     transition={{ ease: 'linear', duration: 1 }}
                   />
-                  <div className="absolute inset-px z-[1] rounded-[inherit] bg-[#0c0c0c]" />
+                  <div className="absolute inset-px z-[1] rounded-[inherit] bg-[#080808]" />
                   <div className="relative z-[2] flex gap-1.5 overflow-x-auto scrollbar-none p-1">
                     {currentCategory.items.map((item) => {
                       const isActive = item.id === current.id;
@@ -490,7 +493,7 @@ function ServiceModal({
                             backgroundColor: isActive ? `${hex}22` : undefined,
                             borderColor: isActive ? `${hex}50` : 'transparent',
                           }}
-                          className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center border border-transparent bg-white/[0.04] transition-all duration-200"
+                          className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center border border-transparent bg-white/[0.03] transition-all duration-200"
                         >
                           <ItemIcon
                             name={item.icon}
@@ -502,7 +505,7 @@ function ServiceModal({
                       );
                     })}
                   </div>
-                  <div className="absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-[#0c0c0c] to-transparent pointer-events-none z-[3]" />
+                  <div className="absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-[#080808] to-transparent pointer-events-none z-[3]" />
                 </div>
               </div>
             </div>{/* end sticky */}
@@ -511,7 +514,7 @@ function ServiceModal({
             <motion.ul
               key={currentCategory.id}
               role="list"
-              className="space-y-1 md:block hidden mt-1"
+              className="space-y-1.5 md:block hidden mt-1 pb-3"
               variants={sidebarListVariants}
               initial="hidden"
               animate="visible"
@@ -521,38 +524,70 @@ function ServiceModal({
                 const isHovered = hoveredId === item.id;
                 const lit = isActive || isHovered;
                 return (
-                  <motion.li key={item.id} role="listitem" variants={sidebarItemVariants}>
+                  <motion.li key={item.id} role="listitem" className="relative" variants={sidebarItemVariants}>
                     <button
                       onClick={() => setCurrent(item)}
                       onMouseEnter={() => setHoveredId(item.id)}
                       onMouseLeave={() => setHoveredId(null)}
-                      style={{
-                        backgroundColor: lit ? `${hex}14` : undefined,
-                        borderColor: isActive ? `${hex}50` : isHovered ? `${hex}28` : 'transparent',
-                        transition: 'background-color 180ms ease, border-color 180ms ease',
-                      }}
-                      className="w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-left border"
+                      className="w-full relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-left border border-transparent transition-all duration-200 overflow-hidden"
                     >
-                      <div
-                        style={{
-                          backgroundColor: lit ? `${hex}22` : 'rgba(255,255,255,0.04)',
-                          transition: 'background-color 180ms ease',
-                        }}
-                        className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center"
-                      >
-                        <ItemIcon
-                          name={item.icon}
-                          size={14}
-                          style={{ color: lit ? hex : undefined, transition: 'color 180ms ease' }}
-                          className={lit ? '' : 'text-white/35'}
+                      {/* Active sliding indicator */}
+                      {isActive && (
+                        <motion.div
+                          layoutId="active-modal-indicator"
+                          className="absolute inset-0 z-0 rounded-xl"
+                          style={{
+                            backgroundColor: `${hex}12`,
+                            border: `1px solid ${hex}35`,
+                          }}
+                          transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                         />
+                      )}
+
+                      {/* Hover subtle overlay */}
+                      {!isActive && isHovered && (
+                        <div
+                          className="absolute inset-0 z-0 rounded-xl bg-white/[0.02] border border-white/[0.04]"
+                        />
+                      )}
+
+                      <div className="relative z-10 flex items-center gap-3 w-full">
+                        <div
+                          style={{
+                            backgroundColor: lit ? `${hex}18` : 'rgba(255,255,255,0.03)',
+                            border: `1px solid ${lit ? `${hex}30` : 'transparent'}`,
+                            transition: 'all 180ms ease',
+                          }}
+                          className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center relative overflow-hidden"
+                        >
+                          <ItemIcon
+                            name={item.icon}
+                            size={14}
+                            style={{ color: lit ? hex : undefined, transition: 'color 180ms ease' }}
+                            className={lit ? '' : 'text-white/35'}
+                          />
+                        </div>
+                        <span
+                          style={{
+                            color: isActive ? '#fff' : isHovered ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.4)',
+                            transition: 'color 180ms ease'
+                          }}
+                          className={`text-xs leading-snug transition-all ${lit ? 'font-semibold tracking-wide' : 'font-medium'}`}
+                        >
+                          {item.label}
+                        </span>
+
+                        {/* Active tiny glowing led dot on the far right */}
+                        {isActive && (
+                          <span
+                            className="ml-auto w-1 h-1 rounded-full shrink-0 animate-pulse"
+                            style={{
+                              backgroundColor: hex,
+                              boxShadow: `0 0 5px 1.5px ${hex}`,
+                            }}
+                          />
+                        )}
                       </div>
-                      <span
-                        style={{ color: isActive ? '#fff' : isHovered ? 'rgba(255,255,255,0.88)' : 'rgba(255,255,255,0.45)', transition: 'color 180ms ease' }}
-                        className={`text-xs leading-snug ${lit ? 'font-semibold' : 'font-medium'}`}
-                      >
-                        {item.label}
-                      </span>
                     </button>
                   </motion.li>
                 );
@@ -568,70 +603,128 @@ function ServiceModal({
           glowColor={CATEGORY_GLOW[currentCategory.id] ?? 'blue'}
           className="flex-1 min-w-0 overflow-visible md:overflow-hidden shadow-[0_48px_120px_rgba(0,0,0,0.9),0_16px_40px_rgba(0,0,0,0.7)]"
         >
-          <div className="rounded-[18px] bg-[#0c0c0c] p-2.5 overflow-y-auto md:max-h-[85vh]" style={{ touchAction: 'pan-y' }}>
+          <div className="rounded-[18px] bg-[#080808]/98 p-3 overflow-y-auto md:max-h-[85vh] relative" style={{ touchAction: 'pan-y' }}>
+            
+            {/* Engineering technical blueprint layout underlay */}
+            <div className="absolute inset-0 pointer-events-none opacity-[0.035] select-none z-0">
+              <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <pattern id="modal-grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-white" />
+                  </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#modal-grid)" />
+                {/* precise calibration marks */}
+                <line x1="20" y1="50%" x2="40" y2="50%" stroke={hex} strokeWidth="1.5" />
+                <line x1="50%" y1="20" x2="50%" y2="40" stroke={hex} strokeWidth="1.5" />
+                <circle cx="50%" cy="50%" r="30" fill="none" stroke={hex} strokeWidth="0.5" strokeDasharray="3,3" />
+                <circle cx="50%" cy="50%" r="4" fill={hex} />
+              </svg>
+            </div>
 
             <AnimatePresence mode="wait">
               <motion.div
                 key={current.id}
-                initial={{ opacity: 0, y: 8 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-                transition={{ duration: 0.18, ease: 'easeOut' }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+                className="relative z-10"
               >
 
                 {/* Header */}
-                <div className="relative rounded-2xl bg-[#141414] p-5 mb-2 overflow-hidden">
-                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/18 to-transparent" />
+                <div className="relative rounded-2xl bg-[#121212]/90 backdrop-blur-md p-6 mb-2 overflow-hidden border border-white/[0.03]">
+                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
 
                   <button onClick={onClose}
-                    className="absolute top-3 right-3 p-2 rounded-full text-white/70 hover:text-white bg-white/10 hover:bg-white/20 border border-white/15 hover:border-white/30 transition-all z-10">
-                    <X size={18} />
+                    className="absolute top-4 right-4 p-2 rounded-full text-white/50 hover:text-white bg-white/5 hover:bg-white/15 border border-white/10 hover:border-white/20 transition-all duration-300 hover:rotate-90 z-10">
+                    <X size={16} />
                   </button>
 
                   {/* Icon + badge row */}
-                  <div className="flex items-center gap-2.5 mb-3">
-                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center bg-white/[0.06]`}>
+                  <div className="flex items-center gap-2.5 mb-3.5">
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-white/[0.04] border border-white/[0.06] shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]">
                       <ItemIcon name={current.icon} size={18} className={currentCategory.color} />
                     </div>
-                    <span className={`text-[10px] font-bold uppercase tracking-[0.15em] ${currentCategory.color}`}>
-                      {currentCategory.shortTitle}
-                    </span>
+                    <div className="flex flex-col gap-0.5">
+                      <span className={`text-[9px] font-bold uppercase tracking-[0.2em] ${currentCategory.color}`}>
+                        {currentCategory.shortTitle}
+                      </span>
+                      <span className="text-[8px] font-mono text-white/30 tracking-wider">SEC: 00{currentCategory.id.toUpperCase()}</span>
+                    </div>
                   </div>
 
-                  <h3 className="text-lg md:text-xl font-semibold text-white leading-snug pr-8 mb-3">
+                  <h3 className="text-xl md:text-2xl font-semibold text-white leading-snug pr-8 mb-3.5 tracking-tight">
                     {current.label}
                   </h3>
                   {current.description && (
-                    <p className="text-sm text-white/50 leading-relaxed">{current.description}</p>
+                    <p className="text-sm text-white/50 leading-relaxed font-light">{current.description}</p>
                   )}
                 </div>
 
                 {/* Details */}
                 {current.details && current.details.length > 0 && (
-                  <div className="relative rounded-2xl bg-[#141414] p-5 mb-2 overflow-hidden">
+                  <div className="relative rounded-2xl bg-[#121212]/90 backdrop-blur-md p-6 mb-2 overflow-hidden border border-white/[0.03]">
                     <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-                    <motion.ul role="list" className="space-y-2" variants={cardVariants} initial="hidden" animate="visible">
+                    <motion.ul role="list" className="space-y-2.5" variants={cardVariants} initial="hidden" animate="visible">
                       {current.details.map((detail, i) => (
-                        <motion.li key={i} role="listitem" variants={cardItemVariants}
-                          className="flex items-start gap-3 rounded-xl bg-white/[0.04] px-4 py-3">
-                          <CheckCircle2 size={14} className={`mt-0.5 shrink-0 ${currentCategory.color}`} />
-                          <span className="text-sm text-white/60 leading-snug">{detail}</span>
+                        <motion.li
+                          key={i}
+                          role="listitem"
+                          variants={cardItemVariants}
+                          className="group flex items-start gap-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] border border-white/[0.02] hover:border-white/[0.06] px-4 py-3.5 transition-all duration-300 hover:translate-x-1 cursor-default"
+                        >
+                          <svg
+                            className={`mt-0.5 shrink-0 w-3.5 h-3.5 ${currentCategory.color} transition-transform duration-300 group-hover:translate-x-1`}
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="m6 17 5-5-5-5M13 17l5-5-5-5" />
+                          </svg>
+                          <span className="text-sm text-white/55 group-hover:text-white/80 transition-colors leading-snug">{detail}</span>
                         </motion.li>
                       ))}
                     </motion.ul>
                   </div>
                 )}
 
-                {/* Quick facts */}
+                {/* Quick facts (Instrument Telemetry Card) */}
                 {quickFacts.length > 0 && (
-                  <div className="relative rounded-2xl bg-[#141414] p-5 overflow-hidden">
+                  <div className="relative rounded-2xl bg-[#121212]/90 backdrop-blur-md p-6 overflow-hidden border border-white/[0.03]">
                     <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-                    <motion.div className="grid grid-cols-3 gap-2" variants={cardVariants} initial="hidden" animate="visible">
+                    
+                    {/* Glowing LED banner for standard verification */}
+                    <div className="flex items-center justify-between mb-4 border-b border-white/[0.04] pb-3">
+                      <span className="flex items-center gap-1.5 text-[8px] font-bold uppercase tracking-[0.18em] text-emerald-400 font-mono">
+                        <span className="relative flex h-1.5 w-1.5">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                        </span>
+                        {language === 'sl' ? 'Skladnost potrjena' : 'Compliance verified'}
+                      </span>
+                      <span className="text-[7.5px] font-mono text-white/20">NDT_REF_CAL_010</span>
+                    </div>
+
+                    <motion.div className="grid grid-cols-3 gap-2.5" variants={cardVariants} initial="hidden" animate="visible">
                       {quickFacts.map(({ label, value }) => (
-                        <motion.div key={label} variants={cardItemVariants}
-                          className="rounded-xl bg-white/[0.04] px-3 py-3 flex flex-col gap-1">
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-white/25">{label}</span>
-                          <span className="text-xs text-white/65 leading-snug">{value}</span>
+                        <motion.div
+                          key={label}
+                          variants={cardItemVariants}
+                          className="relative rounded-xl bg-white/[0.015] hover:bg-white/[0.035] border border-white/[0.03] hover:border-white/[0.06] transition-all duration-300 px-3.5 py-3.5 flex flex-col gap-1.5"
+                        >
+                          {/* Corner bracket styling */}
+                          <div className="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-white/20 rounded-tl-sm pointer-events-none" />
+                          <div className="absolute top-0 right-0 w-1.5 h-1.5 border-t border-r border-white/20 rounded-tr-sm pointer-events-none" />
+                          <div className="absolute bottom-0 left-0 w-1.5 h-1.5 border-b border-l border-white/20 rounded-bl-sm pointer-events-none" />
+                          <div className="absolute bottom-0 right-0 w-1.5 h-1.5 border-b border-r border-white/20 rounded-br-sm pointer-events-none" />
+
+                          <span className="text-[9px] font-bold uppercase tracking-widest text-white/30 font-mono">{label}</span>
+                          <span className="text-xs text-white/70 leading-snug font-mono select-all tracking-tight break-words">{value}</span>
                         </motion.div>
                       ))}
                     </motion.div>
@@ -639,9 +732,9 @@ function ServiceModal({
                 )}
 
                 {/* Inquiry CTA */}
-                <motion.div variants={cardItemVariants} className="mt-2">
+                <motion.div variants={cardItemVariants} className="mt-2.5">
                   <CategoryCTA onClick={handleInquiry} hex={hex} fullWidth>
-                    <Send size={14} />
+                    <Send size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                     {language === 'sl' ? 'Pošlji povpraševanje' : 'Send inquiry'}
                   </CategoryCTA>
                 </motion.div>

@@ -907,18 +907,22 @@ function Stats({ lang }: { lang: "sl" | "en" }) {
 
 function StatCell({ item, delay }: { item: StatItem; delay: number }) {
   const ref = useRef<HTMLDivElement>(null);
+  const valueRef = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
-  const [displayText, setDisplayText] = useState("");
 
   useEffect(() => {
     if (!inView) {
       // Prior to appearing in viewport, initialize with scrambling-like zero placeholders
-      setDisplayText(Array.from({ length: item.value.toString().length }, () => "0").join(""));
+      if (valueRef.current) {
+        valueRef.current.textContent = Array.from({ length: item.value.toString().length }, () => "0").join("");
+      }
       return;
     }
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setDisplayText(item.value.toString());
+      if (valueRef.current) {
+        valueRef.current.textContent = item.value.toString();
+      }
       return;
     }
 
@@ -932,7 +936,9 @@ function StatCell({ item, delay }: { item: StatItem; delay: number }) {
       if (now < start) {
         // Scramble rapidly before actual resolving starts (simulating scanning warmup)
         const temp = Array.from({ length: len }, () => Math.floor(Math.random() * 10).toString()).join("");
-        setDisplayText(temp);
+        if (valueRef.current) {
+          valueRef.current.textContent = temp;
+        }
         frameId = requestAnimationFrame(updateScramble);
         return;
       }
@@ -953,7 +959,9 @@ function StatCell({ item, delay }: { item: StatItem; delay: number }) {
         }
       }
 
-      setDisplayText(current);
+      if (valueRef.current) {
+        valueRef.current.textContent = current;
+      }
 
       if (progress < 1) {
         frameId = requestAnimationFrame(updateScramble);
@@ -1013,7 +1021,7 @@ function StatCell({ item, delay }: { item: StatItem; delay: number }) {
       <div className="relative z-10 flex flex-col justify-between h-full w-full">
         <div>
           <div className="text-[clamp(2.25rem,5.2vw,4.2rem)] font-mono font-semibold tracking-tight leading-none text-white tabular-nums group-hover:text-[#0071e3] transition-colors duration-500">
-            {displayText}
+            <span ref={valueRef}>{Array.from({ length: item.value.toString().length }, () => "0").join("")}</span>
             <span className="text-white/35 font-sans ml-0.5 text-[0.45em] select-none vertical-align-top">
               {item.suffix}
             </span>
