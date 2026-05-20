@@ -32,6 +32,7 @@
     ".claude",
     "dist",
     "archive",
-    "public/storitve1"
+    "public/storitve1",
+    "**/*.backup.tsx"
   ]
 }

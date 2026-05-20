@@ -97,33 +97,96 @@ void main() {
 }
 `;
 
-/* ── PT: dye penetrant seeping into crack ──────────────────────── */
+/* ── PT: dye penetrant seeping into crack (Multi-Phase Simulation) ──────────────── */
 const PT_FS = /* glsl */`
 precision highp float;
+uniform float uPhase;          // 0.0: Spray Red, 1.0: Wipe, 2.0: Spray White, 3.0: Bleed-out
+uniform float uPhaseProgress;  // 0.0 to 1.0 within the phase
 uniform float uTime;
 varying vec2 vUv;
+
 float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5); }
+
 void main() {
   vec2 uv = vUv;
   float grain = hash(floor(uv * 90.0));
-  vec3 c = vec3(0.14, 0.18, 0.25) + (grain - 0.5) * 0.025;
+  
+  // 1. Bare Steel Base
+  vec3 steelColor = vec3(0.14, 0.18, 0.25) + (grain - 0.5) * 0.025;
+  
+  // 2. Crack Geometry (retained for authentic physical shape)
   float cx = 0.5 + sin(uv.y * 14.0) * 0.011 + sin(uv.y * 6.5 + 1.7) * 0.007;
   float crackW = mix(0.003, 0.008, smoothstep(0.5, 1.0, uv.y));
   float onCrack = smoothstep(crackW, 0.0, abs(uv.x - cx));
+  
   float bx = cx + sin(uv.y * 22.0 + 0.5) * 0.009;
   float bFade = smoothstep(0.04, 0.0, abs(uv.y - 0.38));
   float onBranch = smoothstep(0.003, 0.0, abs(uv.x - bx)) * bFade;
   float crack = max(onCrack, onBranch * 0.7);
-  float bleedW = 0.022 + 0.008 * sin(uTime * 2.2 + uv.y * 3.0);
-  float bleed = exp(-abs(uv.x - cx) / bleedW) * (1.0 - crack);
-  float glowP = 0.65 + 0.35 * sin(uTime * 3.8 + uv.y * 6.0);
-  float penetrant = (crack + bleed * 0.45) * glowP;
-  c = mix(c, vec3(0.02, 0.0, 0.0), crack * 0.7);
-  c += vec3(0.95, 0.06, 0.0) * penetrant * 2.5;
-  c += vec3(1.0, 0.3, 0.1) * crack * glowP * 2.0;
+  
+  // Deep crack shadow base
+  vec3 baseColor = mix(steelColor, vec3(0.02, 0.0, 0.0), crack * 0.7);
+  
+  vec3 finalColor = baseColor;
+  
+  if (uPhase < 0.5) {
+    // ════ PHASE 0: Red penetrant application ════
+    // Spray can moves from right (X=1.3) to left (X=-1.3), so nozzle goes right to left in UV
+    float nozzleUvX = 0.9 - uPhaseProgress * 0.8;
+    float coatAmount = smoothstep(nozzleUvX - 0.06, nozzleUvX + 0.06, uv.x);
+    
+    vec3 penetrantColor = vec3(0.85, 0.02, 0.0);
+    // Subtle shiny gloss to show wetness under active spray
+    float wetness = 0.15 * sin(uv.x * 20.0 + uv.y * 30.0 + uTime * 2.0) * coatAmount;
+    
+    finalColor = mix(baseColor, penetrantColor + vec3(wetness), coatAmount);
+    finalColor += vec3(0.2, 0.05, 0.0) * crack * coatAmount;
+    
+  } else if (uPhase < 1.5) {
+    // ════ PHASE 1: Wiping / cleaning surface ════
+    // Clean wipe progresses from left to right (wipeUvX from 0.0 to 1.0)
+    float wipeUvX = uPhaseProgress;
+    float coatAmount = smoothstep(wipeUvX - 0.06, wipeUvX + 0.06, uv.x);
+    
+    vec3 penetrantColor = vec3(0.85, 0.02, 0.0);
+    finalColor = mix(baseColor, penetrantColor, coatAmount);
+    
+    // NDT physics: Deep red penetrant remains trapped inside the crack!
+    float cleanPart = 1.0 - coatAmount;
+    finalColor += vec3(0.9, 0.04, 0.0) * crack * cleanPart * 2.2;
+    
+  } else if (uPhase < 2.5) {
+    // ════ PHASE 2: Developer application ════
+    // White spray moves from left to right (nozzleUvX from 0.1 to 0.9)
+    float nozzleUvX = 0.1 + uPhaseProgress * 0.8;
+    float whiteAmount = 1.0 - smoothstep(nozzleUvX - 0.06, nozzleUvX + 0.06, uv.x);
+    
+    vec3 developerColor = vec3(0.92, 0.93, 0.95) + (grain - 0.5) * 0.015;
+    vec3 uncoatedColor = baseColor + vec3(0.9, 0.04, 0.0) * crack * 2.2;
+    
+    finalColor = mix(uncoatedColor, developerColor, whiteAmount);
+    
+  } else {
+    // ════ PHASE 3: Capillary bleed-out ════
+    // Plate is covered in matte white developer, red dye capillary-bleeds through!
+    vec3 developerColor = vec3(0.92, 0.93, 0.95) + (grain - 0.5) * 0.015;
+    
+    // Indication bleeds wider and glows vibrant red
+    float bleedWidth = 0.004 + 0.018 * uPhaseProgress;
+    float bleed = exp(-abs(uv.x - cx) / bleedWidth) * (1.0 - crack * 0.5);
+    
+    float pulse = 0.85 + 0.15 * sin(uTime * 4.5 + uv.y * 8.0);
+    vec3 bleedColor = vec3(0.98, 0.01, 0.0) * pulse * 2.6;
+    
+    finalColor = mix(developerColor, bleedColor, bleed * uPhaseProgress);
+    finalColor += vec3(0.8, 0.0, 0.0) * crack * uPhaseProgress * 2.0;
+  }
+  
+  // High-fidelity edge vignette
   vec2 e = abs(uv - 0.5) * 2.0;
-  c *= 1.0 - dot(e * 0.35, e * 0.35) * 0.35;
-  gl_FragColor = vec4(clamp(c, 0.0, 1.6), 1.0);
+  finalColor *= 1.0 - dot(e * 0.35, e * 0.35) * 0.35;
+  
+  gl_FragColor = vec4(clamp(finalColor, 0.0, 2.0), 1.0);
 }
 `;
 
@@ -299,27 +362,248 @@ const VTScene = () => {
 /* ════════════════════════════════════════════════════════════════
    PT – Penetrant Testing  (GLSL shader)
    ════════════════════════════════════════════════════════════════ */
-const PTScene = () => (
-  <group rotation={[-0.08, 0.1, 0]}>
-    <ShaderPlane fs={PT_FS} />
-    {/* Spray can */}
-    <mesh position={[0.9, 0.92, 0.2]}>
-      <cylinderGeometry args={[0.1, 0.1, 0.5, 14]} />
-      <meshStandardMaterial color="#cc2200" metalness={0.7} roughness={0.3} />
-    </mesh>
-    <mesh position={[0.9, 1.18, 0.2]}>
-      <cylinderGeometry args={[0.06, 0.1, 0.12, 12]} />
-      <meshStandardMaterial color="#880000" metalness={0.6} roughness={0.35} />
-    </mesh>
-    {/* Spray nozzle glow */}
-    <pointLight position={[0.9, 0.7, 0.2]} color={E.penet} intensity={1.5} distance={1.2} />
-    {/* Part surface edge */}
-    <mesh position={[0, -0.95, 0]}>
-      <boxGeometry args={[3.2, 0.06, 0.18]} />
-      <meshStandardMaterial color={C.steel} metalness={0.85} roughness={0.3} />
-    </mesh>
-  </group>
-);
+const PTScene = () => {
+  const matRef = useRef<THREE.ShaderMaterial>(null);
+  const geomRef = useRef<THREE.BufferGeometry>(null);
+  const redCanRef = useRef<THREE.Group>(null);
+  const whiteCanRef = useRef<THREE.Group>(null);
+  const lightRef = useRef<THREE.PointLight>(null);
+
+  // 12-second looping cycle
+  // Phase 0: Red spray can (0s - 3s)
+  // Phase 1: Wiping (3s - 6s)
+  // Phase 2: White developer spray can (6s - 9s)
+  // Phase 3: Bleed out (9s - 12s)
+
+  const uniforms = useMemo(() => ({
+    uTime: { value: 0 },
+    uPhase: { value: 0.0 },
+    uPhaseProgress: { value: 0.0 },
+  }), []);
+
+  // Pre-allocated particles for aerosol mist
+  const PARTICLE_COUNT = 60;
+  const particles = useMemo(() => {
+    const arr = [];
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      arr.push({
+        x: 0,
+        y: -999,
+        z: 0,
+        vx: 0,
+        vy: 0,
+        vz: 0,
+        life: 0,
+        colorType: 0, // 0: red, 1: white
+      });
+    }
+    return arr;
+  }, []);
+
+  const posArray = useMemo(() => new Float32Array(PARTICLE_COUNT * 3), []);
+  const colorArray = useMemo(() => new Float32Array(PARTICLE_COUNT * 3), []);
+
+  useFrame((state) => {
+    const clock = state.clock;
+    const time = clock.getElapsedTime() % 12;
+    const phase = Math.floor(time / 3);
+    const progress = (time % 3) / 3;
+    const dt = Math.min(state.clock.getDelta(), 0.03); // Cap dt to keep physics stable on frame hiccups
+
+    // Update shader uniforms
+    if (matRef.current) {
+      matRef.current.uniforms.uTime.value = clock.getElapsedTime();
+      matRef.current.uniforms.uPhase.value = phase;
+      matRef.current.uniforms.uPhaseProgress.value = progress;
+    }
+
+    // Set can dynamics
+    let canX = 0;
+    let canY = 0.8;
+    const canZ = 0.35;
+    let canTiltZ = 0;
+    let isSpraying = false;
+
+    if (phase === 0) {
+      // Sweep right to left
+      canX = 1.3 - progress * 2.6;
+      canY = 0.82 + Math.sin(progress * Math.PI) * 0.06;
+      canTiltZ = 0.28 * Math.sin(progress * Math.PI);
+      isSpraying = true;
+
+      if (redCanRef.current) {
+        redCanRef.current.position.set(canX, canY, canZ);
+        redCanRef.current.rotation.set(0.12, 0, canTiltZ);
+        redCanRef.current.visible = true;
+      }
+      if (whiteCanRef.current) whiteCanRef.current.visible = false;
+
+      // Project red light onto weld plate surface
+      if (lightRef.current) {
+        lightRef.current.position.set(canX, canY - 0.25, canZ - 0.04);
+        lightRef.current.color.set(E.penet);
+        lightRef.current.intensity = (2.2 + Math.sin(clock.getElapsedTime() * 45) * 0.3) * Math.sin(progress * Math.PI);
+      }
+    } else if (phase === 2) {
+      // Sweep left to right
+      canX = -1.3 + progress * 2.6;
+      canY = 0.82 + Math.sin(progress * Math.PI) * 0.06;
+      canTiltZ = -0.28 * Math.sin(progress * Math.PI);
+      isSpraying = true;
+
+      if (whiteCanRef.current) {
+        whiteCanRef.current.position.set(canX, canY, canZ);
+        whiteCanRef.current.rotation.set(0.12, 0, canTiltZ);
+        whiteCanRef.current.visible = true;
+      }
+      if (redCanRef.current) redCanRef.current.visible = false;
+
+      // Project cool blue-white light for developer spray
+      if (lightRef.current) {
+        lightRef.current.position.set(canX, canY - 0.25, canZ - 0.04);
+        lightRef.current.color.set('#0071e3');
+        lightRef.current.intensity = (1.8 + Math.sin(clock.getElapsedTime() * 35) * 0.2) * Math.sin(progress * Math.PI);
+      }
+    } else {
+      // Hide cans and active lights during wiping/cleaning (Phase 1) and bleed-out (Phase 3)
+      if (redCanRef.current) redCanRef.current.visible = false;
+      if (whiteCanRef.current) whiteCanRef.current.visible = false;
+      if (lightRef.current) lightRef.current.intensity = 0;
+    }
+
+    // Aerosol particle system updates
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      const p = particles[i];
+      if (isSpraying) {
+        p.life -= dt * 1.8; // particle life ~0.55s
+        if (p.life <= 0) {
+          // Spray out from nozzle location
+          p.x = canX;
+          p.y = canY - 0.25;
+          p.z = canZ - 0.04;
+          p.vy = -2.3 - Math.random() * 0.6;
+          p.vx = (Math.random() - 0.5) * 1.0 + (phase === 0 ? -0.4 : 0.4);
+          p.vz = (Math.random() - 0.5) * 0.5;
+          p.life = 1.0;
+          p.colorType = phase === 0 ? 0 : 1;
+        } else {
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          p.z += p.vz * dt;
+        }
+      } else {
+        p.y = -999;
+        p.life = 0;
+      }
+
+      posArray[i * 3] = p.x;
+      posArray[i * 3 + 1] = p.y;
+      posArray[i * 3 + 2] = p.z;
+
+      if (p.colorType === 0) {
+        colorArray[i * 3] = 0.98;
+        colorArray[i * 3 + 1] = 0.02 * p.life;
+        colorArray[i * 3 + 2] = 0.0;
+      } else {
+        colorArray[i * 3] = 0.95;
+        colorArray[i * 3 + 1] = 0.95;
+        colorArray[i * 3 + 2] = 0.98;
+      }
+    }
+
+    if (geomRef.current) {
+      geomRef.current.attributes.position.needsUpdate = true;
+      geomRef.current.attributes.color.needsUpdate = true;
+    }
+  });
+
+  return (
+    <group rotation={[-0.08, 0.1, 0]}>
+      {/* 3D plate with dynamic shader */}
+      <mesh>
+        <planeGeometry args={[3.2, 2.1]} />
+        <shaderMaterial
+          ref={matRef}
+          vertexShader={VS}
+          fragmentShader={PT_FS}
+          uniforms={uniforms}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
+
+      {/* Red Penetrant Spray Can */}
+      <group ref={redCanRef} visible={false}>
+        <mesh position={[0, 0, 0]}>
+          <cylinderGeometry args={[0.09, 0.09, 0.44, 16]} />
+          <meshStandardMaterial color="#ee2200" metalness={0.7} roughness={0.2} />
+        </mesh>
+        <mesh position={[0, 0.02, 0]}>
+          <cylinderGeometry args={[0.091, 0.091, 0.16, 16]} />
+          <meshStandardMaterial color="#ffffff" metalness={0.15} roughness={0.4} />
+        </mesh>
+        <mesh position={[0, 0.25, 0]}>
+          <cylinderGeometry args={[0.06, 0.09, 0.06, 16]} />
+          <meshStandardMaterial color="#b31a00" metalness={0.8} roughness={0.25} />
+        </mesh>
+        <mesh position={[0, 0.3, 0]}>
+          <boxGeometry args={[0.03, 0.04, 0.03]} />
+          <meshStandardMaterial color="#1a1a1a" metalness={0.1} roughness={0.7} />
+        </mesh>
+      </group>
+
+      {/* White Developer Spray Can */}
+      <group ref={whiteCanRef} visible={false}>
+        <mesh position={[0, 0, 0]}>
+          <cylinderGeometry args={[0.09, 0.09, 0.44, 16]} />
+          <meshStandardMaterial color="#f0f0f0" metalness={0.75} roughness={0.2} />
+        </mesh>
+        <mesh position={[0, 0.02, 0]}>
+          <cylinderGeometry args={[0.091, 0.091, 0.16, 16]} />
+          <meshStandardMaterial color="#0071e3" metalness={0.4} roughness={0.3} />
+        </mesh>
+        <mesh position={[0, 0.25, 0]}>
+          <cylinderGeometry args={[0.06, 0.09, 0.06, 16]} />
+          <meshStandardMaterial color="#e0e0e0" metalness={0.8} roughness={0.25} />
+        </mesh>
+        <mesh position={[0, 0.3, 0]}>
+          <boxGeometry args={[0.03, 0.04, 0.03]} />
+          <meshStandardMaterial color="#1a1a1a" metalness={0.1} roughness={0.7} />
+        </mesh>
+      </group>
+
+      {/* 3D Aerosol Particle Mist */}
+      <points>
+        <bufferGeometry ref={geomRef}>
+          <bufferAttribute
+            attach="attributes-position"
+            args={[posArray, 3]}
+          />
+          <bufferAttribute
+            attach="attributes-color"
+            args={[colorArray, 3]}
+          />
+        </bufferGeometry>
+        <pointsMaterial
+          size={0.08}
+          vertexColors={true}
+          transparent={true}
+          opacity={0.65}
+          depthWrite={false}
+          sizeAttenuation={true}
+        />
+      </points>
+
+      {/* Dynamic spray nozzle glow projecting light onto plate */}
+      <pointLight ref={lightRef} intensity={0} distance={1.8} />
+
+      {/* Bottom Plate steel thickness edge for physical realism */}
+      <mesh position={[0, -1.08, 0.05]}>
+        <boxGeometry args={[3.2, 0.06, 0.1]} />
+        <meshStandardMaterial color={C.steel} metalness={0.85} roughness={0.3} />
+      </mesh>
+    </group>
+  );
+};
 
 /* ════════════════════════════════════════════════════════════════
    MT – Magnetic Testing  (GLSL shader)

@@ -22,419 +22,8 @@ import {
 import { useLanguage } from '../context/LanguageContext';
 import { Link } from 'react-router-dom';
 import { articles, Article, Tag } from '../data/blogArticles';
+import { Helmet } from 'react-helmet-async';
 
-// ==========================================
-// INTERACTIVE NDT SCANNER SIMULATOR (CANVAS)
-// ==========================================
-const NdtScanner: React.FC = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [probePos, setProbePos] = useState({ x: 175, isHovered: false });
-  const [scanStats, setScanStats] = useState({ amp: 0, depth: 0, status: 'STANDBY' });
-
-  // Track cursor position to control ultrasonic probe
-  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!canvasRef.current) return;
-    const rect = canvasRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    // Constrain probe movement to plate bounds
-    const constrainedX = Math.max(60, Math.min(240, x));
-    setProbePos({ x: constrainedX, isHovered: true });
-  };
-
-  const handleMouseLeave = () => {
-    setProbePos(prev => ({ ...prev, isHovered: false }));
-  };
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    let animationId: number;
-    let time = 0;
-
-    const render = () => {
-      time += 1;
-      const width = canvas.width;
-      const height = canvas.height;
-
-      // Clear canvas
-      ctx.fillStyle = '#050505';
-      ctx.fillRect(0, 0, width, height);
-
-      // 1. Draw Background Grid System
-      ctx.strokeStyle = 'rgba(0, 113, 227, 0.04)';
-      ctx.lineWidth = 1;
-      const gridSize = 20;
-      for (let x = 0; x < width; x += gridSize) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, height);
-        ctx.stroke();
-      }
-      for (let y = 0; y < height; y += gridSize) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(width, y);
-        ctx.stroke();
-      }
-
-      // 2. Probe X position logic (Auto-slide when not hovered)
-      let currentX = probePos.x;
-      if (!probePos.isHovered) {
-        // Auto oscillate probe position back and forth
-        currentX = 150 + Math.sin(time * 0.015) * 80;
-      }
-
-      // 3. Define Physical Features
-      const weldCenterX = 180;
-      const defectX = 195;
-      const defectY = 120;
-      const defectRadius = 3;
-
-      // Calculate distance from probe to defect sweep zone
-      // Optimal detection point is when probe directs beam at defect (around probeX = 140 for a 45-degree shear wave)
-      const optimalScanX = defectX - 55; 
-      const distanceToOptimal = Math.abs(currentX - optimalScanX);
-      const isDetecting = distanceToOptimal < 25;
-      
-      // Calculate amplitude signal
-      const signalAmplitude = isDetecting 
-        ? Math.max(5, Math.round(95 - (distanceToOptimal * 3.5) + Math.sin(time * 0.2) * 4)) 
-        : Math.round(10 + Math.sin(time * 0.1) * 3);
-
-      const calculatedDepth = isDetecting 
-        ? (48.2 + Math.sin(time * 0.05) * 0.1).toFixed(1) 
-        : '0.0';
-
-      // Update state for numeric displays (throttled to avoid rendering thrashing)
-      if (time % 5 === 0) {
-        setScanStats({
-          amp: signalAmplitude,
-          depth: isDetecting ? parseFloat(calculatedDepth) : 0,
-          status: isDetecting ? 'DEFECT DETECTED' : 'SCANNING'
-        });
-      }
-
-      // 4. Draw Steel Plates (Cross Section)
-      // Left Plate
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-      ctx.lineWidth = 1.5;
-      
-      ctx.beginPath();
-      ctx.rect(10, 80, 145, 70);
-      ctx.fill();
-      ctx.stroke();
-
-      // Right Plate
-      ctx.beginPath();
-      ctx.rect(205, 80, 105, 70);
-      ctx.fill();
-      ctx.stroke();
-
-      // Weld Joint (V-Groove geometry)
-      ctx.fillStyle = 'rgba(0, 113, 227, 0.05)';
-      ctx.beginPath();
-      ctx.moveTo(155, 80);
-      ctx.lineTo(205, 80);
-      ctx.lineTo(190, 150);
-      ctx.lineTo(170, 150);
-      ctx.closePath();
-      ctx.fill();
-      
-      // Weld cap and root boundaries (dashed lines)
-      ctx.strokeStyle = 'rgba(0, 113, 227, 0.2)';
-      ctx.setLineDash([4, 4]);
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      // Draw Weld Bead Reinforcement (top and bottom curves)
-      ctx.fillStyle = 'rgba(0, 113, 227, 0.1)';
-      ctx.beginPath();
-      ctx.arc(180, 80, 27, Math.PI, 0, false);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(180, 150, 12, 0, Math.PI, false);
-      ctx.fill();
-
-      // 5. Draw Simulated Internal Defect (Slag / Crack)
-      ctx.fillStyle = isDetecting ? '#ef4444' : '#555555';
-      ctx.shadowBlur = isDetecting ? 15 : 0;
-      ctx.shadowColor = '#ef4444';
-      ctx.beginPath();
-      ctx.arc(defectX, defectY, defectRadius, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.shadowBlur = 0; // Reset glow
-
-      // 6. Draw Transducer Probe
-      const probeWidth = 36;
-      const probeHeight = 18;
-      const probeY = 80 - probeHeight;
-      
-      // Probe body
-      ctx.fillStyle = '#121212';
-      ctx.strokeStyle = '#0071e3';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.roundRect(currentX - probeWidth / 2, probeY, probeWidth, probeHeight, 3);
-      ctx.fill();
-      ctx.stroke();
-
-      // Connector pin
-      ctx.fillStyle = '#86868b';
-      ctx.fillRect(currentX - 3, probeY - 4, 6, 4);
-
-      // Acoustic coupling liquid layer (thin cyan line under probe)
-      ctx.strokeStyle = '#00ff41';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(currentX - probeWidth / 2, 80);
-      ctx.lineTo(currentX + probeWidth / 2, 80);
-      ctx.stroke();
-
-      // 7. Draw Phased Array Sound Beams (Sectorial Sweep)
-      const numBeams = 11;
-      const startAngle = 40 * Math.PI / 180; // 40 degrees
-      const endAngle = 72 * Math.PI / 180;   // 72 degrees
-      
-      for (let i = 0; i < numBeams; i++) {
-        const ratio = i / (numBeams - 1);
-        const angle = startAngle + ratio * (endAngle - startAngle);
-        
-        // Beam projection vectors
-        const beamStartX = currentX + 6; // slightly forward element index
-        const beamStartY = 80;
-        
-        // Calculate penetration length to backwall (y=150)
-        const targetY = 150;
-        const length = (targetY - beamStartY) / Math.cos(angle - Math.PI/4);
-        
-        const beamEndX = beamStartX + length * Math.sin(angle);
-        const beamEndY = targetY;
-
-        // Check if this specific beam ray intersects the defect
-        // Simple line-point distance check
-        const dx = beamEndX - beamStartX;
-        const dy = beamEndY - beamStartY;
-        const t_proj = Math.max(0, Math.min(1, ((defectX - beamStartX) * dx + (defectY - beamStartY) * dy) / (dx*dx + dy*dy)));
-        const projX = beamStartX + t_proj * dx;
-        const projY = beamStartY + t_proj * dy;
-        const distToDefect = Math.hypot(defectX - projX, defectY - projY);
-        
-        const rayHitsDefect = distToDefect < 8;
-
-        ctx.lineWidth = rayHitsDefect ? 2 : 0.8;
-        ctx.strokeStyle = rayHitsDefect 
-          ? `rgba(239, 68, 68, ${0.4 + Math.sin(time * 0.2) * 0.2})` 
-          : 'rgba(0, 113, 227, 0.15)';
-        
-        ctx.beginPath();
-        ctx.moveTo(beamStartX, beamStartY);
-        
-        if (rayHitsDefect) {
-          // Draw reflection back to probe
-          ctx.lineTo(defectX, defectY);
-          ctx.stroke();
-          
-          ctx.strokeStyle = `rgba(239, 68, 68, ${0.6 + Math.sin(time * 0.2) * 0.2})`;
-          ctx.beginPath();
-          ctx.moveTo(defectX, defectY);
-          ctx.lineTo(currentX - 6, 80); // reflection returns to receiver element
-          ctx.stroke();
-        } else {
-          ctx.lineTo(beamEndX, beamEndY);
-          ctx.stroke();
-        }
-      }
-
-      // 8. Draw A-SCAN Oscilloscope (Right side: x=330 to 480)
-      const oscX = 340;
-      const oscY = 30;
-      const oscW = 140;
-      const oscH = 130;
-
-      // Draw Scope Screen
-      ctx.fillStyle = '#020202';
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.roundRect(oscX, oscY, oscW, oscH, 6);
-      ctx.fill();
-      ctx.stroke();
-
-      // Screen Grid Lines
-      ctx.strokeStyle = 'rgba(0, 255, 65, 0.08)';
-      ctx.setLineDash([2, 3]);
-      // Vertical grid
-      for (let gx = oscX + 20; gx < oscX + oscW; gx += 20) {
-        ctx.beginPath();
-        ctx.moveTo(gx, oscY);
-        ctx.lineTo(gx, oscY + oscH);
-        ctx.stroke();
-      }
-      // Horizontal grid
-      for (let gy = oscY + 20; gy < oscY + oscH; gy += 20) {
-        ctx.beginPath();
-        ctx.moveTo(oscX, gy);
-        ctx.lineTo(oscX + oscW, gy);
-        ctx.stroke();
-      }
-      ctx.setLineDash([]);
-
-      // Draw Neon Green A-Scan Waveform
-      ctx.strokeStyle = '#00ff41';
-      ctx.lineWidth = 1.5;
-      ctx.shadowBlur = 4;
-      ctx.shadowColor = '#00ff41';
-      ctx.beginPath();
-      
-      ctx.moveTo(oscX + 2, oscY + oscH - 10);
-      
-      // Generate synthetic RF signal wave points
-      for (let px = 0; px < oscW - 4; px++) {
-        const screenX = oscX + 2 + px;
-        let amplitude = 0;
-        
-        // A) Initial Pulse (at beginning)
-        if (px < 15) {
-          amplitude = Math.sin(px * 0.6) * 55 * Math.exp(-px * 0.15);
-        }
-        
-        // B) Defect Reflection (in middle, height depends on isDetecting)
-        const defectPeakPos = 65;
-        if (px >= 40 && px <= 90) {
-          const distFromPeak = Math.abs(px - defectPeakPos);
-          const rawAmp = signalAmplitude * 0.9;
-          amplitude = Math.sin((px - 40) * 0.5) * rawAmp * Math.exp(-distFromPeak * 0.12);
-        }
-
-        // C) Backwall Echo (near end)
-        const backwallPeakPos = 115;
-        if (px >= 100 && px <= 135) {
-          const distFromPeak = Math.abs(px - backwallPeakPos);
-          const rawAmp = 35 + Math.sin(time * 0.05) * 3;
-          amplitude = Math.sin((px - 100) * 0.7) * rawAmp * Math.exp(-distFromPeak * 0.15);
-        }
-
-        // Noise floor
-        amplitude += Math.sin(px * 1.5 + time * 0.8) * 1.5;
-
-        // Constrain and invert amplitude for canvas y-coordinates (y goes down)
-        const drawY = Math.max(oscY + 5, Math.min(oscY + oscH - 5, oscY + oscH - 10 - amplitude));
-        ctx.lineTo(screenX, drawY);
-      }
-      ctx.stroke();
-      ctx.shadowBlur = 0; // Reset glow
-
-      // Label inside Oscilloscope Screen
-      ctx.fillStyle = 'rgba(0, 255, 65, 0.6)';
-      ctx.font = '7px JetBrains Mono, monospace';
-      ctx.fillText('A-SCAN RF', oscX + 8, oscY + 12);
-      ctx.fillText(`F1: 5.0 MHz`, oscX + 8, oscY + 22);
-      ctx.fillText(`GATE A: ${signalAmplitude}%`, oscX + 80, oscY + 12);
-
-      // 9. Status Bar overlay at bottom of canvas
-      ctx.fillStyle = '#0b0b0c';
-      ctx.fillRect(10, 175, width - 20, 22);
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(10, 175, width - 20, 22);
-
-      // Text statuses
-      ctx.font = '8px JetBrains Mono, monospace';
-      ctx.fillStyle = '#86868b';
-      ctx.fillText('SYS: OK', 20, 189);
-      ctx.fillText('MODE: SHEAR WAVE', 80, 189);
-      ctx.fillText(`RANGE: 120.0mm`, 180, 189);
-      
-      // Neon green or red blinking light
-      ctx.fillStyle = isDetecting ? '#ef4444' : '#00ff41';
-      ctx.beginPath();
-      ctx.arc(285, 186, 2.5, 0, Math.PI * 2);
-      ctx.fill();
-      
-      ctx.fillStyle = isDetecting ? '#ef4444' : '#e1e1e1';
-      ctx.fillText(isDetecting ? 'ALARM / PEAK' : 'STABLE', 293, 189);
-
-      // Loop frame
-      animationId = requestAnimationFrame(render);
-    };
-
-    // Initialize high DPI canvas setting
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width = 500 * dpr;
-    canvas.height = 210 * dpr;
-    canvas.style.width = '100%';
-    canvas.style.height = '210px';
-    ctx.scale(dpr, dpr);
-
-    render();
-
-    return () => {
-      cancelAnimationFrame(animationId);
-    };
-  }, [probePos]);
-
-  return (
-    <div ref={containerRef} className="w-full bg-black/45 border border-white/10 rounded-2xl p-5 shadow-[0_20px_50px_rgba(0,113,227,0.06)] relative overflow-hidden backdrop-blur-md">
-      {/* Decorative scan overlay bar */}
-      <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-apple-blue/50 to-transparent animate-scan" />
-      
-      {/* Technical Header */}
-      <div className="flex items-center justify-between border-b border-white/5 pb-3 mb-4">
-        <div className="flex items-center gap-2">
-          <Activity className="w-4 h-4 text-apple-blue animate-pulse" />
-          <span className="font-mono text-xs text-white font-bold tracking-wider">NDT COGNITIVE DIAGNOSTIC CONSOLE</span>
-        </div>
-        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-apple-blue/10 border border-apple-blue/20">
-          <span className="w-1.5 h-1.5 rounded-full bg-apple-blue animate-ping" />
-          <span className="font-mono text-[9px] text-apple-blue font-bold uppercase">LIVE FEED</span>
-        </div>
-      </div>
-
-      {/* Canvas Element */}
-      <canvas 
-        ref={canvasRef} 
-        onMouseMove={handleMouseMove} 
-        onMouseLeave={handleMouseLeave}
-        className="rounded-lg cursor-crosshair border border-white/5 bg-[#050505] transition-all duration-300 hover:border-apple-blue/20 w-full"
-      />
-
-      {/* Grid Stats Bar below Canvas */}
-      <div className="grid grid-cols-4 gap-2 mt-4 pt-1 border-t border-white/5 text-center font-mono">
-        <div className="bg-white/[0.01] border border-white/5 rounded p-2 flex flex-col justify-center">
-          <span className="text-[9px] text-gray-500 uppercase tracking-wider block">PROBE COORD</span>
-          <span className="text-xs text-white font-semibold mt-0.5">X: {Math.round(probePos.x)} mm</span>
-        </div>
-        <div className="bg-white/[0.01] border border-white/5 rounded p-2 flex flex-col justify-center">
-          <span className="text-[9px] text-gray-500 uppercase tracking-wider block">SIGNAL GAIN</span>
-          <span className="text-xs text-white font-semibold mt-0.5">48.0 dB</span>
-        </div>
-        <div className="bg-white/[0.01] border border-white/5 rounded p-2 flex flex-col justify-center">
-          <span className="text-[9px] text-gray-500 uppercase tracking-wider block">ECHO AMPLITUDE</span>
-          <span className={`text-xs font-semibold mt-0.5 transition-colors duration-200 ${scanStats.amp > 60 ? 'text-red-400' : 'text-green-400'}`}>
-            {scanStats.amp}%
-          </span>
-        </div>
-        <div className="bg-white/[0.01] border border-white/5 rounded p-2 flex flex-col justify-center">
-          <span className="text-[9px] text-gray-500 uppercase tracking-wider block">INDICATOR DEPTH</span>
-          <span className={`text-xs font-semibold mt-0.5 ${scanStats.depth > 0 ? 'text-red-400' : 'text-gray-400'}`}>
-            {scanStats.depth > 0 ? `${scanStats.depth} mm` : 'N/A'}
-          </span>
-        </div>
-      </div>
-      
-      {/* Dynamic Console Prompt Instruction */}
-      <p className="text-[10px] text-gray-500 font-mono text-center mt-3 flex items-center justify-center gap-1">
-        <Cpu className="w-3 h-3 text-apple-blue" />
-        <span>{probePos.isHovered ? 'PROBE IN MANUAL CONTROL MODE' : 'MOVE CURSOR OVER GRAPH TO CALIBRATE ULTRASONIC SIGNAL'}</span>
-      </p>
-    </div>
-  );
-};
 
 // ==========================================
 // KNOWLEDGE METRICS DISPLAY WIDGET
@@ -480,6 +69,24 @@ const Blog: React.FC = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // Lock body scroll when popup is active
+  useEffect(() => {
+    if (activeArticle) {
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+      window.__lenis?.stop();
+    } else {
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+      window.__lenis?.start();
+    }
+    return () => {
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+      window.__lenis?.start();
+    };
+  }, [activeArticle]);
 
   // Track modal scrolling for reading progress indicator
   const handleModalScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -546,7 +153,41 @@ const Blog: React.FC = () => {
   };
 
   return (
-    <main className="w-full bg-[#030303] text-industrial-text relative overflow-hidden">
+    <>
+      <Helmet>
+        <title>
+          {language === 'sl'
+            ? 'Baza znanja – Strokovni članki NDT in varjenje | Megama'
+            : 'Knowledge Base – Expert NDT & Welding Articles | Megama'}
+        </title>
+        <meta
+          name="description"
+          content={
+            language === 'sl'
+              ? 'Strokovni članki, standardi in tehnični uvidi s področja neporušnih preiskav (NDT), varilnega nadzora in zagotavljanja kakovosti QA/QC.'
+              : 'Expert articles, standards, and technical insights on non-destructive testing (NDT), welding supervision, and QA/QC quality assurance.'
+          }
+        />
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content="https://megama.si/blog" />
+        <meta
+          property="og:title"
+          content={
+            language === 'sl'
+              ? 'Baza znanja – Megama NDT'
+              : 'Knowledge Base – Megama NDT'
+          }
+        />
+        <meta
+          property="og:description"
+          content={
+            language === 'sl'
+              ? 'Strokovna knjižnica in tehnični uvidi s področja NDT preiskav in nadzora varjenja.'
+              : 'Expert library and technical insights in the field of NDT inspections and welding supervision.'
+          }
+        />
+      </Helmet>
+      <main className="w-full bg-[#030303] text-industrial-text relative overflow-hidden">
       {/* Technical Background Aesthetics */}
       <div className="fixed inset-0 pointer-events-none z-0">
         {/* Subtle grid pattern */}
@@ -564,35 +205,26 @@ const Blog: React.FC = () => {
         <div className="max-w-[1240px] mx-auto px-6 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             
-            {/* Left Column: Headline */}
-            <div className="lg:col-span-6">
+            {/* Column: Headline */}
+            <div className="lg:col-span-12 lg:max-w-3xl mx-auto text-center lg:text-left">
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
               >
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-apple-blue/10 border border-apple-blue/20 text-apple-blue text-[10px] font-bold uppercase tracking-wider mb-6 font-mono">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-apple-blue/10 border border-apple-blue/20 text-apple-blue text-[10px] font-bold uppercase tracking-wider mb-6 font-mono mx-auto lg:mx-0">
                   <BookOpen className="w-3.5 h-3.5" />
                   {t.blogPage.hero_badge}
                 </div>
                 <h1 className="text-4xl sm:text-6xl lg:text-7xl font-semibold text-white mb-6 tracking-tight leading-none">
                   {language === 'sl' ? 'Baza Znanja' : 'Knowledge Base'}
                 </h1>
-                <p className="text-lg md:text-xl text-gray-400 max-w-xl leading-relaxed mb-8">
+                <p className="text-lg md:text-xl text-gray-400 max-w-xl mx-auto lg:mx-0 leading-relaxed mb-8">
                   {t.blogPage.hero_subtitle}
                 </p>
-                <KnowledgeMetrics />
-              </motion.div>
-            </div>
-
-            {/* Right Column: Interactive Simulator */}
-            <div className="lg:col-span-6 w-full max-w-[540px] mx-auto lg:max-w-none">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.1, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              >
-                <NdtScanner />
+                <div className="flex justify-center lg:justify-start">
+                  <KnowledgeMetrics />
+                </div>
               </motion.div>
             </div>
 
@@ -861,7 +493,7 @@ const Blog: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/95 z-50 flex justify-end backdrop-blur-md"
+            className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 md:p-10 backdrop-blur-md"
           >
             {/* Click backdrop to close */}
             <div className="absolute inset-0 cursor-zoom-out" onClick={() => setActiveArticle(null)} />
@@ -874,14 +506,15 @@ const Blog: React.FC = () => {
               />
             </div>
 
-            {/* Modal Body Container (Slide-over panel) */}
+            {/* Modal Body Container (Centered dialog) */}
             <motion.div
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              initial={{ opacity: 0, y: 30, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 30, scale: 0.98 }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
               onScroll={handleModalScroll}
-              className="w-full max-w-[940px] bg-[#09090b] border-l border-white/10 h-full relative z-10 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent flex flex-col"
+              data-lenis-prevent
+              className="w-full max-w-[940px] bg-[#09090b] border border-white/10 rounded-3xl max-h-[90vh] relative z-10 overflow-y-auto overscroll-contain scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent flex flex-col shadow-[0_30px_80px_rgba(0,0,0,0.8)]"
             >
               {/* Sticky Top Nav within Reader */}
               <div className="sticky top-0 bg-[#09090b]/90 backdrop-blur-md border-b border-white/5 py-4 px-6 md:px-12 flex items-center justify-between z-30">
@@ -1057,6 +690,7 @@ const Blog: React.FC = () => {
         )}
       </AnimatePresence>
     </main>
+    </>
   );
 };
 

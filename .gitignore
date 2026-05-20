@@ -23,6 +23,7 @@ dist-ssr
 *.sln
 # AI Agent internals
 .agent/
+.agents/
 .firecrawl/
 everything-claude-code/
 .gemini/

@@ -13,6 +13,7 @@ import { GlowCard } from './ui/glow-card';
 import { getServicesData } from '../data/services';
 import { ServiceCategory, ServiceItem } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import MethodIllustrations from './MethodIllustrations';
 
 const CATEGORY_GLOW: Record<string, 'blue' | 'orange' | 'green' | 'purple'> = {
   ndt: 'blue',
@@ -318,8 +319,8 @@ const sidebarListVariants = {
 };
 
 const sidebarItemVariants = {
-  hidden: { opacity: 0, x: -12 },
-  visible: { opacity: 1, x: 0, transition: { type: 'spring' as const, stiffness: 130, damping: 16 } },
+  hidden: { opacity: 0, x: -4 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.25, ease: [0.16, 1, 0.3, 1] as const } },
 };
 
 const cardVariants = {
@@ -330,6 +331,199 @@ const cardVariants = {
 const cardItemVariants = {
   hidden: { opacity: 0, y: 10 },
   visible: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 120, damping: 14 } },
+};
+
+interface TelemetryData {
+  logTitle: string;
+  blockLabel: string;
+  blockVal: string;
+  deviceLabel: string;
+  deviceVal: string;
+  paramLabel: string;
+  paramVal: string;
+  statusLabel: string;
+  statusVal: string;
+  ledBlink: boolean;
+}
+
+const getMethodStandards = (id: string, lang: 'sl' | 'en'): Array<{ code: string; desc: string }> => {
+  const map: Record<string, Array<{ code: string; desc: string }>> = {
+    vt: [
+      { code: 'EN ISO 17637', desc: lang === 'sl' ? 'Vizualna kontrola zvarnih spojev' : 'NDT of welds — Visual testing of fusion-welded joints' },
+      { code: 'ASME Sec. V Art. 9', desc: lang === 'sl' ? 'Vizualni pregled tlačne opreme' : 'ASME Section V Article 9 — Visual Examination' }
+    ],
+    pt: [
+      { code: 'EN ISO 3452-1', desc: lang === 'sl' ? 'Preiskave s penetranti — Splošna načela' : 'NDT — Penetrant testing — General principles' },
+      { code: 'ASME Sec. V Art. 6', desc: lang === 'sl' ? 'Preiskava s tekočimi penetranti' : 'ASME Section V Article 6 — Liquid Penetrant Examination' }
+    ],
+    mt: [
+      { code: 'EN ISO 17638', desc: lang === 'sl' ? 'Magnetnofluksna kontrola zvarov' : 'NDT of welds — Magnetic particle testing' },
+      { code: 'ASME Sec. V Art. 7', desc: lang === 'sl' ? 'Magnetna preiskava' : 'ASME Section V Article 7 — Magnetic Particle Examination' }
+    ],
+    ut: [
+      { code: 'EN ISO 17640', desc: lang === 'sl' ? 'Ultrazvočna preiskava zvarnih spojev' : 'NDT of welds — Ultrasonic testing — Techniques' },
+      { code: 'ASME Sec. V Art. 5', desc: lang === 'sl' ? 'Ultrazvočna preiskava materiala in zvarov' : 'ASME Section V Article 5 — Ultrasonic Examination' }
+    ],
+    utt: [
+      { code: 'EN 15317', desc: lang === 'sl' ? 'Ultrazvočno merjenje debeline stene' : 'NDT — Ultrasonic testing — Thickness measurement' },
+      { code: 'ASTM E797', desc: lang === 'sl' ? 'Standardna praksa za merjenje debeline z ultrazvokom' : 'Standard Practice for Measuring Thickness by Manual Ultrasonic' }
+    ],
+    lt: [
+      { code: 'EN 1779 / 13185', desc: lang === 'sl' ? 'Preiskava tesnosti — Izbira metode' : 'NDT — Leak testing — Criteria for method selection' },
+      { code: 'ASME Sec. V Art. 10', desc: lang === 'sl' ? 'Preiskava tesnosti tlačne opreme' : 'ASME Section V Article 10 — Leak Testing' }
+    ],
+    rt: [
+      { code: 'EN ISO 17636-1', desc: lang === 'sl' ? 'Radiografska kontrola zvarov — Rentgenski in gama žarki s filmom' : 'NDT of welds — Radiographic testing — Film techniques' },
+      { code: 'ASME Sec. V Art. 2', desc: lang === 'sl' ? 'Radiografska preiskava' : 'ASME Section V Article 2 — Radiographic Examination' }
+    ],
+    'rt-eval': [
+      { code: 'EN ISO 10675-1', desc: lang === 'sl' ? 'Sprejemni nivoji za radiografsko kontrolo jekla' : 'NDT of welds — Acceptance levels for radiographic testing' },
+      { code: 'EN ISO 5817', desc: lang === 'sl' ? 'Stopnje kakovosti glede na nepravilnosti' : 'Welding — Quality levels for imperfections in steel' }
+    ],
+    uci: [
+      { code: 'DIN 50159-1', desc: lang === 'sl' ? 'Merjenje trdote po UCI metodi' : 'Metallic materials — Hardness testing to the UCI method' },
+      { code: 'ASTM A1038', desc: lang === 'sl' ? 'Standardna metoda za testiranje trdote z UCI' : 'Standard Test Method for Portable Hardness Testing by UCI' }
+    ],
+    leeb: [
+      { code: 'EN ISO 16859-1', desc: lang === 'sl' ? 'Merjenje trdote po Leebovi metodi' : 'Metallic materials — Leeb hardness test' },
+      { code: 'ASTM A956', desc: lang === 'sl' ? 'Standardna metoda za testiranje trdote po Leebu' : 'Standard Test Method for Leeb Hardness Testing' }
+    ],
+    varilni: [
+      { code: 'EN ISO 3834', desc: lang === 'sl' ? 'Zahteve za kakovost pri talilnem varjenju kovinskih materialov' : 'Quality requirements for fusion welding of metallic materials' },
+      { code: 'EN 1090-2', desc: lang === 'sl' ? 'Izvedba jeklenih konstrukcij' : 'Execution of steel structures and aluminium structures' }
+    ],
+    prevzemi: [
+      { code: 'EN 10204 3.1/3.2', desc: lang === 'sl' ? 'Kovinski izdelki — Vrste inšpekcijskih dokumentov' : 'Metallic products — Types of inspection documents' },
+      { code: 'PED 2014/68/EU', desc: lang === 'sl' ? 'Direktiva o tlačni opremi' : 'Pressure Equipment Directive (PED)' }
+    ],
+    'third-party': [
+      { code: 'EN ISO/IEC 17020', desc: lang === 'sl' ? 'Zahteve za delovanje različnih organov, ki izvajajo kontrolne preglede' : 'Requirements for the operation of various types of bodies performing inspection' }
+    ],
+    vhodna: [
+      { code: 'EN 10204', desc: lang === 'sl' ? 'Vrste inšpekcijskih dokumentov za materiale' : 'Types of inspection documents for materials' },
+      { code: 'ISO 2768', desc: lang === 'sl' ? 'Splošne tolerance za linearne in kotne mere' : 'General tolerances for linear and angular dimensions' }
+    ],
+    koordinacija: [
+      { code: 'EN ISO 14731', desc: lang === 'sl' ? 'Koordinacija varjenja — Naloge in odgovornosti' : 'Welding coordination — Tasks and responsibilities' },
+      { code: 'EN ISO 3834-2', desc: lang === 'sl' ? 'Celovite zahteve za kakovost varjenja' : 'Comprehensive quality requirements for welding' }
+    ]
+  };
+  return map[id] || [
+    { code: 'EN ISO 9001', desc: lang === 'sl' ? 'Sistemi vodenja kakovosti' : 'Quality management systems' }
+  ];
+};
+
+const getMethodTelemetry = (id: string, lang: 'sl' | 'en'): TelemetryData => {
+  const isEn = lang === 'en';
+  switch (id) {
+    case 'ut':
+    case 'utt':
+      return {
+        logTitle: isEn ? "ULTRASONIC TELEMETRY LOG" : "ULTRAZVOČNA TELEMETRIJA",
+        blockLabel: isEn ? "Cal. Block" : "Kalibr. blok",
+        blockVal: "V1 (EN 12223) / V2",
+        deviceLabel: isEn ? "Transducer" : "Sonda",
+        deviceVal: "4MHz Dual-Element (SE)",
+        paramLabel: isEn ? "Velocity" : "Hitrost",
+        paramVal: "5920 m/s (Steel)",
+        statusLabel: isEn ? "System status" : "Stanje sistema",
+        statusVal: isEn ? "CALIBRATED & SECURE" : "KALIBRIRANO & VARNO",
+        ledBlink: true,
+      };
+    case 'vt':
+      return {
+        logTitle: isEn ? "VISUAL AUDIT LOG" : "VIZUALNI REVIZIJSKI DNEVNIK",
+        blockLabel: isEn ? "Lux Level" : "Osvetljenost",
+        blockVal: "> 550 Lux (ISO 3059)",
+        deviceLabel: isEn ? "Optics" : "Optika",
+        deviceVal: "6.0mm HD Endoscope / Weld Gauge",
+        paramLabel: isEn ? "Contrast" : "Kontrast",
+        paramVal: isEn ? "Visual ratio > 1:10" : "Vizualno razmerje > 1:10",
+        statusLabel: isEn ? "Illumination" : "Osvetlitev",
+        statusVal: isEn ? "OPTIMAL ILLUMINANCE" : "OPTIMALNA OSVETLITEV",
+        ledBlink: true,
+      };
+    case 'pt':
+      return {
+        logTitle: isEn ? "PENETRANT TELEMETRY" : "PENETRANTSKA TELEMETRIJA",
+        blockLabel: isEn ? "TAM Panel" : "Kontrolna ploščica",
+        blockVal: "ISO 3452-3 TAM Panel",
+        deviceLabel: isEn ? "Chemicals" : "Kemikalije",
+        deviceVal: "Class 2 Solvent / Red Dye",
+        paramLabel: isEn ? "Dwell Time" : "Čas delovanja",
+        paramVal: "10 min @ 20°C",
+        statusLabel: isEn ? "Capillary action" : "Kapilarni vlek",
+        statusVal: isEn ? "CAPILLARY ACTIVE" : "KAPILARNO AKTIVNO",
+        ledBlink: true,
+      };
+    case 'mt':
+      return {
+        logTitle: isEn ? "MAGNETIC PARTICLE TELEMETRY" : "MAGNETNA TELEMETRIJA",
+        blockLabel: isEn ? "Field Indicator" : "Indikator polja",
+        blockVal: "Castrol Strip / Berthold Ring",
+        deviceLabel: isEn ? "Yoke Device" : "Magnetni jarem",
+        deviceVal: "AC Yoke Y-2 (4.5kg Lift)",
+        paramLabel: isEn ? "Suspension" : "Suspenzija",
+        paramVal: isEn ? "Fluorescent / Water suspension" : "Fluorescentna / Vodna",
+        statusLabel: isEn ? "Field intensity" : "Jakost polja",
+        statusVal: isEn ? "MAGNETIC FIELD ACTIVE" : "MAGNETNO POLJE AKTIVNO",
+        ledBlink: true,
+      };
+    case 'rt':
+    case 'rt-eval':
+      return {
+        logTitle: isEn ? "RADIOGRAPHIC TELEMETRY" : "RADIOGRAFSKA TELEMETRIJA",
+        blockLabel: isEn ? "Source/Tube" : "Izvor sevanja",
+        blockVal: "Ir-192 (Gamma) / X-Ray 220kV",
+        deviceLabel: isEn ? "IQI Indicator" : "IQI indikator",
+        deviceVal: "EN ISO 19232-1 Fe 10/16 W",
+        paramLabel: isEn ? "Density" : "Optična gostota",
+        paramVal: "2.35 - 2.50 H&D (Target)",
+        statusLabel: isEn ? "Dosimetry" : "Dozimetrija",
+        statusVal: isEn ? "DOSIMETRY STABLE" : "DOZIMETRIJA STABILNA",
+        ledBlink: true,
+      };
+    case 'lt':
+      return {
+        logTitle: isEn ? "LEAK TESTING COMPLIANCE" : "PREISKAVA TESNOSTI",
+        blockLabel: isEn ? "Cal. Leak" : "Kalibr. puščanje",
+        blockVal: "10^-5 Pa m^3/s Cal.",
+        deviceLabel: isEn ? "Apparatus" : "Aparatura",
+        deviceVal: "Vacuum Box / Surfactant Formulation",
+        paramLabel: isEn ? "Pressure" : "Tlak / Vakuum",
+        paramVal: "-0.3 bar vacuum (Target)",
+        statusLabel: isEn ? "Tightness status" : "Stanje tesnosti",
+        statusVal: isEn ? "PRESSURE SEAL SECURE" : "TLAK STABILEN / TESNO",
+        ledBlink: true,
+      };
+    case 'uci':
+    case 'leeb':
+      return {
+        logTitle: isEn ? "HARDNESS TESTING LOG" : "MERJENJE TRDOTE",
+        blockLabel: isEn ? "Cal. Block" : "Kalibr. ploščica",
+        blockVal: "Test Block (240 HV5)",
+        deviceLabel: isEn ? "Method / Probe" : "Metoda / Sonda",
+        deviceVal: id === 'uci' ? "UCI 10N Rod" : "Leeb Type D Impact Device",
+        paramLabel: isEn ? "Scale conversion" : "Konverzija lestvic",
+        paramVal: "HV / HB / HRC (Automatic)",
+        statusLabel: isEn ? "Sensor alignment" : "Poravnava sonde",
+        statusVal: isEn ? "REBOUND READY" : "PRIPRAVLJEN NA MERITEV",
+        ledBlink: true,
+      };
+    default:
+      return {
+        logTitle: isEn ? "COMPLIANCE & SUPERVISION AUDIT" : "REVIZIJA SKLADNOSTI & NADZORA",
+        blockLabel: isEn ? "Framework" : "Okvir delovanja",
+        blockVal: "EN ISO 3834 / ISO/IEC 17020",
+        deviceLabel: isEn ? "Auditor Role" : "Vloga auditorja",
+        deviceVal: "IWE / NDT Level III Inspector",
+        paramLabel: isEn ? "Assessment" : "Ocenjevanje",
+        paramVal: isEn ? "Third-Party Neutrality" : "Nevtralnost tretje stranke",
+        statusLabel: isEn ? "Compliance status" : "Status skladnosti",
+        statusVal: isEn ? "AUDIT ACTIVE / EN ISO SECURE" : "REVIZIJA AKTIVNA / SKLADNO",
+        ledBlink: true,
+      };
+  }
 };
 
 function ServiceModal({
@@ -348,6 +542,7 @@ function ServiceModal({
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [stripDir, setStripDir] = useState<Dir>('BOTTOM');
   const { language } = useLanguage();
+  const lang = language as 'sl' | 'en';
   const hex = CATEGORY_HEX[currentCategory.id] ?? '#3b82f6';
 
   useEffect(() => {
@@ -395,32 +590,36 @@ function ServiceModal({
     : [];
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.25 }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-0 md:p-6 bg-black/85 backdrop-blur-xl transition-all duration-300"
-      style={{
-        backgroundImage: `radial-gradient(circle at center, ${hex}0f 0%, transparent 65%)`
-      }}
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-0 md:p-6 overflow-hidden">
+      {/* Separated Backdrop Layer (GPU-isolated for Safari backdrop-filter performance) */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.25 }}
+        className="absolute inset-0 bg-black/85 backdrop-blur-xl cursor-pointer"
+        style={{
+          backgroundImage: `radial-gradient(circle at center, ${hex}0f 0%, transparent 65%)`
+        }}
+        onClick={onClose}
+      />
+
       {/* Outer flex wrapper: sidebar + card */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.94, rotateX: 6, y: 30 }}
-        animate={{ opacity: 1, scale: 1, rotateX: 0, y: 0 }}
-        exit={{ opacity: 0, scale: 0.94, rotateX: 4, y: 20 }}
-        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-        style={{ perspective: '1200px', touchAction: 'pan-y' }}
-        className="flex flex-col md:flex-row md:items-start gap-3 w-full max-w-[840px] h-full md:h-auto md:max-h-[92vh] overflow-y-auto overflow-x-hidden md:overflow-visible p-3 pb-24 md:p-0 relative z-10"
+        initial={{ opacity: 0, scale: 0.97, y: 15 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.97, y: 10 }}
+        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        style={{ touchAction: 'pan-y' }}
+        data-lenis-prevent
+        className="flex flex-col md:flex-row md:items-stretch gap-3 w-full max-w-[1080px] h-full md:h-[75vh] md:min-h-[580px] md:max-h-[720px] overflow-y-auto overflow-x-hidden md:overflow-visible p-3 pb-24 md:p-0 relative z-10"
         onClick={(e) => e.stopPropagation()}
       >
         {/* ── SIDEBAR ── */}
         <div
-          className="rounded-3xl max-md:p-0 p-px shrink-0 w-full md:w-[270px] md:self-start md:max-h-[85vh] md:[background:linear-gradient(160deg,rgba(255,255,255,0.08)_0%,rgba(255,255,255,0.03)_50%,rgba(255,255,255,0.12)_100%)] md:shadow-[0_32px_80px_rgba(0,0,0,0.85),0_8px_20px_rgba(0,0,0,0.6)]"
+          className="rounded-3xl max-md:p-0 p-px shrink-0 w-full md:w-[270px] md:h-full md:[background:linear-gradient(160deg,rgba(255,255,255,0.08)_0%,rgba(255,255,255,0.03)_50%,rgba(255,255,255,0.12)_100%)] md:shadow-[0_32px_80px_rgba(0,0,0,0.85),0_8px_20px_rgba(0,0,0,0.6)]"
         >
-          <div className="rounded-3xl bg-[#080808] p-3 pb-0 md:pb-3 md:h-full md:overflow-y-auto max-md:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]">
+          <div data-lenis-prevent className="rounded-3xl bg-[#080808] p-3 pb-0 md:pb-3 md:h-full md:overflow-y-auto max-md:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]">
 
             {/* Sticky top: category switcher + header + mobile label + icon strip */}
             <div className="sticky top-0 z-10 bg-[#080808] -mt-3 pt-3 pb-3 md:-mx-3 md:px-3 md:border-b md:border-white/[0.04]">
@@ -601,9 +800,10 @@ function ServiceModal({
         <GlowCard
           customSize
           glowColor={CATEGORY_GLOW[currentCategory.id] ?? 'blue'}
-          className="flex-1 min-w-0 overflow-visible md:overflow-hidden shadow-[0_48px_120px_rgba(0,0,0,0.9),0_16px_40px_rgba(0,0,0,0.7)]"
+          className="flex-1 min-w-0 md:h-full md:flex md:flex-col overflow-visible md:overflow-hidden shadow-[0_48px_120px_rgba(0,0,0,0.9),0_16px_40px_rgba(0,0,0,0.7)]"
         >
-          <div className="rounded-[18px] bg-[#080808] p-3 pb-20 md:pb-3 overflow-y-auto md:max-h-[85vh] relative" style={{ touchAction: 'pan-y' }}>
+          {/* Inner unified container */}
+          <div className="rounded-[18px] bg-[#080808] flex flex-col flex-1 h-full overflow-hidden relative">
             
             {/* Engineering technical blueprint layout underlay */}
             <div className="absolute inset-0 pointer-events-none opacity-[0.035] select-none z-0">
@@ -622,129 +822,214 @@ function ServiceModal({
               </svg>
             </div>
 
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={current.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2, ease: 'easeOut' }}
-                className="relative z-10"
-              >
+            {/* Scrollable Content Area */}
+            <div data-lenis-prevent className="p-5 md:p-6 overflow-y-auto flex-1 min-h-0 relative z-10" style={{ touchAction: 'pan-y' }}>
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                  key={current.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.2, ease: 'easeOut' }}
+                  className="relative z-10"
+                >
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10">
+                    {/* Left Column: Description & Compliance Standards */}
+                    <div className="lg:col-span-7 flex flex-col gap-4">
+                      {/* Header */}
+                      <div className="relative rounded-2xl bg-[#121212] p-6 overflow-hidden border border-white/[0.03]">
+                        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
 
-                {/* Header */}
-                <div className="relative rounded-2xl bg-[#121212] p-6 mb-2 overflow-hidden border border-white/[0.03]">
-                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+                        <button onClick={onClose}
+                          className="absolute top-4 right-4 p-2 rounded-full text-white/50 hover:text-white bg-white/5 hover:bg-white/15 border border-white/10 hover:border-white/20 transition-all duration-300 hover:rotate-90 z-10">
+                          <X size={16} />
+                        </button>
 
-                  <button onClick={onClose}
-                    className="absolute top-4 right-4 p-2 rounded-full text-white/50 hover:text-white bg-white/5 hover:bg-white/15 border border-white/10 hover:border-white/20 transition-all duration-300 hover:rotate-90 z-10">
-                    <X size={16} />
-                  </button>
+                        {/* Icon + badge row */}
+                        <div className="flex items-center gap-2.5 mb-3.5">
+                          <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-white/[0.04] border border-white/[0.06] shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]">
+                            <ItemIcon name={current.icon} size={18} className={currentCategory.color} />
+                          </div>
+                          <div className="flex flex-col gap-0.5">
+                            <span className={`text-[9px] font-bold uppercase tracking-[0.2em] ${currentCategory.color}`}>
+                              {currentCategory.shortTitle}
+                            </span>
+                            <span className="text-[8px] font-mono text-white/30 tracking-wider">SEC: 00{currentCategory.id.toUpperCase()}</span>
+                          </div>
+                        </div>
 
-                  {/* Icon + badge row */}
-                  <div className="flex items-center gap-2.5 mb-3.5">
-                    <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-white/[0.04] border border-white/[0.06] shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]">
-                      <ItemIcon name={current.icon} size={18} className={currentCategory.color} />
-                    </div>
-                    <div className="flex flex-col gap-0.5">
-                      <span className={`text-[9px] font-bold uppercase tracking-[0.2em] ${currentCategory.color}`}>
-                        {currentCategory.shortTitle}
-                      </span>
-                      <span className="text-[8px] font-mono text-white/30 tracking-wider">SEC: 00{currentCategory.id.toUpperCase()}</span>
-                    </div>
-                  </div>
+                        <h3 className="text-xl md:text-2xl font-semibold text-white leading-snug pr-8 mb-3.5 tracking-tight">
+                          {current.label}
+                        </h3>
+                        {current.description && (
+                          <p className="text-sm text-white/50 leading-relaxed font-light">{current.description}</p>
+                        )}
+                      </div>
 
-                  <h3 className="text-xl md:text-2xl font-semibold text-white leading-snug pr-8 mb-3.5 tracking-tight">
-                    {current.label}
-                  </h3>
-                  {current.description && (
-                    <p className="text-sm text-white/50 leading-relaxed font-light">{current.description}</p>
-                  )}
-                </div>
+                      {/* Details */}
+                      {current.details && current.details.length > 0 && (
+                        <div className="relative rounded-2xl bg-[#121212] p-6 overflow-hidden border border-white/[0.03]">
+                          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                          <ul role="list" className="space-y-2.5">
+                            {current.details.map((detail, i) => (
+                              <li
+                                key={i}
+                                role="listitem"
+                                className="group flex items-start gap-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] border border-white/[0.02] hover:border-white/[0.06] px-4 py-3.5 transition-all duration-300 hover:translate-x-1 cursor-default"
+                              >
+                                <svg
+                                  className={`mt-0.5 shrink-0 w-3.5 h-3.5 ${currentCategory.color} transition-transform duration-300 group-hover:translate-x-1`}
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2.5"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
+                                  <path d="m6 17 5-5-5-5M13 17l5-5-5-5" />
+                                </svg>
+                                <span className="text-sm text-white/55 group-hover:text-white/80 transition-colors leading-snug">{detail}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
 
-                {/* Details */}
-                {current.details && current.details.length > 0 && (
-                  <div className="relative rounded-2xl bg-[#121212] p-6 mb-2 overflow-hidden border border-white/[0.03]">
-                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-                    <motion.ul role="list" className="space-y-2.5" variants={cardVariants} initial="hidden" animate="visible">
-                      {current.details.map((detail, i) => (
-                        <motion.li
-                          key={i}
-                          role="listitem"
-                          variants={cardItemVariants}
-                          className="group flex items-start gap-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] border border-white/[0.02] hover:border-white/[0.06] px-4 py-3.5 transition-all duration-300 hover:translate-x-1 cursor-default"
-                        >
-                          <svg
-                            className={`mt-0.5 shrink-0 w-3.5 h-3.5 ${currentCategory.color} transition-transform duration-300 group-hover:translate-x-1`}
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2.5"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
+                      {/* Dynamic Standards Block */}
+                      {(() => {
+                        const standards = getMethodStandards(current.id, lang);
+                        if (!standards || standards.length === 0) return null;
+                        return (
+                          <div className="relative rounded-2xl bg-[#121212] p-6 overflow-hidden border border-white/[0.03]">
+                            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                            <div className="flex items-center gap-2 mb-3">
+                              <span className="font-mono text-[9px] uppercase tracking-widest text-slate-500 font-bold">
+                                {lang === 'sl' ? '// VELJAVNI STANDARDI IN SKLADNOST' : '// APPLICABLE STANDARDS & COMPLIANCE'}
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {standards.map((std, i) => (
+                                <div
+                                  key={i}
+                                  className="flex flex-col gap-1 p-3 rounded-lg border border-white/[0.04] bg-white/[0.01] hover:bg-white/[0.02] transition-colors"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <span className="w-1.5 h-1.5 rounded-full" style={{ background: hex }} />
+                                    <span className="font-mono text-[11px] font-bold text-white tracking-wide">{std.code}</span>
+                                  </div>
+                                  <span className="text-[10px] text-slate-400 font-light leading-relaxed">{std.desc}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })()}
+
+                      {/* Level III indicator */}
+                      {current.level3 && (
+                        <div className="flex items-center gap-2 px-1">
+                          <span
+                            className="flex items-center gap-1.5 font-mono text-[9px] px-3 py-1.5 rounded-lg border"
+                            style={{ color: `${hex}bb`, borderColor: `${hex}40`, background: `${hex}05` }}
                           >
-                            <path d="m6 17 5-5-5-5M13 17l5-5-5-5" />
-                          </svg>
-                          <span className="text-sm text-white/55 group-hover:text-white/80 transition-colors leading-snug">{detail}</span>
-                        </motion.li>
-                      ))}
-                    </motion.ul>
-                  </div>
-                )}
-
-                {/* Quick facts (Instrument Telemetry Card) */}
-                {quickFacts.length > 0 && (
-                  <div className="relative rounded-2xl bg-[#121212] p-6 overflow-hidden border border-white/[0.03]">
-                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-                    
-                    {/* Glowing LED banner for standard verification */}
-                    <div className="flex items-center justify-between mb-4 border-b border-white/[0.04] pb-3">
-                      <span className="flex items-center gap-1.5 text-[8px] font-bold uppercase tracking-[0.18em] text-emerald-400 font-mono">
-                        <span className="relative flex h-1.5 w-1.5">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
-                        </span>
-                        {language === 'sl' ? 'Skladnost potrjena' : 'Compliance verified'}
-                      </span>
-                      <span className="text-[7.5px] font-mono text-white/20">NDT_REF_CAL_010</span>
+                            <ShieldCheck size={11} style={{ color: hex }} />
+                            {lang === 'sl' ? 'EN ISO 9712 Nivo III Certifikacija' : 'EN ISO 9712 Level III Certified'}
+                          </span>
+                        </div>
+                      )}
                     </div>
 
-                    <motion.div className="grid grid-cols-3 gap-2.5" variants={cardVariants} initial="hidden" animate="visible">
-                      {quickFacts.map(({ label, value }) => (
-                        <motion.div
-                          key={label}
-                          variants={cardItemVariants}
-                          className="relative rounded-xl bg-white/[0.015] hover:bg-white/[0.035] border border-white/[0.03] hover:border-white/[0.06] transition-all duration-300 px-3.5 py-3.5 flex flex-col gap-1.5"
-                        >
-                          {/* Corner bracket styling */}
-                          <div className="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-white/20 rounded-tl-sm pointer-events-none" />
-                          <div className="absolute top-0 right-0 w-1.5 h-1.5 border-t border-r border-white/20 rounded-tr-sm pointer-events-none" />
-                          <div className="absolute bottom-0 left-0 w-1.5 h-1.5 border-b border-l border-white/20 rounded-bl-sm pointer-events-none" />
-                          <div className="absolute bottom-0 right-0 w-1.5 h-1.5 border-b border-r border-white/20 rounded-br-sm pointer-events-none" />
+                    {/* Right Column: 3D Visualization & Telemetry */}
+                    <div className="lg:col-span-5 flex flex-col gap-4">
+                      {/* 3D Visual Section */}
+                      <div className="flex flex-col gap-2.5">
+                        <div className="flex items-center justify-between">
+                          <span className="font-mono text-[9px] uppercase tracking-widest text-slate-500 font-bold">
+                            {lang === 'sl' ? '// 3D INTERAKTIVNA VIZUALIZACIJA' : '// 3D INTERACTIVE VISUALIZATION'}
+                          </span>
+                          <span className="flex items-center gap-1.5 font-mono text-[8px] px-2 py-0.5 rounded border border-white/10 bg-white/5 text-slate-400">
+                            <span className="relative flex h-1.5 w-1.5">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-cyan-500"></span>
+                            </span>
+                            R3F GLSL
+                          </span>
+                        </div>
 
-                          <span className="text-[9px] font-bold uppercase tracking-widest text-white/30 font-mono">{label}</span>
-                          <span className="text-xs text-white/70 leading-snug font-mono select-all tracking-tight break-words">{value}</span>
-                        </motion.div>
-                      ))}
-                    </motion.div>
+                        <div className="relative w-full h-[240px] rounded-xl bg-black/60 border border-white/5 overflow-hidden flex items-center justify-center group/viewfinder shadow-inner">
+                          <MethodIllustrations methodId={current.id} color={hex} />
+                          
+                          {/* Telemetry Grid overlay */}
+                          <div className="absolute inset-0 border border-white/[0.03] pointer-events-none rounded-xl" />
+                          
+                          {/* Interaction Hint */}
+                          <div className="absolute bottom-3 left-3 right-3 text-center pointer-events-none opacity-0 group-hover/viewfinder:opacity-100 transition-opacity duration-300 bg-black/80 backdrop-blur border border-white/10 rounded-md py-1 text-[9px] font-mono tracking-wider text-slate-400">
+                            {lang === 'sl' 
+                              ? 'Povlecite za rotacijo 3D modela | Premaknite miško za video' 
+                              : 'Drag to rotate 3D model | Hover for video demonstration'}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Telemetry Calibration Block */}
+                      {(() => {
+                        const tele = getMethodTelemetry(current.id, lang);
+                        return (
+                          <div className="flex flex-col gap-3 p-4 rounded-xl border border-white/[0.05] bg-black/50 font-mono text-[10px] relative overflow-hidden">
+                            {/* Diagonal grid lines background effect */}
+                            <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(to_right,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none opacity-40" />
+                            
+                            <div className="flex items-center justify-between border-b border-white/5 pb-2 relative z-10">
+                              <span className="font-bold text-slate-400 tracking-wider">[{tele.logTitle}]</span>
+                              <span className="text-[8px] text-slate-600">SYS_V2.1.0</span>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-y-2 relative z-10">
+                              <div className="text-slate-500">{tele.blockLabel}:</div>
+                              <div className="text-slate-300 text-right font-semibold">{tele.blockVal}</div>
+
+                              <div className="text-slate-500">{tele.deviceLabel}:</div>
+                              <div className="text-slate-300 text-right font-semibold">{tele.deviceVal}</div>
+
+                              <div className="text-slate-500">{tele.paramLabel}:</div>
+                              <div className="text-slate-300 text-right font-semibold">{tele.paramVal}</div>
+                            </div>
+
+                            <div className="flex items-center justify-between pt-2 border-t border-white/5 mt-1 relative z-10">
+                              <span className="text-slate-500">{tele.statusLabel}:</span>
+                              <span className="flex items-center text-[9px] font-bold text-emerald-400 tracking-wide">
+                                {tele.ledBlink && (
+                                  <span className="relative flex h-2 w-2 mr-2">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                  </span>
+                                )}
+                                {tele.statusVal}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })()}
+                    </div>
                   </div>
-                )}
 
-                {/* Inquiry CTA */}
-                <motion.div variants={cardItemVariants} className="mt-2.5">
-                  <CategoryCTA onClick={handleInquiry} hex={hex} fullWidth>
-                    <Send size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                    {language === 'sl' ? 'Pošlji povpraševanje' : 'Send inquiry'}
-                  </CategoryCTA>
                 </motion.div>
+              </AnimatePresence>
+            </div>
 
-              </motion.div>
-            </AnimatePresence>
+            {/* Static Premium Inquiry Footer */}
+            <div className="p-5 pt-3.5 border-t border-white/[0.04] bg-[#080808] relative z-20 rounded-b-[18px]">
+              <CategoryCTA onClick={handleInquiry} hex={hex} fullWidth>
+                <Send size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                {language === 'sl' ? 'Pošlji povpraševanje' : 'Send inquiry'}
+              </CategoryCTA>
+            </div>
+
           </div>
         </GlowCard>
 
       </motion.div>
-    </motion.div>
+    </div>
   );
 }

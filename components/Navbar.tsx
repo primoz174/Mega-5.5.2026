@@ -259,7 +259,7 @@ const Navbar: React.FC = () => {
               className="absolute inset-0 pointer-events-none rounded-[inherit] transition-opacity duration-500 opacity-0 group-hover/nav:opacity-100"
               style={{
                 zIndex: 0,
-                background: `radial-gradient(150px circle at var(--mouse-x, 0px) var(--mouse-y, 0px), rgba(0, 113, 227, 0.08), transparent 80%)`,
+                background: `radial-gradient(150px circle at var(--mouse-x, 0px) var(--mouse-y, 0px), rgba(0, 113, 227, 0.03), transparent 80%)`,
               }}
             />
           )}
@@ -270,7 +270,7 @@ const Navbar: React.FC = () => {
               style={{
                 zIndex: 0,
                 border: '1px solid transparent',
-                backgroundImage: `linear-gradient(transparent, transparent), radial-gradient(130px circle at var(--mouse-x, 0px) var(--mouse-y, 0px), rgba(0, 113, 227, 0.5), transparent 80%)`,
+                backgroundImage: `linear-gradient(transparent, transparent), radial-gradient(130px circle at var(--mouse-x, 0px) var(--mouse-y, 0px), rgba(0, 113, 227, 0.18), transparent 80%)`,
                 backgroundOrigin: 'border-box',
                 backgroundClip: 'padding-box, border-box',
               }}
@@ -337,12 +337,12 @@ const Navbar: React.FC = () => {
                           style={{
                             background: (activeSub as any)?.color ?? '#0071e3',
                             boxShadow: (activeSub as any)?.color
-                              ? `0 0 6px 2px ${(activeSub as any).color}55`
-                              : '0 0 6px 2px rgba(0,113,227,0.45)',
+                              ? `0 0 4px 1px ${(activeSub as any).color}30`
+                              : '0 0 4px 1px rgba(0,113,227,0.18)',
                           }}
                         />
                       ) : (
-                        <span className="absolute bottom-0.5 left-2 right-2 h-[2px] rounded-full bg-[#0071e3]/70 origin-center scale-x-0 group-hover/btn:scale-x-100 transition-transform duration-300" />
+                        <span className="absolute bottom-0.5 left-2 right-2 h-[2px] rounded-full bg-[#0071e3]/40 origin-center scale-x-0 group-hover/btn:scale-x-100 transition-transform duration-300" />
                       )}
                     </button>
                     <div className={`absolute top-full left-1/2 -translate-x-1/2 pt-2.5 opacity-0 invisible pointer-events-none group-hover:opacity-100 group-hover:visible group-hover:pointer-events-auto transition-all duration-250 z-50 ${hasScrollLinks ? 'w-72' : 'w-56'}`}>
@@ -361,7 +361,7 @@ const Navbar: React.FC = () => {
                               style={{
                                 background: sub.color,
                                 opacity: isSubActive ? 1 : 0.6,
-                                boxShadow: isSubActive ? `0 0 7px 2px ${sub.color}60` : 'none',
+                                boxShadow: isSubActive ? `0 0 4px 1px ${sub.color}35` : 'none',
                               }}
                             />
                             <div className="flex-1">
@@ -378,7 +378,7 @@ const Navbar: React.FC = () => {
                               )}
                             </div>
                             {isSubActive && (
-                              <div className="mt-1 w-1.5 h-1.5 rounded-full shrink-0 self-start" style={{ background: sub.color, boxShadow: `0 0 5px 1px ${sub.color}70` }} />
+                              <div className="mt-1 w-1.5 h-1.5 rounded-full shrink-0 self-start" style={{ background: sub.color, boxShadow: `0 0 3px 1px ${sub.color}40` }} />
                             )}
                           </button>
                         ) : (
@@ -413,10 +413,10 @@ const Navbar: React.FC = () => {
                 >
                   {link.name}
                   {!isActive && (
-                    <span className="absolute bottom-0.5 left-2 right-2 h-[2px] rounded-full bg-[#0071e3]/70 origin-center scale-x-0 group-hover/link:scale-x-100 transition-transform duration-300" />
+                    <span className="absolute bottom-0.5 left-2 right-2 h-[2px] rounded-full bg-[#0071e3]/40 origin-center scale-x-0 group-hover/link:scale-x-100 transition-transform duration-300" />
                   )}
                   {isActive && (
-                    <span className="absolute bottom-0.5 left-2 right-2 h-[2px] rounded-full bg-[#0071e3]/90 shadow-[0_0_6px_2px_rgba(0,113,227,0.45)]" />
+                    <span className="absolute bottom-0.5 left-2 right-2 h-[2px] rounded-full bg-[#0071e3]/80 shadow-[0_0_4px_1px_rgba(0,113,227,0.18)]" />
                   )}
                 </Link>
               ) : (
@@ -431,10 +431,10 @@ const Navbar: React.FC = () => {
                 >
                   {link.name}
                   {!isActive && (
-                    <span className="absolute bottom-0.5 left-2 right-2 h-[2px] rounded-full bg-[#0071e3]/70 origin-center scale-x-0 group-hover/link:scale-x-100 transition-transform duration-300" />
+                    <span className="absolute bottom-0.5 left-2 right-2 h-[2px] rounded-full bg-[#0071e3]/40 origin-center scale-x-0 group-hover/link:scale-x-100 transition-transform duration-300" />
                   )}
                   {isActive && (
-                    <span className="absolute bottom-0.5 left-2 right-2 h-[2px] rounded-full bg-[#0071e3]/90 shadow-[0_0_6px_2px_rgba(0,113,227,0.45)]" />
+                    <span className="absolute bottom-0.5 left-2 right-2 h-[2px] rounded-full bg-[#0071e3]/80 shadow-[0_0_4px_1px_rgba(0,113,227,0.18)]" />
                   )}
                 </button>
               );

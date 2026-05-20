@@ -1,6 +1,6 @@
 import React from 'react';
 import { Linkedin, Facebook, MapPin, Mail, Phone, ExternalLink, ShieldCheck } from 'lucide-react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { motion } from 'framer-motion';
 
@@ -24,7 +24,8 @@ const Footer: React.FC = () => {
 
     const element = document.getElementById(id);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      const offsetPosition = element.getBoundingClientRect().top + window.pageYOffset - 80;
+      window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
     }
   };
 
@@ -101,15 +102,15 @@ const Footer: React.FC = () => {
                 <h4 className="text-white font-bold font-mono text-[10px] uppercase tracking-[0.3em]">{t.footer.sections_company}</h4>
               </div>
               <ul className="space-y-4">
-                <li><Link to="/about" className="text-slate-400 text-xs hover:text-[#0071e3] transition-colors flex items-center gap-2 group">
+                <li><button onClick={() => scrollToSection('why-megama')} className="text-slate-400 text-xs hover:text-[#0071e3] transition-colors flex items-center gap-2 group text-left">
                   <ExternalLink size={10} className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                   {t.nav.about}
-                </Link></li>
-                <li><Link to="/personnel" className="text-slate-400 text-xs hover:text-[#0071e3] transition-colors flex items-center gap-2 group">
+                </button></li>
+                <li><button onClick={() => scrollToSection('ekipa')} className="text-slate-400 text-xs hover:text-[#0071e3] transition-colors flex items-center gap-2 group text-left">
                   <ExternalLink size={10} className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                   {t.personnel.hero_title}
-                </Link></li>
-                <li><button onClick={() => scrollToSection('about')} className="text-slate-400 text-xs hover:text-[#0071e3] transition-colors flex items-center gap-2 group text-left">
+                </button></li>
+                <li><button onClick={() => scrollToSection('certifikati')} className="text-slate-400 text-xs hover:text-[#0071e3] transition-colors flex items-center gap-2 group text-left">
                   <ExternalLink size={10} className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                   {t.about.certs_title}
                 </button></li>
