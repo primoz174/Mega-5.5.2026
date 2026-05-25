@@ -81,12 +81,12 @@ const Footer: React.FC = () => {
                 <div className="w-1.5 h-1.5 bg-[#0071e3] rounded-full" />
                 <h4 className="text-white font-bold font-mono text-[10px] uppercase tracking-[0.3em]">{t.footer.sections_services}</h4>
               </div>
-              <ul className="space-y-4">
+              <ul className="space-y-1">
                 {[t.contact.form_ndt, t.contact.form_supervision, language === 'sl' ? 'Zagotavljanje kakovosti QA/QC' : 'Quality Assurance QA/QC'].map((item) => (
                   <li key={item}>
                     <button 
                       onClick={() => scrollToSection('services')} 
-                      className="text-slate-400 text-xs hover:text-[#0071e3] transition-colors flex items-center gap-2 group"
+                      className="text-slate-400 text-xs hover:text-[#0071e3] transition-colors flex items-center gap-2 group py-2"
                     >
                       <ExternalLink size={10} className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                       {item}
@@ -101,16 +101,16 @@ const Footer: React.FC = () => {
                 <div className="w-1.5 h-1.5 bg-[#0071e3] rounded-full" />
                 <h4 className="text-white font-bold font-mono text-[10px] uppercase tracking-[0.3em]">{t.footer.sections_company}</h4>
               </div>
-              <ul className="space-y-4">
-                <li><button onClick={() => scrollToSection('why-megama')} className="text-slate-400 text-xs hover:text-[#0071e3] transition-colors flex items-center gap-2 group text-left">
+              <ul className="space-y-1">
+                <li><button onClick={() => scrollToSection('why-megama')} className="text-slate-400 text-xs hover:text-[#0071e3] transition-colors flex items-center gap-2 group text-left py-2">
                   <ExternalLink size={10} className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                   {t.nav.about}
                 </button></li>
-                <li><button onClick={() => scrollToSection('ekipa')} className="text-slate-400 text-xs hover:text-[#0071e3] transition-colors flex items-center gap-2 group text-left">
+                <li><button onClick={() => scrollToSection('ekipa')} className="text-slate-400 text-xs hover:text-[#0071e3] transition-colors flex items-center gap-2 group text-left py-2">
                   <ExternalLink size={10} className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                   {t.personnel.hero_title}
                 </button></li>
-                <li><button onClick={() => scrollToSection('certifikati')} className="text-slate-400 text-xs hover:text-[#0071e3] transition-colors flex items-center gap-2 group text-left">
+                <li><button onClick={() => scrollToSection('certifikati')} className="text-slate-400 text-xs hover:text-[#0071e3] transition-colors flex items-center gap-2 group text-left py-2">
                   <ExternalLink size={10} className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                   {t.about.certs_title}
                 </button></li>

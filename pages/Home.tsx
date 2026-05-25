@@ -158,7 +158,7 @@ function CertsSection({ lang }: { lang: "sl" | "en" }) {
           </div>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
           {CERT_DATA.map((cert, i) => {
             const accent = certAccent[cert.color];
             const status = certStatus[cert.status];
@@ -170,7 +170,7 @@ function CertsSection({ lang }: { lang: "sl" | "en" }) {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.55, delay: 0.1 + i * 0.1 }}
-                className={isWide ? "lg:col-span-7" : "lg:col-span-5"}
+                className={isWide ? "md:col-span-6 lg:col-span-7" : "md:col-span-6 lg:col-span-5"}
               >
                 <GlowCard
                   customSize
@@ -622,7 +622,7 @@ function Hero({ lang }: { lang: "sl" | "en" }) {
   return (
     <section
       id="home"
-      className="relative w-full min-h-[120svh] md:min-h-[100svh] flex items-end overflow-hidden bg-black"
+      className="relative w-full min-h-[120svh] md:min-h-[100svh] flex items-end pt-28 md:pt-36 overflow-hidden bg-black"
     >
       <style>{`
         @keyframes megama-kenburns {
@@ -672,26 +672,13 @@ function Hero({ lang }: { lang: "sl" | "en" }) {
       <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-transparent md:from-black/50 md:via-transparent" />
       <div className="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-black to-transparent z-0" />
 
-      {/* Location pill — desktop: absolute; mobile: flows before headline */}
-      <motion.div
-        initial={{ opacity: 0, y: -8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-        className="hidden md:flex absolute top-28 md:top-32 left-6 md:left-[max(1.5rem,calc(50%-600px+1.5rem))] z-10 items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.06] backdrop-blur-md border border-white/10"
-      >
-        <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-        <span className="font-mono text-[10px] tracking-widest text-white/60 uppercase">
-          {HERO_COPY.location[lang]}
-        </span>
-      </motion.div>
-
       <div className="relative z-10 w-full max-w-[1200px] mx-auto px-6 pb-14 md:pb-20">
-        {/* Location pill — mobile only, inline before headline */}
+        {/* Location pill — inline in flow for all screen sizes */}
         <motion.div
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="md:hidden mb-5 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.06] backdrop-blur-md border border-white/10 w-fit"
+          className="mb-5 md:mb-8 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.06] backdrop-blur-md border border-white/10 w-fit"
         >
           <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
           <span className="font-mono text-[10px] tracking-widest text-white/60 uppercase">
@@ -701,7 +688,7 @@ function Hero({ lang }: { lang: "sl" | "en" }) {
 
         <AnimatedHeadline
           text={HERO_COPY.headline[lang]}
-          className="text-[clamp(2.25rem,4.8vw,4.5rem)] font-semibold tracking-[-0.02em] leading-[1.06] text-white max-w-4xl"
+          className="text-[clamp(2rem,4.8vw,4.5rem)] font-semibold tracking-[-0.02em] leading-[1.06] text-white max-w-4xl"
         />
 
         <motion.p
@@ -1242,7 +1229,7 @@ function GlobalPresence({ lang }: { lang: "sl" | "en" }) {
                 </div>
 
                 <div
-                  className="text-[5.5rem] md:text-[9rem] font-bold tracking-[-0.06em] leading-none text-white tabular-nums"
+                  className="text-[clamp(4rem,11vw,9rem)] font-bold tracking-[-0.06em] leading-none text-white tabular-nums"
                   style={{ textShadow: "0 0 60px rgba(0,113,227,0.25)" }}
                 >
                   {pct}
