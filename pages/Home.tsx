@@ -828,7 +828,7 @@ const STATS_DATA: Record<"sl" | "en", StatItem[]> = {
     {
       value: 15,
       suffix: "+",
-      label: "let NDT izkušenj",
+      label: "let izkušenj ekipe",
       sub: "Jedrska energetika, petrokemija in energetika.",
     },
     {
@@ -854,7 +854,7 @@ const STATS_DATA: Record<"sl" | "en", StatItem[]> = {
     {
       value: 15,
       suffix: "+",
-      label: "years NDT expertise",
+      label: "years of team expertise",
       sub: "Nuclear energy, petrochemical and power.",
     },
     {
